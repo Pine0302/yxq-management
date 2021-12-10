@@ -36,7 +36,6 @@ export type TableListParams = {
   sorter?: Record<string, any>;
 };
 
-
 export type OrderDataWrapper = {
   code?: number;
   msg?: string;
@@ -47,18 +46,25 @@ export type OrderDataWrapper = {
     pageSize?: number;
     total?: number;
   };
-}
+};
 
 export type OrderDetailWrapper = {
   code?: number;
   msg?: string;
   success?: boolean;
   data?: OrderDetailDTO;
-}
+};
 
 export type OrderDetailDTO = {
+  orderSn?: string;
+
+  packageFee: number;
+  deliveryFee: number;
+
+  cartDTOS?: cartItemDTO[];
   orderAddressDTO?: OrderAddressDTO;
-}
+  payment?: PaymentDTO;
+};
 
 export type OrderAddressDTO = {
   address: string;
@@ -73,4 +79,20 @@ export type OrderAddressDTO = {
   oid: number;
   phone: string;
   uid: number;
-}
+};
+
+export type PaymentDTO = {
+  createTime: string;
+  fee: number;
+  outTradeNo: string;
+  payType: string;
+};
+
+export type cartItemDTO = {
+  gid?: number;
+  gname?: string;
+  amount?: number;
+  price?: number;
+  realPrice?: number;
+  packageFee?: number;
+};

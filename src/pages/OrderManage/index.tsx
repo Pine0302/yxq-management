@@ -1,125 +1,98 @@
-// import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
-import React, { useState, useRef } from 'react';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import { Drawer } from 'antd';
+import React, { useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-// import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
-import { updateRule, orderPageInfo, orderDetail } from './service';
-import type { TableListItem, TableListPagination, OrderDetailWrapper, OrderDetailDTO } from './data';
+import { orderPageInfo, orderDetail } from './service';
+import type { TableListItem, TableListPagination, OrderDetailDTO, cartItemDTO } from './data';
+import styles from './style.less';
 
-
-
-// const handleUpdate = async (fields: FormValueType, currentRow?: TableListItem) => {
-//   const hide = message.loading('正在配置');
-
-//   try {
-//     await updateRule({
-//       ...currentRow,
-//       ...fields,
-//     });
-//     hide();
-//     message.success('配置成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('配置失败请重试！');
-//     return false;
-//   }
-// };
-
-const tableRequest = async (params?: {pageSize: number ,current: number}) => {
-  
+const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
     ...params,
     pageNum: params?.current,
   });
 
-  return {data: res.data?.list, success: true, total: res.data?.total}
+  return { data: res.data?.list, success: true, total: res.data?.total };
 };
 
 const TableList: React.FC = () => {
-
-  /** 分布更新窗口的弹窗 */
-
-  // const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [showDetail, setShowDetail] = useState<boolean>(false);
-  const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<TableListItem>();
-  const userInfoActionRef = useRef<ActionType>();
-
   const [userInfoDs, setUserInfoDs] = useState<any>();
-  let cartDs = {};
-  let payInfoDs = {};
+  const [payInfoDs, setPayInfoDs] = useState<any>();
+  const [cartDs, setCartDs] = useState<any>();
+  const [detailLoading, setDetailLoading] = useState<boolean>(true);
 
   const detailRequest = async (id: number) => {
-    // const orderId: number = currentRow?.id as number;
-    // console.log(id);
-    const res = await orderDetail({id: id});
-  
-    const { orderAddressDTO } = res.data as OrderDetailDTO;
-    setUserInfoDs({...orderAddressDTO});
-    // console.log(userInfoDs);
+    setDetailLoading(true);
+    const res = await orderDetail({ id: id });
 
-    // return Promise.resolve({
-    //   success: true,
-    //   data: res?.data
-    // })
-  }
+    const { orderAddressDTO, payment, cartDTOS, packageFee, deliveryFee } =
+      res.data as OrderDetailDTO;
+    setUserInfoDs({ ...orderAddressDTO });
+    setPayInfoDs({ ...payment, packageFee, deliveryFee });
+    setCartDs(cartDTOS);
+
+    setDetailLoading(false);
+  };
 
   /** 国际化配置 */
 
   const orderStatusEnum = {
     CANCELED: {
       text: '已取消',
-      status: 'Warning'
+      status: 'Warning',
     },
     WAIT_PAY: {
       text: '待支付',
-      status: 'Error'
+      status: 'Error',
     },
     MAKING: {
       text: '制作中',
-      status: 'Processing'
+      status: 'Processing',
     },
     ON_THE_WAY: {
       text: '配送中',
-      status: 'Default'
+      status: 'Default',
     },
     ARRIVED: {
       text: '已送达',
-      status: 'Success'
+      status: 'Success',
     },
     COMMENTED: {
       text: '已评价',
-      status: 'purple'
+      status: 'purple',
     },
   };
 
   const payStatusEnum = {
     WAIT_PAY: {
       text: '待支付',
-      status: 'Warning'
+      status: 'Warning',
     },
     PAY_SUCCESS: {
       text: '支付成功',
-      status: 'Success'
+      status: 'Success',
     },
     PAY_FAIL: {
       text: '支付失败',
-      status: 'Error'
+      status: 'Error',
     },
     RETURN_MONEY: {
       text: '退款中',
-      status: 'Processing'
+      status: 'Processing',
     },
     RETURN_MONEY_SUCCESS: {
       text: '退款成功',
-      status: 'lime'
+      status: 'lime',
+    },
+  };
+
+  const payPlatformEnum = {
+    wx_jsapi: {
+      text: '公众号/小程序',
+      status: 'Success',
     },
   };
 
@@ -137,10 +110,10 @@ const TableList: React.FC = () => {
       search: {
         transform: (v) => {
           return {
-            phone: v
-          }
-        }
-      }
+            phone: v,
+          };
+        },
+      },
     },
     {
       title: '楼宇',
@@ -173,7 +146,7 @@ const TableList: React.FC = () => {
             deliveryEndTime: value[1] + ' 23:59:59',
           };
         },
-      }
+      },
     },
     {
       title: '创建时间',
@@ -187,7 +160,7 @@ const TableList: React.FC = () => {
             endTime: value[1] + ' 23:59:59',
           };
         },
-      }
+      },
     },
     {
       title: '订单状态',
@@ -207,57 +180,64 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={async () => {
-            setCurrentRow(record);
+            // setCurrentRow(record);
             setShowDetail(true);
             // console.log(record);
             await detailRequest(record?.id as number);
-            // userInfoActionRef.current?.reload();
           }}
         >
           查看详情
         </a>,
-        <a 
-          key="subscribeAlert"
-          onClick={()=>{}}
-        >
+        <a key="subscribeAlert" onClick={() => {}}>
           干其他的
         </a>,
         <TableDropdown
-        key="actionGroup"
-        onSelect={() => {}}
-        menus={[
-          { key: 'copy', name: '订单详情' },
-          { key: 'delete', name: '历史订单' },
-          { key: 'ts', name: '客户投诉' },
-        ]}
-      />,
+          key="actionGroup"
+          onSelect={() => {}}
+          menus={[
+            { key: 'copy', name: '订单详情' },
+            { key: 'delete', name: '历史订单' },
+            { key: 'ts', name: '客户投诉' },
+          ]}
+        />,
       ],
+    },
+  ];
+
+  const cartColumns: ProColumns<cartItemDTO>[] = [
+    {
+      title: '商品名称',
+      dataIndex: 'gname',
+    },
+    {
+      title: '数量',
+      dataIndex: 'amount',
+    },
+    {
+      title: '原价',
+      dataIndex: 'price',
+      valueType: 'money',
+    },
+    {
+      title: '到手价',
+      dataIndex: 'realPrice',
+      valueType: 'money',
+    },
+    {
+      title: '打包费',
+      dataIndex: 'packageFee',
     },
   ];
 
   return (
     <PageContainer>
       <ProTable<TableListItem, TableListPagination>
-        // headerTitle="查询表格"
-        actionRef={actionRef}
         rowKey="id"
         search={{
           labelWidth: 120,
         }}
         toolBarRender={false}
-        // toolBarRender={() => [
-        //   <Button
-        //     type="primary"
-        //     key="primary"
-        //     onClick={() => {
-        //       handleModalVisible(true);
-        //     }}
-        //   >
-        //     <PlusOutlined /> 新建
-        //   </Button>,
-        // ]}
-        request={ tableRequest }
-        // dataSource={data.list}
+        request={tableRequest}
         columns={columns}
         rowSelection={false}
       />
@@ -267,26 +247,62 @@ const TableList: React.FC = () => {
         visible={showDetail}
         title={'订单详情'}
         onClose={() => {
-          // setCurrentRow(undefined);
           setShowDetail(false);
         }}
         closable={true}
       >
         <ProDescriptions<any>
-          actionRef={userInfoActionRef}
           column={3}
           title={'用户信息'}
           dataSource={userInfoDs}
+          loading={detailLoading}
         >
-          <ProDescriptions.Item dataIndex="contacts" label="姓名" renderText={(_, record) => `${record.contacts}(${record.gender})`} />
+          <ProDescriptions.Item
+            dataIndex="contacts"
+            label="姓名"
+            renderText={(_, record) => `${record.contacts}(${record.gender})`}
+          />
           <ProDescriptions.Item dataIndex="phone" label="手机号" />
-          <ProDescriptions.Item 
-            dataIndex="contacts" 
-            label="联系地址" 
-            renderText={(_, record) => `[${record.label}] ${record.address} ${record.building} ${record.houseNumber}`} 
+          <ProDescriptions.Item
+            dataIndex="contacts"
+            label="联系地址"
+            renderText={(_, record) =>
+              `[${record.label}] ${record.address} ${record.building} ${record.houseNumber}`
+            }
           />
         </ProDescriptions>
-        
+        <ProDescriptions<any>
+          column={3}
+          title={'支付信息'}
+          dataSource={payInfoDs}
+          loading={detailLoading}
+        >
+          <ProDescriptions.Item dataIndex="createTime" label="支付时间" valueType={'dateTime'} />
+          <ProDescriptions.Item dataIndex="outTradeNo" label="商户订单号" />
+          <ProDescriptions.Item dataIndex="payType" label="支付方式" valueEnum={payPlatformEnum} />
+          <ProDescriptions.Item dataIndex="packageFee" label="打包费" valueType={'money'} />
+          <ProDescriptions.Item dataIndex="deliveryFee" label="配送费" valueType={'money'} />
+          <ProDescriptions.Item
+            dataIndex="fee"
+            label="支付金额"
+            renderText={(_, record) => {
+              const fenFee = record.fee as number;
+              return '￥' + (fenFee / 100).toFixed(2);
+            }}
+          />
+        </ProDescriptions>
+        <div className={styles.title}>商品明细</div>
+        <ProTable
+          style={{ marginBottom: 24 }}
+          pagination={false}
+          search={false}
+          loading={detailLoading}
+          options={false}
+          toolBarRender={false}
+          dataSource={cartDs}
+          columns={cartColumns}
+          rowKey="gid"
+        />
       </Drawer>
     </PageContainer>
   );

@@ -39,7 +39,8 @@ const Login: React.FC = () => {
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
-      userInfo!.avatar = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+      userInfo!.avatar =
+        'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
       await setInitialState((s) => ({
         ...s,
         currentUser: userInfo,
@@ -64,6 +65,7 @@ const Login: React.FC = () => {
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         /** 此方法会跳转到 redirect 参数所在的位置 */
+        console.log(history);
         if (!history) return;
         const { query } = history.location;
         const { redirect } = query as { redirect: string };
