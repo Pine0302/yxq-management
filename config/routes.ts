@@ -115,6 +115,12 @@ export default [
         component: './biz/BuildingManage',
       },
       {
+        name: 'delivery-user',
+        icon: 'smile',
+        path: '/biz/delivery-user',
+        component: './biz/DeliveryUser',
+      },
+      {
         component: './404',
       },
     ],
