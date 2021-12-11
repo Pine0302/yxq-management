@@ -63,4 +63,11 @@ export default {
   'menu.biz.kitchen-manage': '厨房管理',
   'menu.biz.building-manage': '楼宇管理',
   'menu.biz.delivery-user': '配送员管理',
+  'menu.biz.kitchen-user': '厨房用户管理',
+
+  'menu.marketing': '营销管理',
+
+  'menu.finance': '财务管理',
+
+  'menu.system': '系统管理',
 };

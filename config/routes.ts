@@ -43,12 +43,6 @@ export default [
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
-  {
     path: '/',
     redirect: '/welcome',
   },
@@ -120,6 +114,42 @@ export default [
         path: '/biz/delivery-user',
         component: './biz/DeliveryUser',
       },
+      {
+        name: 'kitchen-user',
+        icon: 'smile',
+        path: '/biz/kitchen-user',
+        component: './biz/KitchenUser',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
+    name: 'marketing',
+    icon: 'smile',
+    path: '/marketing',
+    routes: [
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
+    name: 'finance',
+    icon: 'smile',
+    path: '/finance',
+    routes: [
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
+    name: 'system',
+    icon: 'smile',
+    path: '/system',
+    routes: [
       {
         component: './404',
       },
