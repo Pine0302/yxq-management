@@ -5,6 +5,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { userPageInfo } from './service';
 import type { TableListPagination, UserTableItem } from './data';
+import { nullImage } from '@/consts/consts';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await userPageInfo({
@@ -24,7 +25,7 @@ const TableList: React.FC = () => {
       dataIndex: 'avatar',
       hideInSearch: true,
       width: 60,
-      render: (_, record) => <Image width={55} src={record.avatar} />,
+      render: (_, record) => <Image width={55} src={record.avatar} fallback={nullImage} />,
     },
     {
       title: '昵称',

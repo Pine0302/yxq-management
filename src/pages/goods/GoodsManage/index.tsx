@@ -7,6 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { goodsPageInfo } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import { nullImage } from '@/consts/consts';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
@@ -33,16 +34,18 @@ const TableList: React.FC = () => {
       width: 60,
       dataIndex: 'pic',
       hideInSearch: true,
-      render: (_, record) => <Image width={55} src={`http://img.nidcai.com/${record.pic}`} />,
+      render: (_, record) => (
+        <Image width={55} src={`http://img.nidcai.com/${record.pic}`} fallback={nullImage} />
+      ),
     },
     {
       title: '名称',
       dataIndex: 'gname',
       search: {
         transform: (v) => {
-          return {keyword: v};
-        }
-      }
+          return { keyword: v };
+        },
+      },
     },
     {
       title: '价格',
@@ -60,7 +63,14 @@ const TableList: React.FC = () => {
       title: '上/下架',
       dataIndex: 'status',
       hideInSearch: true,
-      render: (_, record) => <Switch checkedChildren="上架" unCheckedChildren="下架" checked={record.status} defaultChecked />,
+      render: (_, record) => (
+        <Switch
+          checkedChildren="上架"
+          unCheckedChildren="下架"
+          checked={record.status}
+          defaultChecked
+        />
+      ),
     },
     {
       title: '操作',
@@ -70,6 +80,7 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
+            console.log(record);
             setMergeModalVisible(true);
             setIsEdit(true);
           }}
@@ -105,15 +116,16 @@ const TableList: React.FC = () => {
         ]}
         request={tableRequest}
         columns={columns}
-        pagination={{pageSize: 20}}
-      />
-      
-      <MergeForm
-        modalVisible={mergeModalVisible}
-        onCancel={() => {setMergeModalVisible(false)}}
-        isEdit={isEdit}
+        pagination={{ pageSize: 20 }}
       />
 
+      <MergeForm
+        modalVisible={mergeModalVisible}
+        onCancel={() => {
+          setMergeModalVisible(false);
+        }}
+        isEdit={isEdit}
+      />
     </PageContainer>
   );
 };

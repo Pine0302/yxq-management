@@ -7,6 +7,11 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import { orderPageInfo, orderDetail } from './service';
 import type { TableListItem, TableListPagination, OrderDetailDTO, cartItemDTO } from './data';
 import styles from './style.less';
+import {
+  orderStatusValueEnum,
+  payPlatformValueEnum,
+  payStatusValueEnum,
+} from '@/consts/valueEnums';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -38,63 +43,6 @@ const TableList: React.FC = () => {
   };
 
   /** 国际化配置 */
-
-  const orderStatusEnum = {
-    CANCELED: {
-      text: '已取消',
-      status: 'Warning',
-    },
-    WAIT_PAY: {
-      text: '待支付',
-      status: 'Error',
-    },
-    MAKING: {
-      text: '制作中',
-      status: 'Processing',
-    },
-    ON_THE_WAY: {
-      text: '配送中',
-      status: 'Default',
-    },
-    ARRIVED: {
-      text: '已送达',
-      status: 'Success',
-    },
-    COMMENTED: {
-      text: '已评价',
-      status: 'purple',
-    },
-  };
-
-  const payStatusEnum = {
-    WAIT_PAY: {
-      text: '待支付',
-      status: 'Warning',
-    },
-    PAY_SUCCESS: {
-      text: '支付成功',
-      status: 'Success',
-    },
-    PAY_FAIL: {
-      text: '支付失败',
-      status: 'Error',
-    },
-    RETURN_MONEY: {
-      text: '退款中',
-      status: 'Processing',
-    },
-    RETURN_MONEY_SUCCESS: {
-      text: '退款成功',
-      status: 'lime',
-    },
-  };
-
-  const payPlatformEnum = {
-    wx_jsapi: {
-      text: '公众号/小程序',
-      status: 'Success',
-    },
-  };
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -165,12 +113,12 @@ const TableList: React.FC = () => {
     {
       title: '订单状态',
       dataIndex: 'orderStatus',
-      valueEnum: orderStatusEnum,
+      valueEnum: orderStatusValueEnum,
     },
     {
       title: '支付状态',
       dataIndex: 'payStatus',
-      valueEnum: payStatusEnum,
+      valueEnum: payStatusValueEnum,
     },
     {
       title: '操作',
@@ -279,7 +227,11 @@ const TableList: React.FC = () => {
         >
           <ProDescriptions.Item dataIndex="createTime" label="支付时间" valueType={'dateTime'} />
           <ProDescriptions.Item dataIndex="outTradeNo" label="商户订单号" />
-          <ProDescriptions.Item dataIndex="payType" label="支付方式" valueEnum={payPlatformEnum} />
+          <ProDescriptions.Item
+            dataIndex="payType"
+            label="支付方式"
+            valueEnum={payPlatformValueEnum}
+          />
           <ProDescriptions.Item dataIndex="packageFee" label="打包费" valueType={'money'} />
           <ProDescriptions.Item dataIndex="deliveryFee" label="配送费" valueType={'money'} />
           <ProDescriptions.Item

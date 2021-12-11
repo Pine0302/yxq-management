@@ -1,9 +1,16 @@
 import React, { useRef } from 'react';
 import { Modal } from 'antd';
-import ProForm, { ProFormInstance, ProFormMoney, ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton } from '@ant-design/pro-form';
-import { ProFieldRequestData, RequestOptionsType } from '@ant-design/pro-utils';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, {
+  ProFormMoney,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+  ProFormUploadButton,
+} from '@ant-design/pro-form';
+import type { ProFieldRequestData, RequestOptionsType } from '@ant-design/pro-utils';
 
-import commonService from '@/services/common'
+import { listApi } from '@/services/common';
 
 type MergeFormProps = {
   modalVisible: boolean;
@@ -12,25 +19,24 @@ type MergeFormProps = {
 };
 
 const goodsClassRequest: ProFieldRequestData<any> = async (params: any) => {
-
-  const res = await commonService.listApi.goodsClassPageInfo(params);
+  const res = await listApi.goodsClassPageInfo(params);
   const zh = res.data?.list?.map((v) => {
     return {
       label: v.className,
-      value: v.id
-    }
+      value: v.id,
+    };
   }) as RequestOptionsType[];
 
   return Promise.resolve<RequestOptionsType[]>(zh);
-}
+};
 
 const goodsTypeRequest: ProFieldRequestData<any> = async () => {
   const zh: RequestOptionsType[] = [
     { label: '标准套餐', value: 'STANDARD' },
     { label: '规格套餐', value: 'SPECIFICATIONS' },
     { label: '小菜', value: 'SIDE_DISH' },
-    { label: '例汤', value: 'SOUP' }, 
-    { label: '米饭', value: 'RICE' }, 
+    { label: '例汤', value: 'SOUP' },
+    { label: '米饭', value: 'RICE' },
   ];
 
   return Promise.resolve<RequestOptionsType[]>(zh);
@@ -59,42 +65,14 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           console.log(vals);
         }}
       >
-        <ProFormSelect
-          label="商品类目"
-          request={goodsClassRequest}
-          name={'cid'}
-        />
-        <ProFormSelect
-          label="商品类型"
-          request={goodsTypeRequest}
-          name={'type'}
-        />
-        <ProFormText
-          width="md"
-          name={'gname'}
-          label="商品名称"
-        />
-        <ProFormTextArea
-          label="商品描述"
-          name={'content'}
-        />
-        <ProFormUploadButton
-          label="商品图片"
-          name={'pic'}
-        />
-        <ProFormMoney
-          label="划线价格"
-          name={'originalPrice'}
-        />
-        <ProFormMoney
-          label="单价价格"
-          name={'price'}
-        />
-        <ProFormMoney
-          label="打包费"
-          name={'packageFee'}
-        />
-
+        <ProFormSelect label="商品类目" request={goodsClassRequest} name={'cid'} />
+        <ProFormSelect label="商品类型" request={goodsTypeRequest} name={'type'} />
+        <ProFormText width="md" name={'gname'} label="商品名称" />
+        <ProFormTextArea label="商品描述" name={'content'} />
+        <ProFormUploadButton label="商品图片" name={'pic'} />
+        <ProFormMoney label="划线价格" name={'originalPrice'} />
+        <ProFormMoney label="单价价格" name={'price'} />
+        <ProFormMoney label="打包费" name={'packageFee'} />
       </ProForm>
     </Modal>
   );

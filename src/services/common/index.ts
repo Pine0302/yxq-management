@@ -1,6 +1,3 @@
+import * as listApi from './list';
 
-import * as listApi from "./list";
-
-export default {
-  listApi,
-};
+export { listApi };

@@ -4,7 +4,10 @@ import { request } from 'umi';
 import { GoodsClassTableWrapper, TableListItem } from './data';
 
 /** 商品类目分页信息 */
-export async function goodsClassPageInfo( params: { current?: number; pageSize?: number; }, options?: { [key: string]: any }, ) {
+export async function goodsClassPageInfo(
+  params: { current?: number; pageSize?: number; pageNum?: number },
+  options?: { [key: string]: any },
+) {
   return request<GoodsClassTableWrapper>('/adminapi/goods/goods_class_page_info', {
     method: 'GET',
     params: {
@@ -15,7 +18,10 @@ export async function goodsClassPageInfo( params: { current?: number; pageSize?:
 }
 
 /** 新建商品类目 */
-export async function addGoodsClass(data: { [key: string]: any }, options?: { [key: string]: any }) {
+export async function addGoodsClass(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
   return request<TableListItem>('/adminapi/goods/add_goods_class', {
     data,
     method: 'POST',
@@ -25,7 +31,10 @@ export async function addGoodsClass(data: { [key: string]: any }, options?: { [k
 }
 
 /** 更新商品类目 */
-export async function modifyGoodsClass(data: { [key: string]: any }, options?: { [key: string]: any }) {
+export async function modifyGoodsClass(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
   return request<TableListItem>('/adminapi/goods/modify_goods_class', {
     data,
     method: 'POST',
@@ -33,11 +42,6 @@ export async function modifyGoodsClass(data: { [key: string]: any }, options?: {
     ...(options || {}),
   });
 }
-
-
-
-
-
 
 /** 新建规则 PUT /api/rule */
 export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {

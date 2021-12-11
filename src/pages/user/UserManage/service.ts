@@ -5,7 +5,7 @@ import { UserTableWrapper } from './data';
 
 /** 获取用户列表 */
 export async function userPageInfo(
-  params: { current?: number; pageSize?: number },
+  params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
   return request<UserTableWrapper>('/adminapi/user/page_info', {
