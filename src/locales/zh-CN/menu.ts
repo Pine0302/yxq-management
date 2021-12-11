@@ -53,4 +53,6 @@ export default {
 
   
   'menu.order-manage': '订单管理',
+  'menu.goods': '商品管理',
+  'menu.goods.goods-manage': '商品管理',
 };

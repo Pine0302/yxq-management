@@ -59,6 +59,23 @@ export default [
     component: './OrderManage',
   },
   {
+    name: 'goods',
+    icon: 'smile',
+    path: '/goods',
+    // component: './OrderManage',
+    routes: [
+      {
+        name: 'goods-manage',
+        icon: 'smile',
+        path: '/goods/goods-manage',
+        component: './goods/GoodsManage',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     component: './404',
   },
 ];
