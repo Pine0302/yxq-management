@@ -6,6 +6,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { goodsPageInfo } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
+import MergeForm from './components/MergeForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
@@ -18,10 +19,8 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 
 const TableList: React.FC = () => {
   /** 新建窗口的弹窗 */
-  // const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  /** 分布更新窗口的弹窗 */
-
-  // const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  const [mergeModalVisible, setMergeModalVisible] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   // const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   // const [currentRow, setCurrentRow] = useState<GoodsTableItem>();
@@ -71,14 +70,11 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            // handleUpdateModalVisible(true);
-            // setCurrentRow(record);
+            setMergeModalVisible(true);
+            setIsEdit(true);
           }}
         >
-          配置
-        </a>,
-        <a key="subscribeAlert">
-          订阅警报
+          编辑
         </a>,
       ],
     },
@@ -90,7 +86,7 @@ const TableList: React.FC = () => {
         headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
-        size={'large'}
+        size={'middle'}
         search={{
           labelWidth: 120,
         }}
@@ -100,7 +96,8 @@ const TableList: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
-              // handleModalVisible(true);
+              setMergeModalVisible(true);
+              setIsEdit(false);
             }}
           >
             <PlusOutlined /> 新建
@@ -109,13 +106,14 @@ const TableList: React.FC = () => {
         request={tableRequest}
         columns={columns}
         pagination={{pageSize: 20}}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
       />
       
+      <MergeForm
+        modalVisible={mergeModalVisible}
+        onCancel={() => {setMergeModalVisible(false)}}
+        isEdit={isEdit}
+      />
+
     </PageContainer>
   );
 };
