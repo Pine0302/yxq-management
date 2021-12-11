@@ -82,6 +82,22 @@ export default [
     ],
   },
   {
+    name: 'user',
+    icon: 'smile',
+    path: '/user',
+    routes: [
+      {
+        name: 'user-manage',
+        icon: 'smile',
+        path: '/user/user-manage',
+        component: './user/UserManage',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     component: './404',
   },
 ];
