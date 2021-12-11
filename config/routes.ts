@@ -71,6 +71,12 @@ export default [
         component: './goods/GoodsManage',
       },
       {
+        name: 'goods-class',
+        icon: 'smile',
+        path: '/goods/goods-class',
+        component: './goods/GoodsClass',
+      },
+      {
         component: './404',
       },
     ],
