@@ -5,7 +5,7 @@ import { BuildingTableWrapper, TableListItem } from './data';
 
 /** 获取楼宇列表 */
 export async function buildingPageInfo(
-  params: { current?: number; pageSize?: number },
+  params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
   return request<BuildingTableWrapper>('/adminapi/area/page_info', {

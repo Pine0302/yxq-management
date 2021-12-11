@@ -5,7 +5,7 @@ import { DeliveryUserTableWrapper, TableListItem } from './data';
 
 /** 获取配送员列表 */
 export async function deliveryUserPageInfo(
-  params: { current?: number; pageSize?: number },
+  params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
   return request<DeliveryUserTableWrapper>('/adminapi/delivery_user/page_info', {

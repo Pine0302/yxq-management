@@ -5,7 +5,7 @@ import { KitchenTableWrapper, TableListItem } from './data';
 
 /** 获取厨房列表 */
 export async function kitchenPageInfo(
-  params: { current?: number; pageSize?: number },
+  params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
   return request<KitchenTableWrapper>('/adminapi/kitchen/page_info', {
