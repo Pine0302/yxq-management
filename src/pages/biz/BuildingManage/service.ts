@@ -1,14 +1,14 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { KitchenTableWrapper, TableListItem } from './data';
+import { BuildingTableWrapper, TableListItem } from './data';
 
-/** 获取厨房列表 */
-export async function kitchenPageInfo(
+/** 获取楼宇列表 */
+export async function buildingPageInfo(
   params: { current?: number; pageSize?: number },
   options?: { [key: string]: any },
 ) {
-  return request<KitchenTableWrapper>('/adminapi/kitchen/page_info', {
+  return request<BuildingTableWrapper>('/adminapi/area/page_info', {
     method: 'GET',
     params: {
       ...params,

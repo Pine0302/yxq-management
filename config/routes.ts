@@ -109,6 +109,12 @@ export default [
         component: './biz/KitchenManage',
       },
       {
+        name: 'building-manage',
+        icon: 'smile',
+        path: '/biz/building-manage',
+        component: './biz/BuildingManage',
+      },
+      {
         component: './404',
       },
     ],

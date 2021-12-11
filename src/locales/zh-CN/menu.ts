@@ -61,4 +61,5 @@ export default {
 
   'menu.biz': '业务管理',
   'menu.biz.kitchen-manage': '厨房管理',
+  'menu.biz.building-manage': '楼宇管理',
 };
