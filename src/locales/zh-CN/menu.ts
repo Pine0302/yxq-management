@@ -58,4 +58,7 @@ export default {
 
   'menu.user': '用户管理',
   'menu.user.user-manage': '用户管理',
+
+  'menu.biz': '业务管理',
+  'menu.biz.kitchen-manage': '厨房管理',
 };

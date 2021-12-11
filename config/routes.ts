@@ -98,6 +98,22 @@ export default [
     ],
   },
   {
+    name: 'biz',
+    icon: 'smile',
+    path: '/biz',
+    routes: [
+      {
+        name: 'kitchen-manage',
+        icon: 'smile',
+        path: '/biz/kitchen-manage',
+        component: './biz/KitchenManage',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     component: './404',
   },
 ];
