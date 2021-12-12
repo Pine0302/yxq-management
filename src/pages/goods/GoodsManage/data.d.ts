@@ -17,6 +17,8 @@ export type TableListPagination = {
   total: number;
   pageSize: number;
   current: number;
+
+  status?: number;
 };
 
 export type TableListData = {
@@ -45,7 +47,7 @@ export type GoodsTableWrapper = {
     pageNum?: number;
     pageSize?: number;
     total?: number;
-  }
+  };
 };
 
 /** 商品管理分页数据 - 单条数据 */
@@ -57,7 +59,7 @@ export type GoodsTableItem = {
   content?: string;
   // expectedPrice: null
   gname?: string;
-  id?: 2
+  id?: 2;
   // limitBuy: null
   // limitNum: null
   originalPrice?: number;
@@ -66,4 +68,24 @@ export type GoodsTableItem = {
   price?: number;
   status?: boolean;
   type?: string;
-}
+};
+
+export type GoodsDetailWrapper = {
+  code?: number;
+  msg?: string;
+  success?: boolean;
+  data?: GoodsDetail;
+};
+
+export type GoodsDetail = {
+  // id: 1
+  // cid: 2
+  // content: "酸辣土豆丝"
+  // gname: "酸辣土豆丝"
+  // originalPrice: 6.88
+  // pic: "/2021/10/26/ebb8cf2e39332fa41b1f65c020b077db.png"
+  // price: 3
+  // sideDishGoods: null
+  // status: true
+  // type: "SIDE_DISH"
+};

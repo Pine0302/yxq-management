@@ -19,14 +19,14 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 };
 
 const TableList: React.FC = () => {
-  /** 新建窗口的弹窗 */
   const [mergeModalVisible, setMergeModalVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  // const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [row, setRow] = useState<any>();
+
   const actionRef = useRef<ActionType>();
-  // const [currentRow, setCurrentRow] = useState<GoodsTableItem>();
-  // const [selectedRowsState, setSelectedRows] = useState<GoodsTableItem[]>([]);
-  /** 国际化配置 */
+  //tab 全部 上架 下架
+  const [tabActivekey, setTabActivekey] = useState<React.Key>('all');
+  const [tableParams, setTableParams] = useState<TableListPagination>();
 
   const columns: ProColumns<GoodsTableItem>[] = [
     {
@@ -80,7 +80,7 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            console.log(record);
+            setRow({ ...record });
             setMergeModalVisible(true);
             setIsEdit(true);
           }}
@@ -94,7 +94,7 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<GoodsTableItem, TableListPagination>
-        headerTitle="查询表格"
+        // headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
         size={'middle'}
@@ -115,16 +115,49 @@ const TableList: React.FC = () => {
           </Button>,
         ]}
         request={tableRequest}
+        params={tableParams}
         columns={columns}
         pagination={{ pageSize: 20 }}
+        toolbar={{
+          menu: {
+            type: 'tab',
+            activeKey: tabActivekey,
+            items: [
+              {
+                key: 'all',
+                label: <span>全部</span>,
+              },
+              {
+                key: 'up',
+                label: <span>上架</span>,
+              },
+              {
+                key: 'down',
+                label: <span>下架</span>,
+              },
+            ],
+            onChange: (key) => {
+              const keyStr = key as string;
+              setTabActivekey(keyStr);
+
+              let status: number | undefined;
+              if (keyStr === 'up') status = 1;
+              else if (keyStr === 'down') status = 0;
+
+              const params = { ...tableParams, status } as TableListPagination;
+              setTableParams(params);
+            },
+          },
+        }}
       />
 
       <MergeForm
         modalVisible={mergeModalVisible}
+        isEdit={isEdit}
         onCancel={() => {
           setMergeModalVisible(false);
         }}
-        isEdit={isEdit}
+        value={row}
       />
     </PageContainer>
   );
