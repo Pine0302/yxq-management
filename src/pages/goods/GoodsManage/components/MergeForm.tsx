@@ -41,8 +41,7 @@ const goodsTypeRequest: ProFieldRequestData<any> = async () => {
 const MergeForm: React.FC<MergeFormProps> = (props) => {
   const { onCancel, value, isEdit } = props;
 
-  const [fieldList, setFieldList] = useState<any>([]);
-  setFieldList([
+  const [fieldList, setFieldList] = useState<any>([
     {
       uid: '-1',
       name: 'image.png',
@@ -50,6 +49,14 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
     },
   ]);
+  // setFieldList([
+  //   {
+  //     uid: '-1',
+  //     name: 'image.png',
+  //     status: 'done',
+  //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+  //   },
+  // ]);
 
   const formRef = useRef<ProFormInstance>();
 
@@ -80,6 +87,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         // 不写这一句，modal窗口没法关闭
         onCancel: () => {
           onCancel();
+          setFieldList([]);
           // formRef.current?.setFieldsValue({cid: null});
         },
       }}
@@ -98,7 +106,12 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       <ProFormUploadButton
         label="商品图片"
         name="pic"
-        fieldProps={{ name: 'pic' }}
+        fieldProps={{
+          name: 'pic',
+          customRequest: (option) => {
+            console.log(option);
+          },
+        }}
         fileList={fieldList}
         listType="picture-card"
       />
