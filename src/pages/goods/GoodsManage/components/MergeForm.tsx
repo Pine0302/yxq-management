@@ -6,12 +6,20 @@ import { ProFormMoney, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-
 import type { ProFieldRequestData, RequestOptionsType } from '@ant-design/pro-utils';
 
 import { listApi } from '@/services/common';
+import type { UploadChangeParam } from 'antd/lib/upload';
+import type { RcFile, UploadFile } from 'antd/lib/upload/interface';
+import { Modal } from 'antd';
 
 type MergeFormProps = {
   modalVisible: boolean;
   isEdit: boolean;
   onCancel: () => void;
   value?: any;
+};
+
+type UploadPreviewState = {
+  previewImage: string | undefined;
+  previewVisible: boolean;
 };
 
 const goodsClassRequest: ProFieldRequestData<any> = async (params: any) => {
@@ -38,27 +46,46 @@ const goodsTypeRequest: ProFieldRequestData<any> = async () => {
   return Promise.resolve<RequestOptionsType[]>(zh);
 };
 
+const getBase64 = (file: RcFile | undefined) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file as Blob);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 const MergeForm: React.FC<MergeFormProps> = (props) => {
   const { onCancel, value, isEdit } = props;
 
-  const [fieldList, setFieldList] = useState<any>([
-    {
-      uid: '-1',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-  ]);
-  // setFieldList([
-  //   {
-  //     uid: '-1',
-  //     name: 'image.png',
-  //     status: 'done',
-  //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  //   },
-  // ]);
-
+  const [fileList, setFileList] = useState<any>([]);
+  const [previewState, setPreviewState] = useState<UploadPreviewState>();
   const formRef = useRef<ProFormInstance>();
+
+  const uploadOnChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    setFileList([...info.fileList]);
+    console.log('onChange', info);
+  };
+
+  const handlePreviewCancel = () =>
+    setPreviewState({ ...previewState, previewVisible: false } as UploadPreviewState);
+
+  const handlePreview = async (file: UploadFile<any>) => {
+    if (!file.url && !file.preview) {
+      file.preview = (await getBase64(file.originFileObj)) as string;
+    }
+
+    setPreviewState({
+      previewImage: file.url || file.preview,
+      previewVisible: true,
+    });
+
+    // this.setState({
+    //   previewImage: file.url || file.preview,
+    //   previewVisible: true,
+    //   previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+    // });
+  };
 
   return (
     <ModalForm
@@ -69,13 +96,21 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         //todo 请求数据，设置表单？
         if (visible && isEdit) {
           console.log(value);
-          formRef.current?.setFieldsValue({ cid: 1 });
+          // formRef.current?.setFieldsValue({ cid: 1 });
           setTimeout(() => {
             formRef.current?.setFieldsValue({
               ...value,
-              pic: `http://img.nidcai.com${value.pic}`,
+              // pic: `http://img.nidcai.com${value.pic}`,
             });
           }, 0);
+          setFileList([
+            {
+              uid: props?.value?.pic,
+              name: props?.value?.pic,
+              status: 'done',
+              url: `https://img.nidcai.com${props?.value?.pic}`,
+            },
+          ]);
         } else {
           formRef.current?.setFieldsValue({});
         }
@@ -87,7 +122,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         // 不写这一句，modal窗口没法关闭
         onCancel: () => {
           onCancel();
-          setFieldList([]);
+          setFileList([]);
           // formRef.current?.setFieldsValue({cid: null});
         },
       }}
@@ -106,18 +141,29 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       <ProFormUploadButton
         label="商品图片"
         name="pic"
+        accept=".png,.jpg"
         fieldProps={{
-          name: 'pic',
-          customRequest: (option) => {
-            console.log(option);
-          },
+          name: 'file',
+          onPreview: handlePreview,
         }}
-        fileList={fieldList}
+        action="/file/upload"
+        fileList={fileList}
         listType="picture-card"
+        onChange={uploadOnChange}
+        max={1}
       />
       <ProFormMoney label="划线价格" name={'originalPrice'} />
       <ProFormMoney label="单价价格" name={'price'} />
       <ProFormMoney label="打包费" name={'packageFee'} />
+
+      <Modal
+        visible={previewState?.previewVisible}
+        // title={previewTitle}
+        footer={null}
+        onCancel={handlePreviewCancel}
+      >
+        <img alt="example" style={{ width: '100%' }} src={previewState?.previewImage} />
+      </Modal>
     </ModalForm>
   );
 };
