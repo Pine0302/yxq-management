@@ -24,3 +24,12 @@ export async function goodsDetail(params: { id: number }, options?: { [key: stri
     ...(options || {}),
   });
 }
+
+export async function addGoods( data: { [key: string]: any }, options?: { [key: string]: any }, ) {
+  return request<GoodsTableWrapper>('/adminapi/goods/add_goods', {
+    data,
+    method: 'POST',
+    requestType: 'json',
+    ...(options || {}),
+  });
+}

@@ -1,5 +1,14 @@
 
 declare namespace Common {
+
+  // 服务器默认返回数据封装
+  export type ResponseWrapper<T> = {
+    code?: number;
+    msg?: string;
+    success?: boolean;
+    data?: T;
+  }
+
   export type GoodsClassListWrapper = {
     code?: number;
     msg?: string;
