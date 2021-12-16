@@ -1,10 +1,10 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Image, Switch } from 'antd';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Button, Image, Popconfirm, Switch } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { goodsPageInfo } from './service';
+import { goodsPageInfo, updateGoodsStatus } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import { nullImage } from '@/consts/consts';
@@ -27,6 +27,13 @@ const TableList: React.FC = () => {
   //tab 全部 上架 下架
   const [tabActivekey, setTabActivekey] = useState<React.Key>('all');
   const [tableParams, setTableParams] = useState<TableListPagination>();
+
+  //switch 上/下架
+  const handleSwitch = async (id: number | undefined, status: boolean | undefined) => {
+    const status2: number = status ? 1 : 0;
+    const res = await updateGoodsStatus({ id: id, status: status2 });
+    if (res.data === true) actionRef.current?.reload();
+  };
 
   const columns: ProColumns<GoodsTableItem>[] = [
     {
@@ -64,12 +71,20 @@ const TableList: React.FC = () => {
       dataIndex: 'status',
       hideInSearch: true,
       render: (_, record) => (
-        <Switch
-          checkedChildren="上架"
-          unCheckedChildren="下架"
-          checked={record.status}
-          defaultChecked
-        />
+        <Popconfirm
+          title="确定要这么操作吗？"
+          icon={<QuestionCircleOutlined />}
+          onConfirm={async () => {
+            await handleSwitch(record.id, !record.status);
+          }}
+        >
+          <Switch
+            checkedChildren="上架"
+            unCheckedChildren="下架"
+            checked={record.status}
+            defaultChecked
+          />
+        </Popconfirm>
       ),
     },
     {

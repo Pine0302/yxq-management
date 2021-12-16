@@ -25,11 +25,25 @@ export async function goodsDetail(params: { id: number }, options?: { [key: stri
   });
 }
 
-export async function addGoods( data: { [key: string]: any }, options?: { [key: string]: any }, ) {
+/** 新增商品 POST /adminapi/goods/add_goods */
+export async function addGoods(data: { [key: string]: any }, options?: { [key: string]: any }) {
   return request<GoodsTableWrapper>('/adminapi/goods/add_goods', {
     data,
     method: 'POST',
     requestType: 'json',
+    ...(options || {}),
+  });
+}
+
+/** 商品上下架 POST /adminapi/goods/edit_goods_status */
+export async function updateGoodsStatus(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<Common.ResponseWrapper<boolean>>('/adminapi/goods/edit_goods_status', {
+    data,
+    method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
