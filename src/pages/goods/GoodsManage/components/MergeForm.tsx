@@ -135,23 +135,21 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
     >
       {/* {props.children} */}
       <ProFormText name="id" hidden />
-      <ProForm.Group>
-        <ProFormSelect
-          label="商品类目"
-          request={goodsClassRequest}
-          name="cid"
-          rules={[{ required: true }]}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 8 }}
-        />
-        <ProFormSelect
-          label="商品类型"
-          request={goodsTypeRequest}
-          name="type"
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 8 }}
-        />
-      </ProForm.Group>
+      <ProFormSelect
+        label="商品类目"
+        request={goodsClassRequest}
+        name="cid"
+        rules={[{ required: true }]}
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+      />
+      <ProFormSelect
+        label="商品类型"
+        request={goodsTypeRequest}
+        name="type"
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+      />
       <ProFormText label="商品名称" name="gname" />
       <ProFormTextArea label="商品描述" name="content" />
       <ProFormUploadButton
