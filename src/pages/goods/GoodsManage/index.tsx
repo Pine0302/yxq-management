@@ -6,8 +6,8 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { goodsPageInfo, updateGoodsStatus } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
-import MergeForm from './components/MergeForm';
 import { nullImage } from '@/consts/consts';
+import MergeStepForm from './components/MergeStepForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
@@ -166,7 +166,15 @@ const TableList: React.FC = () => {
         }}
       />
 
-      <MergeForm
+      {/* <MergeForm
+        modalVisible={mergeModalVisible}
+        isEdit={isEdit}
+        onCancel={() => {
+          setMergeModalVisible(false);
+        }}
+        value={row}
+      /> */}
+      <MergeStepForm
         modalVisible={mergeModalVisible}
         isEdit={isEdit}
         onCancel={() => {
