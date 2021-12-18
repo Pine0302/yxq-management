@@ -18,9 +18,10 @@ export async function goodsPageInfo(
 
 /** 获取商品详情 GET /adminapi/goods/goods_detail */
 export async function goodsDetail(params: { id: number }, options?: { [key: string]: any }) {
-  return request<GoodsTableWrapper>('/adminapi/goods/goods_page_info', {
+  return request<Common.ResponseWrapper<any>>('/adminapi/goods/goods_detail', {
     params: params,
     method: 'GET',
+    requestType: 'form',
     ...(options || {}),
   });
 }

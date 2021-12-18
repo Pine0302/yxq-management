@@ -9,13 +9,16 @@ import type { ProFieldRequestData, RequestOptionsType } from '@ant-design/pro-ut
 import { listApi } from '@/services/common';
 import type { UploadChangeParam } from 'antd/lib/upload';
 import type { RcFile, UploadFile } from 'antd/lib/upload/interface';
-import { FormInstance, message, Modal } from 'antd';
+import { message, Modal } from 'antd';
+import { goodsDetail } from '../service';
 
 type MergeFormProps = {
   modalVisible: boolean;
   isEdit: boolean;
   onCancel: () => void;
   value?: any;
+  showPackageStep?: boolean;
+  onGoodsTypeSelected?: () => void;
 };
 
 type UploadPreviewState = {
@@ -62,32 +65,32 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
   const [limitBuyState, setLimitBuyState] = useState<boolean>();
   const [fileList, setFileList] = useState<any>([]);
   const [previewState, setPreviewState] = useState<UploadPreviewState>();
-  const formRef = useRef<FormInstance>();
-  const step1FormRef = useRef<ProFormInstance>();
-  const step2FormRef = useRef<ProFormInstance>();
-  const step3FormRef = useRef<ProFormInstance>();
-
   const formMapRef = useRef<React.MutableRefObject<ProFormInstance<any> | undefined>[]>([]);
+
+  const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
 
   useEffect(() => {
     if (props.modalVisible && isEdit) {
-      console.log(value);
+      console.log('useEffect', value);
 
-      setTimeout(() => {
+      const getDetail = async () => {
+        const { data } = await goodsDetail({ id: props.value.id });
         formMapRef.current.forEach((formInstanceRef) => {
-          formInstanceRef.current?.setFieldsValue(value);
+          formInstanceRef.current?.setFieldsValue(data);
         });
-      }, 0);
+        setShowPackageStep(data?.type === 'SPECIFICATIONS');
+        // 处理图片展示
+        setFileList([
+          {
+            uid: data?.pic,
+            name: data?.pic,
+            status: 'done',
+            url: `https://img.nidcai.com${data?.pic}`,
+          },
+        ]);
+      };
 
-      // 处理图片展示
-      setFileList([
-        {
-          uid: props?.value?.pic,
-          name: props?.value?.pic,
-          status: 'done',
-          url: `https://img.nidcai.com${props?.value?.pic}`,
-        },
-      ]);
+      getDetail();
     } else {
       setTimeout(() => {
         formMapRef.current.forEach((formInstanceRef) => {
@@ -127,9 +130,7 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
     <>
       <StepsForm
         formMapRef={formMapRef}
-        formRef={formRef}
         onFinish={async (values) => {
-          // console.log(values);
           mergeSubmit(values);
           message.success('提交成功');
         }}
@@ -154,8 +155,7 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
         }}
       >
         <StepsForm.StepForm
-          formRef={step1FormRef}
-          // name="base"
+          name="base"
           title="基础信息"
           layout="horizontal"
           onFinish={async () => {
@@ -175,6 +175,14 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
             request={goodsTypeRequest}
             name="type"
             rules={[{ required: true }]}
+            fieldProps={{
+              onChange: (v) => {
+                // setTimeout(() => {
+                //   setShowPackageStep(v === 'SPECIFICATIONS');
+                // }, 0);
+                setShowPackageStep(v === 'SPECIFICATIONS');
+              },
+            }}
           />
           <ProFormText label="商品名称" name="gname" rules={[{ required: true }]} />
           <ProFormTextArea label="商品描述" name="content" rules={[{ required: true }]} />
@@ -194,15 +202,12 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
             rules={[{ required: true }]}
           />
         </StepsForm.StepForm>
-        <StepsForm.StepForm
-          formRef={step2FormRef}
-          name="checkbox"
-          title="套餐信息"
-          layout="horizontal"
-        >
-          <ProFormText label="商品名称" name="gname" />
-        </StepsForm.StepForm>
-        <StepsForm.StepForm formRef={step3FormRef} name="time" title="其他信息" layout="horizontal">
+        {showPackageStep && (
+          <StepsForm.StepForm name="packageInfo" title="套餐信息" layout="horizontal">
+            <ProFormText label="商品名称" name="gname" />
+          </StepsForm.StepForm>
+        )}
+        <StepsForm.StepForm name="other" title="其他信息" layout="horizontal">
           <ProFormMoney label="划线价格" name="originalPrice" />
           <ProFormMoney label="单价价格" name="price" />
           <ProFormMoney label="打包费用" name="packageFee" />
@@ -221,6 +226,7 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
         </StepsForm.StepForm>
       </StepsForm>
       <Modal
+        zIndex={9999999}
         visible={previewState?.previewVisible}
         // title={previewTitle}
         footer={null}
