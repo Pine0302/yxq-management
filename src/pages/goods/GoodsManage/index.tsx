@@ -7,7 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { goodsPageInfo, updateGoodsStatus } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
 import { nullImage } from '@/consts/consts';
-import MergeStepForm from './components/MergeStepForm';
+import MergeDrawerForm from './components/MergeDrawerForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
@@ -124,6 +124,7 @@ const TableList: React.FC = () => {
             onClick={() => {
               setMergeModalVisible(true);
               setIsEdit(false);
+              setRow({});
             }}
           >
             <PlusOutlined /> 新建
@@ -174,7 +175,15 @@ const TableList: React.FC = () => {
         }}
         value={row}
       /> */}
-      <MergeStepForm
+      {/* <MergeStepForm
+        modalVisible={mergeModalVisible}
+        isEdit={isEdit}
+        onCancel={() => {
+          setMergeModalVisible(false);
+        }}
+        value={row}
+      /> */}
+      <MergeDrawerForm
         modalVisible={mergeModalVisible}
         isEdit={isEdit}
         onCancel={() => {

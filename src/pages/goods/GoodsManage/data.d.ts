@@ -77,15 +77,35 @@ export type GoodsDetailWrapper = {
   data?: GoodsDetail;
 };
 
+// 商品详情
 export type GoodsDetail = {
-  // id: 1
-  // cid: 2
-  // content: "酸辣土豆丝"
-  // gname: "酸辣土豆丝"
-  // originalPrice: 6.88
-  // pic: "/2021/10/26/ebb8cf2e39332fa41b1f65c020b077db.png"
-  // price: 3
-  // sideDishGoods: null
-  // status: true
-  // type: "SIDE_DISH"
+  id: number;
+  cid: number;
+  gname: string;
+  content: string;
+  originalPrice: number;
+  pic: string;
+  price: number;
+  sideDishGoods: SideDishGoods[];
+  status: boolean;
+  type: string;
+};
+
+// 套餐子项
+export type SideDishGoods = {
+  id: number;
+  gname: string;
+  content: string;
+  originalPrice: number;
+  pic: string;
+  price: number;
+  // 必选 / 小菜 / 例汤
+  relationType: 'MAST_CHOICE' | 'SIDE_DISH' | 'SOUP';
+  status: boolean;
+};
+
+export type PackageTableListPagination = {
+  total: number;
+  pageSize: number;
+  current: number;
 };

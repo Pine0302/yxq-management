@@ -48,3 +48,16 @@ export async function updateGoodsStatus(
     ...(options || {}),
   });
 }
+
+/** 获取配菜列表 POST /adminapi/goods/side_dish_list */
+export async function getSideDishList(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<Common.ResponseWrapper<any>>('/adminapi/goods/side_dish_list', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
