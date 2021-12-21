@@ -2,14 +2,9 @@ import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import { useRef } from 'react';
 import type { SideDishGoods } from '../data';
-import { Image, Select } from 'antd';
+import { Image } from 'antd';
 import { nullImage } from '@/consts/consts';
-import { getSideDishList } from '../service';
-import { useRequest } from 'umi';
-import { OptionsType } from '@ant-design/pro-table/lib/components/ToolBar';
-import { SelectValue } from 'antd/lib/select';
-
-const { Option } = Select;
+import SideDishSearchInput from './SideDishSearchInput';
 
 export type PackageTableProps = {
   name?: string;
@@ -18,40 +13,8 @@ export type PackageTableProps = {
   onChange?: (v: SideDishGoods[]) => void;
 };
 
-// export type SelectDataType = {
-//   label: string;
-//   value: any;
-// } & SideDishGoods;
-
 const PackageTable: React.FC<PackageTableProps> = (props) => {
   const actionRef = useRef<ActionType>();
-  // const [ds, setDs] = useState<SideDishGoods[]>(props?.value || []);
-  // const [options, setOptions] = useState<any[]>([]);
-
-  const searchHandle = async (v: string) => {
-    const res = await getSideDishList({ gname: v });
-    const arrs = res?.data?.list as SideDishGoods[];
-    console.log(arrs);
-    return Promise.resolve<SideDishGoods[]>(arrs);
-  };
-
-  const { data, loading, run, cancel } = useRequest(searchHandle, {
-    debounceInterval: 500,
-    manual: true,
-  });
-  const optionsDom = data?.map((d: SideDishGoods) => (
-    <Option key={d.gname} value={d.gname}>
-      {d.gname}
-    </Option>
-  ));
-
-  const selectedHandle = (
-    value: SelectValue,
-    option: OptionsType | OptionData | OptionGroupData,
-  ) => {
-    console.log(value);
-    console.log(option);
-  };
 
   const columns: ProColumns<SideDishGoods>[] = [
     {
@@ -64,22 +27,19 @@ const PackageTable: React.FC<PackageTableProps> = (props) => {
       title: '商品名称',
       dataIndex: 'gname',
       hideInSearch: true,
-      renderFormItem: (_, { isEditable }) => {
+      renderFormItem: (schema, { isEditable }, form) => {
         return (
           isEditable && (
-            <Select
-              showSearch
-              // options={options}
-              placeholder="输入关键字"
-              loading={loading}
-              onBlur={cancel}
-              onSearch={run}
-              onChange={selectedHandle}
-              showArrow={false}
-              filterOption={false}
-            >
-              {data && optionsDom}
-            </Select>
+            <SideDishSearchInput
+              name="aaa"
+              onChange={(v: any) => {
+                console.log('parent onChange', v);
+                // console.log('props.value', props?.value);
+                console.log('form', form.getFieldsValue());
+
+                console.log('values ', props?.value);
+              }}
+            />
           )
         );
       },
@@ -136,11 +96,15 @@ const PackageTable: React.FC<PackageTableProps> = (props) => {
       name={props.name}
       headerTitle="套餐列表"
       actionRef={actionRef}
-      rowKey="index"
+      rowKey="id"
       search={false}
       columns={columns}
       value={props?.value}
       onChange={props?.onChange}
+      recordCreatorProps={{
+        creatorButtonText: '新增世行',
+        onClick: () => {},
+      }}
     />
   );
 };

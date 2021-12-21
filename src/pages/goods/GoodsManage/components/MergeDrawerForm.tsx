@@ -202,12 +202,13 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
               const tableDataSource = formRef.current?.getFieldValue(
                 'sideDishGoods',
               ) as SideDishGoods[];
+              console.log(tableDataSource);
               formRef.current?.setFieldsValue({
                 sideDishGoods: tableDataSource.filter((item) => item.id !== row.id),
               });
             }}
             onChange={(ds: SideDishGoods[]) => {
-              console.log(ds);
+              console.log('on change ju', ds);
             }}
           />
         )}
