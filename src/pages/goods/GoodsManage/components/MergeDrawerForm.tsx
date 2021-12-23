@@ -10,7 +10,7 @@ import { listApi } from '@/services/common';
 import type { UploadChangeParam } from 'antd/lib/upload';
 import type { RcFile, UploadFile } from 'antd/lib/upload/interface';
 import { message, Modal } from 'antd';
-import { goodsDetail } from '../service';
+import { addGoods, editGoods, goodsDetail } from '../service';
 import type { SideDishGoods } from '../data';
 import PackageTable from './PackageTable';
 
@@ -19,8 +19,6 @@ type MergeFormProps = {
   isEdit: boolean;
   onCancel: () => void;
   value?: any;
-  // showPackageStep?: boolean;
-  // onGoodsTypeSelected?: () => void;
 };
 
 type UploadPreviewState = {
@@ -68,10 +66,8 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const [fileList, setFileList] = useState<any>([]);
   const [previewState, setPreviewState] = useState<UploadPreviewState>();
   const formRef = useRef<ProFormInstance>();
-  // const actionRef = useRef<ActionType>();
 
   const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
-  // const [ds, setDs] = useState<SideDishGoods[]>([]);
 
   const drawerVisiableChangeHandle = async (visiable: boolean) => {
     if (visiable) {
@@ -102,6 +98,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           limitBuy: false,
           limitNum: 0,
           status: false,
+          sideDishGoods: [],
         });
         setShowPackageStep(false);
         setFileList([]);
@@ -132,6 +129,76 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
 
   const mergeSubmit = async (formData: any) => {
     console.log(formData);
+    const {
+      id,
+      cid,
+      gname,
+      content,
+      type,
+      originalPrice,
+      price,
+      packageFee,
+      limitBuy,
+      limitNum,
+      status,
+      sideDishGoods,
+    } = formData;
+    let { pic } = formData;
+    const sideDishIds: { gid: any; relationType: any }[] = [];
+
+    // pic 处理
+    if (Array.isArray(pic)) {
+      pic = pic?.[0]?.response?.data;
+    }
+
+    // 配菜处理
+    if (sideDishGoods && Array.isArray(sideDishGoods)) {
+      sideDishGoods.forEach((v) => {
+        sideDishIds.push({ gid: v?.id, relationType: v?.relationType });
+      });
+    }
+
+
+
+    if (id) {
+      // edit
+      const postData = {
+        id,
+        cid,
+        gname,
+        content,
+        type,
+        originalPrice,
+        price,
+        packageFee,
+        limitBuy,
+        limitNum,
+        status,
+        pic,
+        sideDishIds,
+      };
+      await editGoods(postData);
+    } else {
+      // add
+      const postData = {
+        id,
+        cid,
+        gname,
+        content,
+        type,
+        originalPrice,
+        price,
+        packageFee,
+        limitBuy,
+        limitNum,
+        status,
+        pic,
+        sideDishDTOS: sideDishIds,
+      };
+      await addGoods(postData);
+    }
+    
+
     onCancel();
     return true;
   };
@@ -196,21 +263,32 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           />
         </ProForm.Group>
         {showPackageStep && (
-          <PackageTable
-            name="sideDishGoods"
-            onRemove={(row: SideDishGoods) => {
-              const tableDataSource = formRef.current?.getFieldValue(
-                'sideDishGoods',
-              ) as SideDishGoods[];
-              console.log(tableDataSource);
-              formRef.current?.setFieldsValue({
-                sideDishGoods: tableDataSource.filter((item) => item.id !== row.id),
-              });
-            }}
-            onChange={(ds: SideDishGoods[]) => {
-              console.log('on change ju', ds);
-            }}
-          />
+          <ProForm.Item name="sideDishGoods">
+            <PackageTable
+              // name="sideDishGoods"
+              onRemove={(row: SideDishGoods) => {
+                const tableDataSource = formRef.current?.getFieldValue(
+                  'sideDishGoods',
+                ) as SideDishGoods[];
+                console.log(tableDataSource);
+                formRef.current?.setFieldsValue({
+                  sideDishGoods: tableDataSource.filter((item) => item.id !== row.id),
+                });
+              }}
+              onAdd={(values: any) => {
+                const { sideDishGoods, type } = values;
+                const tableDataSource = formRef.current?.getFieldValue(
+                  'sideDishGoods',
+                ) as SideDishGoods[];
+                const newDs = (tableDataSource || [])
+                  .filter((it) => it.id !== sideDishGoods.id)
+                  .concat([{ ...sideDishGoods, relationType: type }]);
+                formRef.current?.setFieldsValue({
+                  sideDishGoods: newDs,
+                });
+              }}
+            />
+          </ProForm.Item>
         )}
         <ProForm.Group>
           <ProFormMoney label="划线价格" name="originalPrice" rules={[{ required: true }]} />
@@ -244,7 +322,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         footer={null}
         onCancel={handlePreviewCancel}
       >
-        <img alt="example" style={{ width: '100%' }} src={previewState?.previewImage} />
+        <img alt="image" style={{ width: '100%' }} src={previewState?.previewImage} />
       </Modal>
     </>
   );

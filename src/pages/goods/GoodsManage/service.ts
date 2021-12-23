@@ -36,6 +36,16 @@ export async function addGoods(data: { [key: string]: any }, options?: { [key: s
   });
 }
 
+/** 编辑商品 POST /adminapi/goods/edit_goods */
+export async function editGoods(data: { id: number, [key: string]: any }, options?: { [key: string]: any }) {
+  return request<GoodsTableWrapper>('/adminapi/goods/edit_goods', {
+    data,
+    method: 'POST',
+    requestType: 'json',
+    ...(options || {}),
+  });
+}
+
 /** 商品上下架 POST /adminapi/goods/edit_goods_status */
 export async function updateGoodsStatus(
   data: { [key: string]: any },

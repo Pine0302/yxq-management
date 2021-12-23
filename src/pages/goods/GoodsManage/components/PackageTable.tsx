@@ -1,16 +1,17 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { EditableProTable } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { useRef } from 'react';
 import type { SideDishGoods } from '../data';
 import { Image } from 'antd';
 import { nullImage } from '@/consts/consts';
 import SideDishSearchInput from './SideDishSearchInput';
+import SideDishGoodsSelectModal from './SideDishGoodsSelectModal';
 
 export type PackageTableProps = {
   name?: string;
   value?: SideDishGoods[];
   onRemove?: (row: SideDishGoods) => void;
-  onChange?: (v: SideDishGoods[]) => void;
+  onAdd?: (values: any) => void;
 };
 
 const PackageTable: React.FC<PackageTableProps> = (props) => {
@@ -92,19 +93,21 @@ const PackageTable: React.FC<PackageTableProps> = (props) => {
   ];
 
   return (
-    <EditableProTable<SideDishGoods>
-      name={props.name}
+    <ProTable<SideDishGoods>
       headerTitle="套餐列表"
       actionRef={actionRef}
       rowKey="id"
       search={false}
       columns={columns}
-      value={props?.value}
-      onChange={props?.onChange}
-      recordCreatorProps={{
-        creatorButtonText: '新增世行',
-        onClick: () => {},
-      }}
+      dataSource={props?.value}
+      pagination={false}
+      toolBarRender={() => [
+        <SideDishGoodsSelectModal
+          onFinish={async (values: any) => {
+            props?.onAdd?.(values);
+          }}
+        />,
+      ]}
     />
   );
 };

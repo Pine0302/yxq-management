@@ -167,27 +167,12 @@ const TableList: React.FC = () => {
         }}
       />
 
-      {/* <MergeForm
-        modalVisible={mergeModalVisible}
-        isEdit={isEdit}
-        onCancel={() => {
-          setMergeModalVisible(false);
-        }}
-        value={row}
-      /> */}
-      {/* <MergeStepForm
-        modalVisible={mergeModalVisible}
-        isEdit={isEdit}
-        onCancel={() => {
-          setMergeModalVisible(false);
-        }}
-        value={row}
-      /> */}
       <MergeDrawerForm
         modalVisible={mergeModalVisible}
         isEdit={isEdit}
         onCancel={() => {
           setMergeModalVisible(false);
+          actionRef.current?.reload();
         }}
         value={row}
       />
