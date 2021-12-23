@@ -100,6 +100,12 @@ const TableList: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       hideInSearch: true,
+      valueEnum: {
+        OK: {
+          text: '正常',
+          status: 'Success'
+        }
+      }
     },
     {
       title: '操作',
@@ -113,9 +119,9 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          配置
+          编辑
         </a>,
-        <a key="subscribeAlert">订阅警报</a>,
+        // <a key="subscribeAlert">订阅警报</a>,
       ],
     },
   ];
