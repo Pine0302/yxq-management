@@ -17,6 +17,26 @@ export async function buildingPageInfo(
   });
 }
 
+/** 新建楼宇 POST /adminapi/area/add */
+export async function addBuilding(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<TableListItem>('/adminapi/area/add', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 修改楼宇 POST /adminapi/area/modify */
+export async function editBuilding(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<TableListItem>('/adminapi/area/modify', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
 /** 新建规则 PUT /api/rule */
 export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
   return request<TableListItem>('/api/rule', {
