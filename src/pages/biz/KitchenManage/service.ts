@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { KitchenTableWrapper, TableListItem } from './data';
+import { KitchenTableWrapper } from './data';
 
 /** 获取厨房列表 */
 export async function kitchenPageInfo(
@@ -17,20 +17,22 @@ export async function kitchenPageInfo(
   });
 }
 
-/** 新建规则 PUT /api/rule */
-export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 新建厨房 POST /adminapi/kitchen/add */
+export async function addKitchen(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/kitchen/add', {
     data,
-    method: 'PUT',
+    method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
 
-/** 新建规则 POST /api/rule */
-export async function addRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 修改厨房 POST /adminapi/kitchen/modify */
+export async function editKitchen(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/kitchen/modify', {
     data,
     method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
