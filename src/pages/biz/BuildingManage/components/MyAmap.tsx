@@ -19,7 +19,7 @@ const MyAmap: React.FC<MergeFormProps> = () => {
       key: 'c20bbe471f149ae4b53d9769d3603d88',
       // key: '90b552931baba534997699d0286dd6af', // 申请好的Web端开发者Key，首次调用 load 时必填
       version: '2.0', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-      plugins: ['AMap.ToolBar', 'AMap.Marker'], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+      plugins: ['AMap.ToolBar', 'AMap.Marker', 'AMap.ControlBar', 'AMap.Geolocation'], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
       AMapUI: {
         // version: '1.1', // AMapUI 缺省 1.1
         plugins: ['misc/PoiPicker'], // 需要加载的 AMapUI ui插件
@@ -32,19 +32,23 @@ const MyAmap: React.FC<MergeFormProps> = () => {
           zoom: 17, //初始化地图级别
           center: [120.255306, 30.237285], //初始化地图中心点位置
         });
-        const marker = new AMap.Marker();
-
         console.log('map => ', mapInstance);
-        mapInstance.addControl(new AMap.ToolBar());
+        const marker = new AMap.Marker({ map: mapInstance });
+        const controlBar = new AMap.ControlBar({ position: 'LT' });
+        const toolBar = new AMap.ToolBar({ position: 'RT' });
+        const geolocation = new AMap.Geolocation({ position: 'LB' });
+        mapInstance.addControl(controlBar);
+        mapInstance.addControl(toolBar);
+        mapInstance.addControl(geolocation);
+
         const poiPicker = new AMapUI.PoiPicker({
           input: 'pickerInput',
         });
         poiPicker.on('poiPicked', (res: any) => {
-          console.log('res=>  ', res);
-          marker.setMap(mapInstance);
+          // console.log('res=>  ', res);
           marker.setPosition(res.item.location);
           mapInstance.setCenter(marker.getPosition());
-          console.log('pos ', marker.getPosition());
+          // console.log('pos ', marker.getPosition());
         });
         console.log('poiPicker => ', poiPicker);
       })
@@ -64,7 +68,7 @@ const MyAmap: React.FC<MergeFormProps> = () => {
         id="container-amap"
         className={styles.container}
         tabIndex={0}
-        style={{ height: '400px' }}
+        style={{ height: '300px' }}
       />
       <div id="pickerBox" className={styles.pickerBox}>
         <input

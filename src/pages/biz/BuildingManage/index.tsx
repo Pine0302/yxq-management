@@ -1,12 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { buildingPageInfo } from './service';
 import type { BuildingTableItem, TableListPagination } from './data';
-import MyAmap from './components/MyAmap';
+import MergeForm from './components/MergeForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await buildingPageInfo({
@@ -19,7 +19,7 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 
 const TableList: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
-  // const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
 
   const actionRef = useRef<ActionType>();
@@ -43,7 +43,7 @@ const TableList: React.FC = () => {
       title: '经纬度',
       dataIndex: 'aaa',
       renderText: (_, record) => {
-        return `精度：${record.longitude}，维度：${record.latitude}`;
+        return `经度：${record.longitude}，维度：${record.latitude}`;
       },
     },
     {
@@ -88,6 +88,7 @@ const TableList: React.FC = () => {
           key="edit"
           onClick={() => {
             setMergeFormVisible(true);
+            setIsEdit(true);
             // setCurrentRow(record);
             console.log(record);
           }}
@@ -113,6 +114,7 @@ const TableList: React.FC = () => {
             key="primary"
             onClick={() => {
               setMergeFormVisible(true);
+              setIsEdit(false);
             }}
           >
             <PlusOutlined /> 新建
@@ -128,14 +130,11 @@ const TableList: React.FC = () => {
         }}
       />
 
-      <Modal
-        title="新建楼宇"
-        width={600}
+      <MergeForm
         visible={mergeFormVisible}
         onCancel={() => setMergeFormVisible(false)}
-      >
-        <MyAmap />
-      </Modal>
+        isEdit={isEdit}
+      />
     </PageContainer>
   );
 };
