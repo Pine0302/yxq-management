@@ -1,12 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { buildingPageInfo } from './service';
 import type { BuildingTableItem, TableListPagination } from './data';
-import MergeForm from './components/MergeForm';
+import MyAmap from './components/MyAmap';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await buildingPageInfo({
@@ -49,10 +49,30 @@ const TableList: React.FC = () => {
     {
       title: '配送方式',
       dataIndex: 'pickUpType',
+      valueEnum: {
+        FIXED_POS: {
+          text: '用户自提',
+          status: 'processing',
+        },
+        TO_ADDR: {
+          text: '送货上门',
+          status: 'success',
+        },
+      },
     },
     {
       title: '状态',
       dataIndex: 'status',
+      valueEnum: {
+        CLOSED: {
+          text: '关闭',
+          status: 'Error',
+        },
+        OK: {
+          text: '正常',
+          status: 'Success',
+        },
+      },
     },
     {
       title: '创建时间',
@@ -107,11 +127,15 @@ const TableList: React.FC = () => {
           },
         }}
       />
-      <MergeForm
+
+      <Modal
+        title="新建楼宇"
+        width={600}
         visible={mergeFormVisible}
         onCancel={() => setMergeFormVisible(false)}
-        // isEdit={isEdit}
-      />
+      >
+        <MyAmap />
+      </Modal>
     </PageContainer>
   );
 };
