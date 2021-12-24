@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { addKitchen, editKitchen } from '../service';
+import { message } from 'antd';
 
 type MergeFormProps = {
   modalVisible?: boolean;
@@ -92,6 +93,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         onFinish={async (values) => {
           console.log(values);
           await handleSubmit(values);
+          message.success('操作成功');
           props?.onSuccess?.();
           return true;
         }}
