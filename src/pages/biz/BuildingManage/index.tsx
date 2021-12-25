@@ -20,11 +20,8 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 const TableList: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  /** 分布更新窗口的弹窗 */
-
   const actionRef = useRef<ActionType>();
-  // const [currentRow, setCurrentRow] = useState<TableListItem>();
-  /** 国际化配置 */
+  const [currentRow, setCurrentRow] = useState<any>();
 
   const columns: ProColumns<BuildingTableItem>[] = [
     {
@@ -89,7 +86,7 @@ const TableList: React.FC = () => {
           onClick={() => {
             setMergeFormVisible(true);
             setIsEdit(true);
-            // setCurrentRow(record);
+            setCurrentRow(record);
             console.log(record);
           }}
         >
@@ -102,7 +99,6 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<BuildingTableItem, TableListPagination>
-        // headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -115,6 +111,7 @@ const TableList: React.FC = () => {
             onClick={() => {
               setMergeFormVisible(true);
               setIsEdit(false);
+              setCurrentRow(undefined);
             }}
           >
             <PlusOutlined /> 新建
@@ -133,7 +130,9 @@ const TableList: React.FC = () => {
       <MergeForm
         visible={mergeFormVisible}
         onCancel={() => setMergeFormVisible(false)}
+        onSuccess={() => actionRef.current?.reload()}
         isEdit={isEdit}
+        value={currentRow}
       />
     </PageContainer>
   );

@@ -1,29 +1,83 @@
+import { ProFormInstance, ProFormRadio } from '@ant-design/pro-form';
 import ProForm, {
   ProFormText,
   ProFormSelect,
   DrawerForm,
   ProFormSwitch,
 } from '@ant-design/pro-form';
+import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { message } from 'antd';
-import React from 'react';
+import React, { useRef } from 'react';
+import { kitchenPageInfo } from '../../KitchenManage/service';
+import { addBuilding, editBuilding } from '../service';
 import MyAmap from './MyAmap';
 
 export type MergeFormProps = {
+  value?: any;
   visible?: boolean;
   isEdit?: boolean;
   onCancel?: () => void;
+  onSuccess?: () => void;
+};
+
+const waitTime = (time: number = 100) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
+
+const handleSubmit = async (formData: any, isEdit: boolean = false) => {
+  const postData = { status: 'CLOSED', ...formData };
+
+  if (isEdit) {
+    await editBuilding(postData);
+  } else {
+    await addBuilding(postData);
+  }
+};
+
+const kitchenSelectRequest = async () => {
+  const res = await kitchenPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
+  const zh = (res?.data?.list || []).map((v) => {
+    return {
+      label: v.name,
+      value: v.id,
+    };
+  }) as RequestOptionsType[];
+
+  return zh;
 };
 
 const MergeForm: React.FC<MergeFormProps> = (props) => {
+  const formRef = useRef<ProFormInstance>();
+
+  // useEffect(() => {
+  //   if (props.visible && props.isEdit) {
+  //     formRef.current?.setFieldsValue({ ...props.value });
+  //   }
+  //   console.log('useEffect');
+  // }, [props.visible, props.isEdit, props.value]);
+
   return (
     <>
       <DrawerForm
         title={props?.isEdit ? '编辑楼宇' : '新建楼宇'}
         autoFocusFirstInput
+        formRef={formRef}
         layout="horizontal"
         visible={props?.visible}
-        onVisibleChange={(show: boolean) => {
-          if (!show) props?.onCancel?.();
+        onVisibleChange={async (show: boolean) => {
+          if (!show) {
+            props?.onCancel?.();
+          } else {
+            if (props?.isEdit) {
+              console.log('show', props?.value);
+              await waitTime(0);
+              formRef.current?.setFieldsValue(props?.value);
+            }
+          }
         }}
         drawerProps={{
           destroyOnClose: true,
@@ -32,38 +86,87 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           },
         }}
         onFinish={async (values) => {
-          // await waitTime(2000);
-          console.log(values);
+          await handleSubmit(values, props?.isEdit);
           message.success('提交成功');
+          props?.onSuccess?.();
+          // console.log(values);
           return true;
         }}
       >
-        <ProForm.Item>
-          <MyAmap />
+        <ProForm.Item name="xxx">
+          <MyAmap
+            onSelected={(res) => {
+              console.log('res', res);
+              formRef.current?.setFieldsValue({
+                areaName: res?.name,
+                latitude: res.location.lat,
+                longitude: res.location.lng,
+              });
+            }}
+          />
         </ProForm.Item>
+        <ProFormText name="id" hidden />
         <ProForm.Group>
-          <ProFormText width="sm" name="areaName" label="楼宇名称" placeholder="请输入名称" />
-          <ProFormSelect
+          <ProFormText
             width="sm"
-            options={[
-              {
-                value: 'time',
-                label: '履行完终止',
-              },
-            ]}
-            name="kitchenId"
-            label="所属厨房"
+            name="areaName"
+            label="楼宇名称"
+            placeholder="请输入名称"
+            rules={[{ required: true }]}
+          />
+          <ProFormText
+            width="sm"
+            name="latitude"
+            label="经度"
+            placeholder="请输入名称"
+            readonly
+            rules={[{ required: true }]}
+          />
+          <ProFormText
+            width="sm"
+            name="longitude"
+            label="维度"
+            placeholder="请输入名称"
+            readonly
+            rules={[{ required: true }]}
           />
         </ProForm.Group>
         <ProForm.Group>
-          <ProFormText width="xs" name="province" label="省" placeholder="请输入名称" />
-          <ProFormText width="xs" name="city" label="市" placeholder="请输入名称" />
-          <ProFormText width="xs" name="district" label="区" placeholder="请输入名称" />
+          <ProFormText
+            width="xs"
+            name="province"
+            label="省"
+            placeholder="请输入名称"
+            rules={[{ required: true }]}
+          />
+          <ProFormText
+            width="xs"
+            name="city"
+            label="市"
+            placeholder="请输入名称"
+            rules={[{ required: true }]}
+          />
+          <ProFormText
+            width="xs"
+            name="district"
+            label="区"
+            placeholder="请输入名称"
+            rules={[{ required: true }]}
+          />
         </ProForm.Group>
-        <ProForm.Group>
-          <ProFormText width="sm" name="latitude" label="经度" placeholder="请输入名称" />
-          <ProFormText width="sm" name="longitude" label="维度" placeholder="请输入名称" />
-        </ProForm.Group>
+        <ProFormSelect
+          width="sm"
+          options={[
+            {
+              value: 'time',
+              label: '履行完终止',
+            },
+          ]}
+          request={kitchenSelectRequest}
+          name="kitchenId"
+          label="所属厨房"
+          rules={[{ required: true }]}
+        />
 
         <ProForm.Group>
           <ProFormSelect
@@ -80,20 +183,28 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
             ]}
             name="pickUpType"
             label="提货方式"
+            rules={[{ required: true }]}
           />
           <ProFormText width="sm" name="pickUpAddress" label="自提点" placeholder="请输入名称" />
         </ProForm.Group>
-        <ProFormSwitch
+        {/* <ProFormSwitch label="状态" name="status" width="sm" /> */}
+        <ProFormRadio.Group
           label="状态"
           name="status"
           width="sm"
-          // fieldProps={{
-          //   onChange: (v) => setLimitBuyState(v),
-          // }}
+          radioType='button'
+          initialValue='CLOSED'
+          options={[
+            {
+              label: '正常',
+              value: 'OK',
+            },
+            {
+              label: '关闭',
+              value: 'CLOSED',
+            },
+          ]}
         />
-        {/* <ProForm.Item name="status" label='状态'>
-          <Switch defaultChecked={false} />
-        </ProForm.Item> */}
       </DrawerForm>
     </>
   );

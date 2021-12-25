@@ -8,9 +8,10 @@ import styles from './MyAmap.less';
 type MergeFormProps = {
   value?: any;
   onChange?: () => void;
+  onSelected?: (res: any) => void;
 };
 
-const MyAmap: React.FC<MergeFormProps> = () => {
+const MyAmap: React.FC<MergeFormProps> = (props) => {
   // const [map, setMap] = useState<any>();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const MyAmap: React.FC<MergeFormProps> = () => {
           zoom: 17, //初始化地图级别
           center: [120.255306, 30.237285], //初始化地图中心点位置
         });
-        console.log('map => ', mapInstance);
+        // console.log('map => ', mapInstance);
         const marker = new AMap.Marker({ map: mapInstance });
         const controlBar = new AMap.ControlBar({ position: 'LT' });
         const toolBar = new AMap.ToolBar({ position: 'RT' });
@@ -45,15 +46,15 @@ const MyAmap: React.FC<MergeFormProps> = () => {
           input: 'pickerInput',
         });
         poiPicker.on('poiPicked', (res: any) => {
-          // console.log('res=>  ', res);
           marker.setPosition(res.item.location);
           mapInstance.setCenter(marker.getPosition());
-          // console.log('pos ', marker.getPosition());
+
+          props?.onSelected?.(res.item);
         });
-        console.log('poiPicker => ', poiPicker);
+        // console.log('poiPicker => ', poiPicker);
       })
       .catch((e) => {
-        console.log('error => ', e);
+        console.log('amap error => ', e);
       });
 
     // return () => {
