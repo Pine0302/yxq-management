@@ -17,20 +17,28 @@ export async function kitchenUserPageInfo(
   });
 }
 
-/** 新建规则 PUT /api/rule */
-export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 新建厨房用户 POST /adminapi/kitchen_user/add */
+export async function addKitchenUser(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/kitchen_user/add', {
     data,
-    method: 'PUT',
+    method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
 
-/** 新建规则 POST /api/rule */
-export async function addRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 修改厨房用户 POST /adminapi/kitchen_user/modify */
+export async function updateKitchenUser(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/kitchen_user/modify', {
     data,
     method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
