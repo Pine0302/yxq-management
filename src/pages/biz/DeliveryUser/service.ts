@@ -17,20 +17,28 @@ export async function deliveryUserPageInfo(
   });
 }
 
-/** 新建规则 PUT /api/rule */
-export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 新建配送员 POST /adminapi/delivery_user/add */
+export async function addDeliveryUser(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/delivery_user/add', {
     data,
-    method: 'PUT',
+    method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }
 
-/** 新建规则 POST /api/rule */
-export async function addRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+/** 修改配送员 POST /adminapi/delivery_user/add */
+export async function updateDeliveryUser(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/delivery_user/modify', {
     data,
     method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }

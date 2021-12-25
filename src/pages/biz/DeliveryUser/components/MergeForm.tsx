@@ -2,6 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { message } from 'antd';
+import { buildingPageInfo } from '../../BuildingManage/service';
+import type { RequestOptionsType } from '@ant-design/pro-utils';
+import { addDeliveryUser, updateDeliveryUser } from '../service';
 
 type MergeFormProps = {
   visible?: boolean;
@@ -14,16 +17,29 @@ type MergeFormProps = {
 type DataItem = {
   id: number;
   name: string;
-  contact: string;
   phone: string;
+  code: string;
+  areaId: number;
 };
 
-const handleSubmit = async (values: any) => {
-  if (values?.id) {
-    // return await editKitchen(values);
+const handleSubmit = async (values: any, isEdit: boolean = false) => {
+  if (!isEdit) {
+    return await addDeliveryUser(values);
   } else {
-    // return await addKitchen(values);
+    return await updateDeliveryUser(values);
   }
+};
+
+const buildingSelectRequest = async () => {
+  const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  const zh = (res.data?.list || []).map((v) => {
+    return {
+      label: v.areaName,
+      value: v.id,
+    };
+  }) as RequestOptionsType[];
+
+  return zh;
 };
 
 const columns: ProFormColumnsType<DataItem>[] = [
@@ -58,6 +74,8 @@ const columns: ProFormColumnsType<DataItem>[] = [
   {
     title: '工作楼宇',
     dataIndex: 'areaId',
+    valueType: 'select',
+    request: buildingSelectRequest,
     formItemProps: {
       rules: [{ required: true }],
     },
@@ -83,7 +101,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         wrapperCol={{ span: 24 }}
         onFinish={async (values) => {
           console.log(values);
-          await handleSubmit(values);
+          await handleSubmit(values, props?.isEdit);
           message.success('操作成功');
           props?.onSuccess?.();
           return true;

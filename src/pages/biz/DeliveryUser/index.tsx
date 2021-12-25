@@ -1,60 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Drawer } from 'antd';
+import { Button } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
-import { addRule, updateRule, deliveryUserPageInfo } from './service';
-import type { DeliveryUserTableItem, TableListItem, TableListPagination } from './data';
+import { deliveryUserPageInfo } from './service';
+import type { DeliveryUserTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
-/**
- * 添加节点
- *
- * @param fields
- */
-
-const handleAdd = async (fields: TableListItem) => {
-  const hide = message.loading('正在添加');
-
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
-/**
- * 更新节点
- *
- * @param fields
- */
-
-const handleUpdate = async (fields: FormValueType, currentRow?: TableListItem) => {
-  const hide = message.loading('正在配置');
-
-  try {
-    await updateRule({
-      ...currentRow,
-      ...fields,
-    });
-    hide();
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await deliveryUserPageInfo({
@@ -152,6 +104,7 @@ const TableList: React.FC = () => {
             onClick={() => {
               setMergeFormVisible(true);
               setIsEdit(false);
+              setCurrentRow(undefined);
             }}
           >
             <PlusOutlined /> 新建
@@ -171,6 +124,10 @@ const TableList: React.FC = () => {
         visible={mergeFormVisible}
         isEdit={isEdit}
         onCancel={() => setMergeFormVisible(false)}
+        value={currentRow}
+        onSuccess={() => {
+          actionRef.current?.reload();
+        }}
       />
     </PageContainer>
   );
