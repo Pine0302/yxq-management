@@ -84,7 +84,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '送达时间',
-      dataIndex: 'ctime',
+      dataIndex: 'xxx',
       valueType: 'dateRange',
       hideInTable: true,
       search: {
@@ -98,7 +98,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建时间',
-      dataIndex: 'ctime',
+      dataIndex: 'yyy',
       valueType: 'dateRange',
       hideInTable: true,
       search: {
