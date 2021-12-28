@@ -12,6 +12,8 @@ import {
   payPlatformValueEnum,
   payStatusValueEnum,
 } from '@/consts/valueEnums';
+import { buildingPageInfo } from '../biz/BuildingManage/service';
+import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -20,6 +22,18 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
   });
 
   return { data: res.data?.list, success: true, total: res.data?.total };
+};
+
+const buildingSelectRequest = async () => {
+  const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  const zh = (res.data?.list || []).map((v) => {
+    return {
+      label: v.areaName,
+      value: v.id,
+    };
+  }) as RequestOptionsType[];
+
+  return zh;
 };
 
 const TableList: React.FC = () => {
@@ -45,6 +59,26 @@ const TableList: React.FC = () => {
   /** 国际化配置 */
 
   const columns: ProColumns<TableListItem>[] = [
+    {
+      title: '送达时间',
+      dataIndex: 'xxx',
+      valueType: 'dateRange',
+      hideInTable: true,
+      search: {
+        transform: (value) => {
+          return {
+            deliveryStartTime: value[0] + ' 00:00:00',
+            deliveryEndTime: value[1] + ' 23:59:59',
+          };
+        },
+      },
+    },
+    {
+      title: '楼宇',
+      dataIndex: 'areaId',
+      hideInTable: true,
+      request: buildingSelectRequest,
+    },
     {
       title: '订单号',
       dataIndex: 'orderSn',
@@ -74,27 +108,12 @@ const TableList: React.FC = () => {
       valueType: 'money',
       hideInSearch: true,
       tip: '用户实际付款金额',
-      // renderText: (val: string) => `￥${val}`,
     },
     {
       title: '创建时间',
       dataIndex: 'ctime',
       valueType: 'dateTime',
       hideInSearch: true,
-    },
-    {
-      title: '送达时间',
-      dataIndex: 'xxx',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            deliveryStartTime: value[0] + ' 00:00:00',
-            deliveryEndTime: value[1] + ' 23:59:59',
-          };
-        },
-      },
     },
     {
       title: '创建时间',
