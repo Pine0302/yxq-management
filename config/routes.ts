@@ -147,6 +147,9 @@ export default [
             path: '/marketing/coupon/conpon-log',
             component: './marketing/coupon/CouponLog',
           },
+          {
+            component: './404',
+          },
         ],
       },
       {
