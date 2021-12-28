@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -36,11 +36,14 @@ const TableList: React.FC = () => {
     {
       title: '是否管理员',
       dataIndex: 'isAdmin',
+      hideInSearch: true,
+      render: (_, record) => (record.isAdmin ? <CheckOutlined /> : <CloseOutlined />),
     },
     {
       title: '状态',
       dataIndex: 'status',
       hideInForm: true,
+      hideInSearch: true,
       valueEnum: {
         0: {
           text: '禁用',
@@ -56,6 +59,7 @@ const TableList: React.FC = () => {
       title: '创建时间',
       dataIndex: 'ctime',
       valueType: 'dateTime',
+      hideInSearch: true,
     },
     {
       title: '操作',
@@ -73,6 +77,7 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
+        <a>改密</a>,
       ],
     },
   ];
