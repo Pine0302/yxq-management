@@ -1,4 +1,4 @@
-import { Drawer } from 'antd';
+import { Drawer, Popover } from 'antd';
 import React, { useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns } from '@ant-design/pro-table';
@@ -14,6 +14,7 @@ import {
 } from '@/consts/valueEnums';
 import { buildingPageInfo } from '../biz/BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
+import { MessageOutlined } from '@ant-design/icons';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -138,6 +139,20 @@ const TableList: React.FC = () => {
       title: '支付状态',
       dataIndex: 'payStatus',
       valueEnum: payStatusValueEnum,
+    },
+    {
+      title: '备注',
+      dataIndex: 'remark',
+      hideInForm: true,
+      hideInSearch: true,
+      render: (_, record) => {
+        const rd = record.remark && (
+          <Popover content={record.remark}>
+            <MessageOutlined />
+          </Popover>
+        );
+        return rd;
+      },
     },
     {
       title: '操作',

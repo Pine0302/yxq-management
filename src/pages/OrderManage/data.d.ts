@@ -12,6 +12,7 @@ export type TableListItem = {
   updatedAt: Date;
   createdAt: Date;
   progress: number;
+  remark: string;
 };
 
 export type TableListPagination = {

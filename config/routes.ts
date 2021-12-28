@@ -35,7 +35,7 @@ export default [
         path: '/admin1/sub-page',
         name: 'sub-page',
         icon: 'smile',
-        component: './Welcome',
+        // component: './Welcome',
       },
       {
         component: './404',
