@@ -66,6 +66,9 @@ export default {
   'menu.biz.kitchen-user': '厨房用户管理',
 
   'menu.marketing': '营销管理',
+  'menu.marketing.coupon': '优惠券',
+  'menu.marketing.coupon.coupon-manage': '优惠券管理',
+  'menu.marketing.coupon.coupon-log': '优惠券记录',
 
   'menu.finance': '财务管理',
 

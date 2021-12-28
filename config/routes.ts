@@ -131,6 +131,25 @@ export default [
     path: '/marketing',
     routes: [
       {
+        name: 'coupon',
+        icon: 'smile',
+        path: '/marketing/coupon',
+        routes: [
+          {
+            name: 'coupon-manage',
+            icon: 'smile',
+            path: '/marketing/coupon/coupon-manage',
+            component: './marketing/coupon/CouponManage',
+          },
+          {
+            name: 'coupon-log',
+            icon: 'smile',
+            path: '/marketing/coupon/conpon-log',
+            component: './marketing/coupon/CouponLog',
+          },
+        ],
+      },
+      {
         component: './404',
       },
     ],
