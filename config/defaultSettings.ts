@@ -15,7 +15,7 @@ const Settings: LayoutSettings & {
   title: '优选饭堂后台管理',
   pwa: false,
   // logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
-  logo: '/logo.svg',
+  logo: '/logo.png',
   iconfontUrl: '',
 };
 
