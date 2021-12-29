@@ -1,4 +1,4 @@
-import { Drawer, Popover } from 'antd';
+import { Drawer, Popover, Tag } from 'antd';
 import React, { useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns } from '@ant-design/pro-table';
@@ -248,9 +248,14 @@ const TableList: React.FC = () => {
           <ProDescriptions.Item
             dataIndex="contacts"
             label="联系地址"
-            renderText={(_, record) =>
-              `[${record.label}] ${record.address} ${record.building} ${record.houseNumber}`
-            }
+            render={(_, record) => {
+              return (
+                <>
+                  <Tag color="processing">{record.label}</Tag>
+                  {record.address} {record.building} {record.houseNumber}
+                </>
+              );
+            }}
           />
         </ProDescriptions>
         <ProDescriptions<any>
