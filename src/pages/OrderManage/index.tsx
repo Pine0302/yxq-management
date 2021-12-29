@@ -160,7 +160,7 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => [
         <a
-          key="config"
+          key="order_detail"
           onClick={async () => {
             // setCurrentRow(record);
             setShowDetail(true);
@@ -168,18 +168,20 @@ const TableList: React.FC = () => {
             await detailRequest(record?.id as number);
           }}
         >
-          查看详情
+          详情
         </a>,
-        <a key="subscribeAlert" onClick={() => {}}>
-          干其他的
+        <a key="order_cancel" onClick={() => {}}>
+          取消
+        </a>,
+        <a key="order_refund" onClick={() => {}}>
+          退款
         </a>,
         <TableDropdown
           key="actionGroup"
           onSelect={() => {}}
           menus={[
-            { key: 'copy', name: '订单详情' },
-            { key: 'delete', name: '历史订单' },
-            { key: 'ts', name: '客户投诉' },
+            { key: 'user_history', name: '历史订单' },
+            { key: 'complaint', name: '客户投诉' },
           ]}
         />,
       ],
