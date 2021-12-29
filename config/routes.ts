@@ -19,9 +19,9 @@ export default [
     ],
   },
   {
-    path: '/welcome',
     name: 'welcome',
     icon: 'smile',
+    path: '/welcome',
     component: './Welcome',
   },
   {
@@ -34,8 +34,7 @@ export default [
       {
         path: '/admin1/sub-page',
         name: 'sub-page',
-        icon: 'smile',
-        // component: './Welcome',
+        icon: 'smile', // component: './Welcome',
       },
       {
         component: './404',
