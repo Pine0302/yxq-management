@@ -5,11 +5,13 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
   const { currentUser } = initialState || {};
 
   const financeAccounts: string[] = ['nixun'];
-  const kfAccounts: string[] = [];
+  const kfAccounts: string[] = ['yefei', 'xuzixuan'];
 
   return {
     canAdmin: currentUser && currentUser.account === 'admin',
     canFinane: currentUser && financeAccounts.includes(currentUser?.access as string),
     canKf: currentUser && kfAccounts.includes(currentUser?.access as string),
+
+    kfMenuFilter: () => true,
   };
 }
