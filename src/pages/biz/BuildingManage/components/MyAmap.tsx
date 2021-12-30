@@ -6,7 +6,7 @@ import styles from './MyAmap.less';
 // https://lbs.amap.com/api/jsapi-v2/guide/abc/load
 
 type MergeFormProps = {
-  value?: any;
+  // value?: any;
   onChange?: () => void;
   onSelected?: (res: any) => void;
 };
@@ -15,6 +15,7 @@ const MyAmap: React.FC<MergeFormProps> = (props) => {
   // const [map, setMap] = useState<any>();
 
   useEffect(() => {
+    console.log('useEffect ');
     let mapInstance: any;
     AMapLoader.load({
       key: 'c20bbe471f149ae4b53d9769d3603d88',
@@ -61,7 +62,7 @@ const MyAmap: React.FC<MergeFormProps> = (props) => {
     //   console.log('destroy amap.');
     //   mapInstance.destroy();
     // };
-  }, []);
+  });
 
   return (
     <>

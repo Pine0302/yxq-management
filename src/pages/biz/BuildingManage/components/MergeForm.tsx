@@ -1,10 +1,6 @@
-import { ProFormInstance, ProFormRadio } from '@ant-design/pro-form';
-import ProForm, {
-  ProFormText,
-  ProFormSelect,
-  DrawerForm,
-  ProFormSwitch,
-} from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormRadio } from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormSelect, DrawerForm } from '@ant-design/pro-form';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { message } from 'antd';
 import React, { useRef } from 'react';
@@ -156,12 +152,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         </ProForm.Group>
         <ProFormSelect
           width="sm"
-          options={[
-            {
-              value: 'time',
-              label: '履行完终止',
-            },
-          ]}
           request={kitchenSelectRequest}
           name="kitchenId"
           label="所属厨房"
@@ -192,8 +182,8 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           label="状态"
           name="status"
           width="sm"
-          radioType='button'
-          initialValue='CLOSED'
+          radioType="button"
+          initialValue="CLOSED"
           options={[
             {
               label: '正常',

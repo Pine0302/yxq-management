@@ -67,7 +67,7 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => [
         <a
-          key="config"
+          key="edit"
           onClick={() => {
             setMergeFormVisible(true);
             setIsEdit(true);
@@ -77,7 +77,7 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
-        <a>改密</a>,
+        <a key="change_pwd">改密</a>,
       ],
     },
   ];
