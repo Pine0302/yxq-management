@@ -1,7 +1,7 @@
-import { Popover } from 'antd';
-import React, { useState } from 'react';
+import { message, Popconfirm, Popover } from 'antd';
+import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import type { ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { orderPageInfo } from './service';
 import type { TableListItem, TableListPagination } from './data';
@@ -10,6 +10,7 @@ import { buildingPageInfo } from '../biz/BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { MessageOutlined } from '@ant-design/icons';
 import OrderDetailDrawer from './components/OrderDetailDrawer';
+import { Access, useAccess } from 'umi';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -35,6 +36,9 @@ const buildingSelectRequest = async () => {
 const TableList: React.FC = () => {
   const [orderDetailVisible, setOrderDetailVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
+
+  const actionRef = useRef<ActionType>();
+  const access = useAccess();
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -145,10 +149,27 @@ const TableList: React.FC = () => {
         >
           详情
         </a>,
-        <a key="order_cancel" onClick={() => {}}>
-          取消
-        </a>,
-        <a key="order_refund" onClick={() => {}}>
+        <Access
+          key="orderDetailBtn"
+          accessible={(access.canAdmin || access.canKf) as boolean}
+          fallback={null}
+        >
+          <Popconfirm
+            title="确定要取消该订单嘛？"
+            onConfirm={() => {
+              message.success('开发中...');
+              actionRef.current?.reload();
+            }}
+          >
+            <a key="order_cancel">取消</a>
+          </Popconfirm>
+        </Access>,
+        <a
+          key="order_refund"
+          onClick={() => {
+            message.success('开发中...');
+          }}
+        >
           退款
         </a>,
         <TableDropdown
@@ -167,6 +188,7 @@ const TableList: React.FC = () => {
     <PageContainer>
       <ProTable<TableListItem, TableListPagination>
         rowKey="id"
+        actionRef={actionRef}
         search={{
           labelWidth: 120,
         }}
