@@ -5,7 +5,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { orderPageInfo } from './service';
 import type { TableListItem, TableListPagination } from './data';
-import { orderStatusValueEnum, payStatusValueEnum } from '@/consts/valueEnums';
+import { dishTypeValueEnum, orderStatusValueEnum, payStatusValueEnum } from '@/consts/valueEnums';
 import { buildingPageInfo } from '../biz/BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { MessageOutlined } from '@ant-design/icons';
@@ -120,6 +120,12 @@ const TableList: React.FC = () => {
       title: '支付状态',
       dataIndex: 'payStatus',
       valueEnum: payStatusValueEnum,
+    },
+    {
+      title: '早中晚餐',
+      dataIndex: 'dishType',
+      hideInTable: true,
+      valueEnum: dishTypeValueEnum,
     },
     {
       title: '备注',

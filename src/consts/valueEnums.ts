@@ -58,4 +58,20 @@ const payPlatformValueEnum = {
   },
 };
 
-export { orderStatusValueEnum, payStatusValueEnum, payPlatformValueEnum };
+/** 早/中/晚餐 */
+const dishTypeValueEnum = {
+  BREAKFAST: {
+    text: '早餐',
+    status: 'Default',
+  },
+  LUNCH: {
+    text: '中餐',
+    status: 'Success',
+  },
+  DINNER: {
+    text: '晚餐',
+    status: 'purple',
+  },
+};
+
+export { orderStatusValueEnum, payStatusValueEnum, payPlatformValueEnum, dishTypeValueEnum };
