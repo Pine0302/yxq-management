@@ -4,7 +4,7 @@ import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Drawer, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import type { cartItemDTO, OrderDetailDTO } from '../data';
+import type { cartItemDTO } from '../data';
 import { orderDetail } from '../service';
 import styles from './style.less';
 
@@ -50,10 +50,9 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = (props) => {
     setDetailLoading(true);
     const res = await orderDetail({ id: id });
 
-    const { orderAddressDTO, payment, cartDTOS, packageFee, deliveryFee } =
-      res.data as OrderDetailDTO;
+    const { orderAddressDTO, payment, cartDTOS, packageFee, deliveryFee, serialNumber, deliveryTime } = res.data || {};
     setUserInfoDs({ ...orderAddressDTO });
-    setPayInfoDs({ ...payment, packageFee, deliveryFee });
+    setPayInfoDs({ ...payment, packageFee, deliveryFee, serialNumber, deliveryTime });
     setCartDs(cartDTOS);
 
     setDetailLoading(false);
@@ -128,6 +127,8 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = (props) => {
               return '￥' + (fenFee / 100).toFixed(2);
             }}
           />
+          <ProDescriptions.Item dataIndex="serialNumber" label="订单流水号" />
+          <ProDescriptions.Item dataIndex="deliveryTime" label="预计送达时间" valueType='dateTime' />
         </ProDescriptions>
         <div className={styles.title}>商品明细</div>
         <ProTable

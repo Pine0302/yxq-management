@@ -65,6 +65,8 @@ export type OrderDetailDTO = {
   cartDTOS?: cartItemDTO[];
   orderAddressDTO?: OrderAddressDTO;
   payment?: PaymentDTO;
+  serialNumber: string;
+  deliveryTime: string;
 };
 
 export type OrderAddressDTO = {
