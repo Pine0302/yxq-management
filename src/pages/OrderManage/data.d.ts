@@ -13,6 +13,9 @@ export type TableListItem = {
   createdAt: Date;
   progress: number;
   remark: string;
+
+  orderStatus: string;
+  payStatus: string;
 };
 
 export type TableListPagination = {

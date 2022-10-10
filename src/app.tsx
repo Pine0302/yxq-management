@@ -38,7 +38,8 @@ export async function getInitialState(): Promise<{
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
     const currentUser: API.CurrentUser | undefined = await fetchUserInfo();
-    currentUser!.avatar = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+    currentUser!.avatar =
+      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
     return {
       fetchUserInfo,
       currentUser,
@@ -102,23 +103,30 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
 };
 
 // const demoResponseInterceptors = (response: Response, options: RequestOptionsInit) => {
-  // response.headers.append('interceptors', 'yes yo');
-  // return response;
+// response.headers.append('interceptors', 'yes yo');
+// return response;
 // };
+
+const respInterceptor = async (response: Response, options: RequestOptionsInit) => {
+  console.log('response => ', response);
+  console.log('options => ', options);
+
+  return response;
+};
 
 const errorHandler = (error: ResponseError) => {
   // const { messages } = getIntl(getLocale());
-  const { response } = error;
+  // const { response } = error;
   // notification.error({
   //   description: '您的网络发生异常，无法连接服务器',
   //   message: '网络异常',
   // });
-  console.log('response', response);
+  // console.log('response', response);
   throw error;
 };
 
 export const request: RequestConfig = {
   errorHandler,
   requestInterceptors: [authHeaderInterceptor],
-  // responseInterceptors: [demoResponseInterceptors],
+  responseInterceptors: [respInterceptor],
 };

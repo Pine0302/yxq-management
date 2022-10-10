@@ -28,3 +28,12 @@ export async function updateRule(data: { [key: string]: any }, options?: { [key:
     ...(options || {}),
   });
 }
+
+
+export async function refundOrder(params: {oid: number, reason: string, refundPrice: number}, options?: { [key: string]: any },) {
+  return request<OrderDetailWrapper>('/adminapi/order/refund_order', {
+    method: 'GET',
+    params: params,
+    ...(options || {}),
+  });
+}

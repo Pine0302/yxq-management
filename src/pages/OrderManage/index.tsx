@@ -11,6 +11,7 @@ import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { MessageOutlined } from '@ant-design/icons';
 import OrderDetailDrawer from './components/OrderDetailDrawer';
 import { Access, useAccess } from 'umi';
+import RefundForm from './components/RefundForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -36,6 +37,8 @@ const buildingSelectRequest = async () => {
 const TableList: React.FC = () => {
   const [orderDetailVisible, setOrderDetailVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
+
+  const [refundFormVisiable, setRefundFormVisiable] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const access = useAccess();
@@ -173,7 +176,17 @@ const TableList: React.FC = () => {
         <a
           key="order_refund"
           onClick={() => {
-            message.success('开发中...');
+            const { payStatus, orderStatus } = record;
+            if (payStatus !== 'PAY_SUCCESS') {
+              message.warn('未支付订单无法退款.');
+              return;
+            }
+
+            console.log('orderStatus', orderStatus);
+            // return;
+            setCurrentRow(record);
+            setRefundFormVisiable(true);
+            console.log('log', record);
           }}
         >
           退款
@@ -208,6 +221,12 @@ const TableList: React.FC = () => {
         visible={orderDetailVisible}
         orderId={currentRow?.id}
         onCancel={() => setOrderDetailVisible(false)}
+      />
+      <RefundForm
+        visible={refundFormVisiable}
+        value={currentRow}
+        onCancel={() => setRefundFormVisiable(false)}
+        onSuccess={() => setRefundFormVisiable(false)}
       />
     </PageContainer>
   );
