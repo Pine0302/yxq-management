@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
 import type { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormRadio } from '@ant-design/pro-form';
 import { DrawerForm } from '@ant-design/pro-form';
 import { ProFormDigit, ProFormSwitch } from '@ant-design/pro-form';
 import ProForm, { ProFormUploadButton } from '@ant-design/pro-form';
 import { ProFormMoney, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import type { ProFieldRequestData, RequestOptionsType } from '@ant-design/pro-utils';
-
 import { listApi } from '@/services/common';
 import type { UploadChangeParam } from 'antd/lib/upload';
 import type { RcFile, UploadFile } from 'antd/lib/upload/interface';
@@ -142,6 +142,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
       limitNum,
       status,
       sideDishGoods,
+      pepper,
     } = formData;
     let { pic } = formData;
     const sideDishIds: { gid: any; relationType: any }[] = [];
@@ -157,8 +158,6 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         sideDishIds.push({ gid: v?.id, relationType: v?.relationType });
       });
     }
-
-
 
     if (id) {
       // edit
@@ -176,6 +175,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         status,
         pic,
         sideDishIds,
+        pepper,
       };
       await editGoods(postData);
     } else {
@@ -194,10 +194,10 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         status,
         pic,
         sideDishDTOS: sideDishIds,
+        pepper,
       };
       await addGoods(postData);
     }
-    
 
     onCancel();
     return true;
@@ -295,6 +295,22 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           <ProFormMoney label="单价价格" name="price" rules={[{ required: true }]} />
           <ProFormMoney label="打包费用" name="packageFee" rules={[{ required: true }]} />
         </ProForm.Group>
+        <ProForm.Group>
+          <ProFormRadio.Group
+            name="pepper"
+            label="辣度"
+            radioType="button"
+            initialValue={0}
+            options={[
+              { label: '不辣', value: 0 },
+              { label: '微辣', value: 1 },
+              { label: '中辣', value: 2 },
+              { label: '爆辣', value: 3 },
+            ]}
+            rules={[{ required: true }]}
+          />
+        </ProForm.Group>
+
         <ProForm.Group>
           <ProFormSwitch
             label="是否限购"
