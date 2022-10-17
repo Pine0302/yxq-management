@@ -7,6 +7,8 @@ import ProTable from '@ant-design/pro-table';
 import { deliveryUserPageInfo } from './service';
 import type { DeliveryUserTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import { buildingPageInfo } from '../BuildingManage/service';
+import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await deliveryUserPageInfo({
@@ -15,6 +17,18 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
   });
 
   return { data: res.data?.list, success: true, total: res.data?.total };
+};
+
+const buildingSelectRequest = async () => {
+  const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  const zh = (res.data?.list || []).map((v) => {
+    return {
+      label: v.areaName,
+      value: v.id,
+    };
+  }) as RequestOptionsType[];
+
+  return zh;
 };
 
 const TableList: React.FC = () => {
@@ -30,17 +44,15 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: '身份证',
-      dataIndex: 'code',
+      title: '楼宇',
+      dataIndex: 'areaName',
       hideInSearch: true,
     },
     {
       title: '联系电话',
       dataIndex: 'phone',
       hideInSearch: true,
-      // sorter: true,
-      // hideInForm: true,
-      // renderText: (val: string) => `${val}万`,
+      copyable: true,
     },
     {
       title: '创建时间',
@@ -49,15 +61,16 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: '最后上线时间',
-      dataIndex: 'lastTime',
-      valueType: 'dateTime',
-      hideInSearch: true,
+      title: '楼宇',
+      dataIndex: 'areaId',
+      valueType: 'select',
+      hideInTable: true,
+      request: buildingSelectRequest,
     },
     {
       title: '状态',
       dataIndex: 'status',
-      hideInForm: true,
+      hideInSearch: true,
       valueEnum: {
         0: {
           text: '禁用',

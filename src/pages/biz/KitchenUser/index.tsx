@@ -7,6 +7,8 @@ import ProTable from '@ant-design/pro-table';
 import { kitchenUserPageInfo } from './service';
 import type { KitchenUserTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import { kitchenPageInfo } from '../KitchenManage/service';
+import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await kitchenUserPageInfo({
@@ -15,6 +17,18 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
   });
 
   return { data: res.data?.list, success: true, total: res.data?.total };
+};
+
+const kitchenSelectRequest = async () => {
+  const res = await kitchenPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
+  const zh = (res?.data?.list || []).map((v) => {
+    return {
+      label: v.name,
+      value: v.id,
+    };
+  }) as RequestOptionsType[];
+
+  return zh;
 };
 
 const TableList: React.FC = () => {
@@ -30,11 +44,24 @@ const TableList: React.FC = () => {
       dataIndex: 'name',
     },
     {
-      title: '联系电话',
-      dataIndex: 'phone',
+      title: '厨房',
+      dataIndex: 'kitchenName',
+      hideInSearch: true,
     },
     {
-      title: '是否管理员',
+      title: '厨房',
+      dataIndex: 'kitchenId',
+      valueType: 'select',
+      hideInTable: true,
+      request: kitchenSelectRequest,
+    },
+    {
+      title: '联系电话',
+      dataIndex: 'phone',
+      copyable: true,
+    },
+    {
+      title: '厨房管理员',
       dataIndex: 'isAdmin',
       hideInSearch: true,
       render: (_, record) => (record.isAdmin ? <CheckOutlined /> : <CloseOutlined />),
@@ -77,7 +104,9 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
-        <a key="change_pwd">改密</a>,
+        <a key="change_pwd" onClick={() => {}}>
+          改密
+        </a>,
       ],
     },
   ];

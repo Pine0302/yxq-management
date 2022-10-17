@@ -29,16 +29,24 @@ const TableList: React.FC = () => {
       dataIndex: 'areaName',
     },
     {
+      title: '厨房',
+      dataIndex: 'kitchenName',
+      hideInSearch: true,
+    },
+    {
       title: '省份',
       dataIndex: 'province',
+      hideInSearch: true,
     },
     {
       title: '城市',
       dataIndex: 'city',
+      hideInSearch: true,
     },
     {
       title: '经纬度',
       dataIndex: 'aaa',
+      hideInSearch: true,
       renderText: (_, record) => {
         return `经度：${record.longitude}，维度：${record.latitude}`;
       },
@@ -46,6 +54,7 @@ const TableList: React.FC = () => {
     {
       title: '配送方式',
       dataIndex: 'pickUpType',
+      hideInSearch: true,
       valueEnum: {
         FIXED_POS: {
           text: '用户自提',
@@ -60,6 +69,7 @@ const TableList: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'status',
+      hideInSearch: true,
       valueEnum: {
         CLOSED: {
           text: '关闭',
@@ -75,6 +85,7 @@ const TableList: React.FC = () => {
       title: '创建时间',
       dataIndex: 'ctime',
       valueType: 'dateTime',
+      hideInSearch: true,
     },
     {
       title: '操作',

@@ -76,6 +76,7 @@ const columns: ProFormColumnsType<DataItem>[] = [
     dataIndex: 'areaId',
     valueType: 'select',
     request: buildingSelectRequest,
+    width: '100%',
     formItemProps: {
       rules: [{ required: true }],
     },
@@ -97,8 +98,8 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         width={500}
         layout="horizontal"
         layoutType="ModalForm"
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 24 }}
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 22 }}
         onFinish={async (values) => {
           console.log(values);
           await handleSubmit(values, props?.isEdit);

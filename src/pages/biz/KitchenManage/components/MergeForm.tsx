@@ -3,6 +3,7 @@ import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { addKitchen, editKitchen } from '../service';
 import { message } from 'antd';
+// import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 type MergeFormProps = {
   modalVisible?: boolean;
@@ -62,6 +63,34 @@ const columns: ProFormColumnsType<DataItem>[] = [
   {
     title: '电话',
     dataIndex: 'phone',
+    formItemProps: {
+      rules: [
+        {
+          required: true,
+          message: '此项为必填项',
+        },
+      ],
+    },
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    valueType: 'radioButton',
+    valueEnum: {
+      OK: {
+        text: '正常',
+      },
+      CLOSE: {
+        text: '关闭',
+      },
+    },
+    initialValue: 'OK',
+    // request: async () => {
+    //   return [
+    //     { label: '正常', value: 'OK' },
+    //     { label: '关闭', value: 'CLOSE' },
+    //   ] as RequestOptionsType[];
+    // },
     formItemProps: {
       rules: [
         {

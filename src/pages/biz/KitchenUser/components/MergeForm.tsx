@@ -68,6 +68,7 @@ const columns: ProFormColumnsType<DataItem>[] = [
     title: '所在厨房',
     dataIndex: 'kitchenId',
     valueType: 'select',
+    width: '100%',
     request: kitchenSelectRequest,
     formItemProps: {
       rules: [{ required: true }],
@@ -81,6 +82,20 @@ const columns: ProFormColumnsType<DataItem>[] = [
       return [
         { label: '是', value: 1 },
         { label: '否', value: 0 },
+      ] as RequestOptionsType[];
+    },
+    formItemProps: {
+      rules: [{ required: true }],
+    },
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    valueType: 'radioButton',
+    request: async () => {
+      return [
+        { label: '正常', value: 1 },
+        { label: '禁用', value: 0 },
       ] as RequestOptionsType[];
     },
     formItemProps: {
@@ -104,8 +119,8 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         width={500}
         layout="horizontal"
         layoutType="ModalForm"
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 24 }}
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 22 }}
         onFinish={async (values) => {
           console.log(values);
           await handleSubmit(values, props?.isEdit);
