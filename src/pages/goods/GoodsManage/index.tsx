@@ -8,6 +8,7 @@ import { goodsPageInfo, updateGoodsStatus } from './service';
 import type { GoodsTableItem, TableListPagination } from './data';
 import { nullImage } from '@/consts/consts';
 import MergeDrawerForm from './components/MergeDrawerForm';
+import * as styles from './style.less';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
@@ -34,20 +35,31 @@ const TableList: React.FC = () => {
     const res = await updateGoodsStatus({ id: id, status: status2 });
     if (res.data === true) actionRef.current?.reload();
   };
-
+  // '🌶️'
   const columns: ProColumns<GoodsTableItem>[] = [
     {
-      title: '图片',
-      width: 60,
+      title: '菜品名称',
+      width: 300,
       dataIndex: 'pic',
       hideInSearch: true,
       render: (_, record) => (
-        <Image width={55} src={`http://img.nidcai.com/${record.pic}`} fallback={nullImage} />
+        <>
+          <div className={styles.goodWrapper}>
+            <span>
+              <Image width={55} src={`http://img.nidcai.com/${record.pic}`} fallback={nullImage} />
+            </span>
+            <span className={styles.marginLeft}>
+              <div>{record?.gname}</div>
+              <div>{'🌶️'.repeat(record?.pepper as number)}</div>
+            </span>
+          </div>
+        </>
       ),
     },
     {
       title: '名称',
       dataIndex: 'gname',
+      hideInTable: true,
       search: {
         transform: (v) => {
           return { keyword: v };
@@ -59,6 +71,12 @@ const TableList: React.FC = () => {
       dataIndex: 'price',
       hideInSearch: true,
       valueType: 'money',
+      render: (_, record) => (
+        <>
+          <div>划线价：￥{record.originalPrice}</div>
+          <div>销售价：￥{record.price}</div>
+        </>
+      ),
     },
     {
       title: '打包费',

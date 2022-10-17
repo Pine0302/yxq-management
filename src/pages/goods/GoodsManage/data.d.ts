@@ -68,6 +68,7 @@ export type GoodsTableItem = {
   price?: number;
   status?: boolean;
   type?: string;
+  pepper?: number;
 };
 
 export type GoodsDetailWrapper = {
