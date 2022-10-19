@@ -53,9 +53,13 @@ const payStatusValueEnum = {
 /** 支付方式 */
 const payPlatformValueEnum = {
   wx_jsapi: {
-    text: '公众号/小程序',
+    text: '公众号/小程序（微信）',
     status: 'Success',
   },
+  wx_app: {
+    text: 'APP（微信）',
+    status: 'Success'
+  }
 };
 
 /** 早/中/晚餐 */

@@ -37,6 +37,7 @@ const cartColumns: ProColumns<cartItemDTO>[] = [
   {
     title: '打包费',
     dataIndex: 'packageFee',
+    valueType: 'money',
   },
 ];
 

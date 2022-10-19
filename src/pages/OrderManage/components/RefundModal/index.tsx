@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { FormInstance } from 'antd';
+import type { FormInstance} from 'antd';
+import { Space } from 'antd';
 import { Tag } from 'antd';
 import { message } from 'antd';
 import { ModalForm, ProFormGroup, ProFormMoney, ProFormText } from '@ant-design/pro-form';
-import { orderDetail, refundOrder } from '../service';
+import { orderDetail, refundOrder } from '../../service';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { payPlatformValueEnum } from '@/consts/valueEnums';
 
-type RefundFormProps = {
+type RefundModalProps = {
   visible?: boolean;
   onCancel?: () => void;
   value?: any;
@@ -54,35 +55,19 @@ const cartColumns: ProColumns<any>[] = [
 const reFund = async (values: any) => {
   console.log('submit', values);
 
-  // const err1 = refundOrder({ ...values }).then(() => null, err => err);
-  // console.log('err1', err1);
-  // if (err1 == null) {
-  //   message.success('操作成功.');
-  // } else {
-  //   const { response } = err1;
-  //   message.warn(response?.msg || '退款失败，请联系管理员.');
-  // }
-
   try {
     const resp = await refundOrder({ ...values });
-    
+
     console.log('resp', resp);
     message.success('操作成功.');
   } catch (error: any) {
     const { response } = error;
-    message.warn(response.msg || '退款失败，请联系管理员.');
+    message.warn(response.msg || '退单失败，请联系管理员.');
   }
 
-  // const resp = await refundOrder({ ...values });
-  // if (resp.code === 200) {
-  //   message.success('操作成功.');
-  // } else if (resp.code === 500) {
-  //   message.warn(resp.msg || '退款失败，请联系管理员.');
-  // }
-  // console.log('resp', resp);
 };
 
-const RefundForm: React.FC<RefundFormProps> = (props) => {
+const RefundModal: React.FC<RefundModalProps> = (props) => {
   const formRef = useRef<FormInstance<any>>();
   const { visible, value: val, onCancel, onSuccess } = props;
 
@@ -144,8 +129,10 @@ const RefundForm: React.FC<RefundFormProps> = (props) => {
           render={(_, record) => {
             return (
               <>
-                {record.contacts}
-                <Tag color="processing">{record.gender}</Tag>
+                <Space>
+                  <span>{record.contacts}</span>
+                  <Tag color="processing">{record.gender}</Tag>
+                </Space>
               </>
             );
           }}
@@ -157,8 +144,10 @@ const RefundForm: React.FC<RefundFormProps> = (props) => {
           render={(_, record) => {
             return (
               <>
-                <Tag color="processing">{record.label}</Tag>
-                {record.address} {record.building} {record.houseNumber}
+                <Space>
+                  <span>{record.address} {record.building} {record.houseNumber}</span>
+                  <Tag color="processing">{record.label}</Tag>
+                </Space>
               </>
             );
           }}
@@ -224,4 +213,4 @@ const RefundForm: React.FC<RefundFormProps> = (props) => {
   );
 };
 
-export default RefundForm;
+export default RefundModal;

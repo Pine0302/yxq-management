@@ -7,6 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { buildingPageInfo } from './service';
 import type { BuildingTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import QrCodeModal from './components/QrCodeModal';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await buildingPageInfo({
@@ -22,6 +23,8 @@ const TableList: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<any>();
+
+  const [qrCodeModalOpen, setQrCodeModalOpen] = useState<boolean>(false);
 
   const columns: ProColumns<BuildingTableItem>[] = [
     {
@@ -103,6 +106,15 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
+        <a
+          key="qrcode"
+          onClick={() => {
+            setQrCodeModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          取餐码
+        </a>,
       ],
     },
   ];
@@ -144,6 +156,12 @@ const TableList: React.FC = () => {
         onSuccess={() => actionRef.current?.reload()}
         isEdit={isEdit}
         value={currentRow}
+      />
+      <QrCodeModal
+        value={currentRow}
+        open={qrCodeModalOpen}
+        onOk={() => setQrCodeModalOpen(false)}
+        onCancel={() => setQrCodeModalOpen(false)}
       />
     </PageContainer>
   );

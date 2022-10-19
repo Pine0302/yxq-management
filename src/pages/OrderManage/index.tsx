@@ -1,4 +1,4 @@
-import { message, Popconfirm, Popover } from 'antd';
+import { message, Popover } from 'antd';
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
@@ -9,9 +9,9 @@ import { dishTypeValueEnum, orderStatusValueEnum, payStatusValueEnum } from '@/c
 import { buildingPageInfo } from '../biz/BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { MessageOutlined } from '@ant-design/icons';
-import OrderDetailDrawer from './components/OrderDetailDrawer';
 import { Access, useAccess } from 'umi';
-import RefundForm from './components/RefundForm';
+import OrderDetailModal from './components/OrderDetailModal';
+import CancelOrderModal from './components/CancelOrderModal';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await orderPageInfo({
@@ -38,7 +38,8 @@ const TableList: React.FC = () => {
   const [orderDetailVisible, setOrderDetailVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
 
-  const [refundFormVisiable, setRefundFormVisiable] = useState<boolean>(false);
+  // const [refundFormVisiable, setRefundFormVisiable] = useState<boolean>(false);
+  const [cancelOrderModalOpen, setCancelOrderModalOpen] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const access = useAccess();
@@ -67,8 +68,20 @@ const TableList: React.FC = () => {
     {
       title: '订单号',
       dataIndex: 'orderSn',
-      copyable: true,
+      // copyable: true,
       width: 200,
+      render: (_, record) => {
+        return (
+          <a
+            onClick={() => {
+              setCurrentRow(record);
+              setOrderDetailVisible(true);
+            }}
+          >
+            {_}
+          </a>
+        );
+      },
     },
     {
       title: '手机号',
@@ -149,44 +162,31 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key="order_detail"
-          onClick={async () => {
-            setCurrentRow(record);
-            setOrderDetailVisible(true);
-          }}
-        >
-          详情
-        </a>,
         <Access
           key="orderDetailBtn"
           accessible={(access.canAdmin || access.canKf) as boolean}
           fallback={null}
         >
-          <Popconfirm
-            title="确定要取消该订单嘛？"
-            onConfirm={() => {
-              message.success('开发中...');
-              actionRef.current?.reload();
+          <a
+            key="order_cancel"
+            onClick={() => {
+              const { payStatus } = record;
+              if (payStatus !== 'PAY_SUCCESS') {
+                message.warn('此订单无法退款.');
+                return;
+              }
+
+              setCurrentRow(record);
+              setCancelOrderModalOpen(true);
             }}
           >
-            <a key="order_cancel">取消</a>
-          </Popconfirm>
+            退单
+          </a>
         </Access>,
         <a
           key="order_refund"
           onClick={() => {
-            const { payStatus, orderStatus } = record;
-            if (payStatus !== 'PAY_SUCCESS') {
-              message.warn('未支付订单无法退款.');
-              return;
-            }
-
-            console.log('orderStatus', orderStatus);
-            // return;
-            setCurrentRow(record);
-            setRefundFormVisiable(true);
-            console.log('log', record);
+            message.success('开发中...');
           }}
         >
           退款
@@ -216,17 +216,19 @@ const TableList: React.FC = () => {
         columns={columns}
         rowSelection={false}
       />
-
-      <OrderDetailDrawer
+      <OrderDetailModal
         visible={orderDetailVisible}
-        orderId={currentRow?.id}
+        oid={currentRow?.id}
         onCancel={() => setOrderDetailVisible(false)}
       />
-      <RefundForm
-        visible={refundFormVisiable}
+      <CancelOrderModal
+        visible={cancelOrderModalOpen}
         value={currentRow}
-        onCancel={() => setRefundFormVisiable(false)}
-        onSuccess={() => setRefundFormVisiable(false)}
+        onCancel={() => setCancelOrderModalOpen(false)}
+        onSuccess={() => {
+          setCancelOrderModalOpen(false);
+          actionRef.current?.reload();
+        }}
       />
     </PageContainer>
   );
