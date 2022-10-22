@@ -329,7 +329,6 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
             />
           )}
         </ProForm.Group>
-        <ProFormSwitch label="是否上架" name="status" />
       </DrawerForm>
       <Modal
         // zIndex={9999999}
