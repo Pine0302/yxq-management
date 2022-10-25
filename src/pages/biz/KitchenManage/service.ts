@@ -36,3 +36,29 @@ export async function editKitchen(data: { [key: string]: any }, options?: { [key
     ...(options || {}),
   });
 }
+
+// 获取厨房库存分页信息
+export async function kitchenStockPageInfo(
+  params: { current?: number; pageSize?: number; pageNum?: number; kitchenId: number },
+  options?: { [key: string]: any },
+) {
+  return request<Common.ResponseWrapper>('/adminapi/kitchen_stock/kitchen_goods_stock', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function editKitchenStock(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<Common.ResponseWrapper>('/adminapi/kitchen_stock/edit_kitchen_goods_stock', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}

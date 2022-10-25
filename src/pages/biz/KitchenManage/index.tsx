@@ -7,6 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { kitchenPageInfo } from './service';
 import type { KitchenTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import KitchenStockModal from './components/KitchenStockModal';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await kitchenPageInfo({
@@ -22,6 +23,8 @@ const TableList: React.FC = () => {
   const [mergeModalVisible, setMergeModalVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<KitchenTableItem>();
+
+  const [kitchenStockModalOpen, setKitchenStockModalOpen] = useState<boolean>(false);
 
   const columns: ProColumns<KitchenTableItem>[] = [
     {
@@ -65,6 +68,17 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
+        <a
+          key="edit_stock"
+          onClick={() => {
+            // setMergeModalVisible(true);
+            // setIsEdit(true);
+            setKitchenStockModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          调库存
+        </a>,
       ],
     },
   ];
@@ -104,6 +118,11 @@ const TableList: React.FC = () => {
         }}
         isEdit={isEdit}
         value={currentRow}
+      />
+      <KitchenStockModal
+        open={kitchenStockModalOpen}
+        value={currentRow}
+        onCancel={() => setKitchenStockModalOpen(false)}
       />
     </PageContainer>
   );
