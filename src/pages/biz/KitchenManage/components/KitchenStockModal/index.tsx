@@ -13,6 +13,7 @@ type KitchenStockModalProp = {
 
 type DataItem = {
   kitchenGoodsId: number;
+  gid: number;
   gname: string;
   stock: number;
   sold: number;
@@ -32,7 +33,7 @@ const KitchenStockModal: React.FC<KitchenStockModalProp> = (props) => {
     });
 
     const tmp = res.data.list.sort(
-      (a: DataItem, b: DataItem) => a.kitchenGoodsId - b.kitchenGoodsId,
+      (a: DataItem, b: DataItem) => a.gid - b.gid,
     );
 
     setDs([...tmp]);
