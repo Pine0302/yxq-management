@@ -32,9 +32,7 @@ const KitchenStockModal: React.FC<KitchenStockModalProp> = (props) => {
       kitchenId: props.value?.id,
     });
 
-    const tmp = res.data.list.sort(
-      (a: DataItem, b: DataItem) => a.gid - b.gid,
-    );
+    const tmp = res.data.list.sort((a: DataItem, b: DataItem) => a.gid - b.gid);
 
     setDs([...tmp]);
   };
@@ -78,7 +76,7 @@ const KitchenStockModal: React.FC<KitchenStockModalProp> = (props) => {
                 const two = ds
                   .filter((o) => o.kitchenGoodsId != record.kitchenGoodsId)
                   .concat([{ ...one[0], stock: e }])
-                  .sort((a: DataItem, b: DataItem) => a.kitchenGoodsId - b.kitchenGoodsId);
+                  .sort((a: DataItem, b: DataItem) => a.gid - b.gid);
                 setDs([...two]);
               }}
             />
