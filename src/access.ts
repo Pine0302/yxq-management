@@ -5,7 +5,7 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
   const { currentUser } = initialState || {};
 
   const financeAccounts: string[] = ['nixun'];
-  const kfAccounts: string[] = ['chenyi','yefei'];
+  const kfAccounts: string[] = ['chenyi', 'gaozhilei', 'chenchen'];
 
   return {
     canAdmin: currentUser && currentUser.account === 'admin',
