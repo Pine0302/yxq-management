@@ -1,14 +1,14 @@
-import { message, Popover } from 'antd';
+import { message, Popover, Button, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { orderPageInfo } from './service';
+import { orderPageInfo, orderPrint } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import { dishTypeValueEnum, orderStatusValueEnum, payStatusValueEnum } from '@/consts/valueEnums';
 import { buildingPageInfo } from '../biz/BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
-import { MessageOutlined } from '@ant-design/icons';
+import { MessageOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { Access, useAccess } from 'umi';
 import OrderDetailModal from './components/OrderDetailModal';
 import CancelOrderModal from './components/CancelOrderModal';
@@ -32,6 +32,10 @@ const buildingSelectRequest = async () => {
   }) as RequestOptionsType[];
 
   return zh;
+};
+
+const printOrders = async (v: any) => {
+  await orderPrint(v);
 };
 
 const TableList: React.FC = () => {
@@ -82,6 +86,10 @@ const TableList: React.FC = () => {
           </a>
         );
       },
+    },
+    {
+      title: '流水号',
+      dataIndex: 'serialNumber',
     },
     {
       title: '手机号',
@@ -142,6 +150,20 @@ const TableList: React.FC = () => {
       dataIndex: 'dishType',
       hideInTable: true,
       valueEnum: dishTypeValueEnum,
+    },
+    {
+      title: '打印状态',
+      dataIndex: 'print',
+      valueEnum: {
+        true: {
+          text: '已打印',
+          status: 'Success',
+        },
+        false: {
+          text: '未打印',
+          status: 'Error',
+        },
+      },
     },
     {
       title: '备注',
@@ -210,6 +232,43 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         search={{
           labelWidth: 120,
+          optionRender: (searchConfig, formProps, dom) => [
+            ...dom.reverse(),
+            <Popconfirm
+              key="ppk"
+              title="确定要打印当前订单吗？"
+              okText="确定"
+              cancelText="取消"
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+              onConfirm={async () => {
+                // xxx  送达时间 yyy 下单时间
+                const values = searchConfig?.form?.getFieldsValue();
+                const params = {
+                  abc: values.abc,
+                  areaId: values.areaId,
+                  dishType: values.dishType,
+                  orderSn: values.orderSn,
+                  orderStatus: values.orderStatus,
+                  payStatus: values.payStatus,
+                };
+                if (values.xxx) {
+                  params['deliveryStartTime'] = values.xxx[0].format('YYYY-MM-DD 00:00:00');
+                  params['deliveryEndTime'] = values.xxx[1].format('YYYY-MM-DD 23:59:59');
+                  // delete values.xxx;
+                }
+                if (values.yyy) {
+                  params['startTime'] = values.yyy[0].format('YYYY-MM-DD 00:00:00');
+                  params['endTime'] = values.yyy[1].format('YYYY-MM-DD 23:59:59');
+                  // delete values.yyy;
+                }
+                console.log(params);
+                await printOrders(params);
+                message.info('打印任务已提交，你等待打印机打印.');
+              }}
+            >
+              <Button key="printBtn">打印小票(多页)</Button>
+            </Popconfirm>,
+          ],
         }}
         toolBarRender={false}
         request={tableRequest}

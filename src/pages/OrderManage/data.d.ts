@@ -14,6 +14,8 @@ export type TableListItem = {
   progress: number;
   remark: string;
 
+  print: boolean;
+
   orderStatus: string;
   payStatus: string;
 };
