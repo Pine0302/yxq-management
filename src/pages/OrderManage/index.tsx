@@ -90,6 +90,7 @@ const TableList: React.FC = () => {
     {
       title: '流水号',
       dataIndex: 'serialNumber',
+      hideInSearch: true,
     },
     {
       title: '手机号',
@@ -250,6 +251,7 @@ const TableList: React.FC = () => {
                   orderSn: values.orderSn,
                   orderStatus: values.orderStatus,
                   payStatus: values.payStatus,
+                  print: values.print,
                 };
                 if (values.xxx) {
                   params['deliveryStartTime'] = values.xxx[0].format('YYYY-MM-DD 00:00:00');
