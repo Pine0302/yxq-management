@@ -195,7 +195,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         pic,
         sideDishDTOS: sideDishIds,
         pepper,
-        source: 1,
+        source: 2,
       };
       await addGoods(postData);
     }

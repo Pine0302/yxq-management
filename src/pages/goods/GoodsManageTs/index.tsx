@@ -14,7 +14,7 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await goodsPageInfo({
     ...params,
     pageNum: params?.current,
-    source: 1,
+    source: 2,
   });
 
   return { data: res.data?.list, success: true, total: res.data?.total };
