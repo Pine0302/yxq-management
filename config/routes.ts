@@ -131,6 +131,40 @@ export default [
     ],
   },
   {
+    name: 'biz-ts',
+    icon: 'smile',
+    path: '/biz-ts',
+    routes: [
+      {
+        name: 'kitchen-manage-ts',
+        icon: 'smile',
+        path: '/biz-ts/kitchen-manage-ts',
+        component: './biz-ts/KitchenManageTs',
+      },
+      {
+        name: 'building-manage-ts',
+        icon: 'smile',
+        path: '/biz-ts/building-manage-ts',
+        component: './biz-ts/BuildingManageTs',
+      },
+      // {
+      //   name: 'delivery-user-ts',
+      //   icon: 'smile',
+      //   path: '/biz/delivery-user-ts',
+      //   component: './biz/DeliveryUserTs',
+      // },
+      // {
+      //   name: 'kitchen-user-ts',
+      //   icon: 'smile',
+      //   path: '/biz/kitchen-user-ts',
+      //   component: './biz/KitchenUserTs',
+      // },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     name: 'marketing',
     icon: 'smile',
     path: '/marketing',

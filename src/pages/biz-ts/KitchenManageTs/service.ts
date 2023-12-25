@@ -8,7 +8,7 @@ export async function kitchenPageInfo(
   params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
-  return request<KitchenTableWrapper>('/adminapi/kitchen/page_info?source=1', {
+  return request<KitchenTableWrapper>('/adminapi/kitchen/page_info?source=2', {
     method: 'GET',
     params: {
       ...params,
@@ -42,7 +42,7 @@ export async function kitchenStockPageInfo(
   params: { current?: number; pageSize?: number; pageNum?: number; kitchenId: number },
   options?: { [key: string]: any },
 ) {
-  return request<Common.ResponseWrapper>('/adminapi/kitchen_stock/kitchen_goods_stock?source=1', {
+  return request<Common.ResponseWrapper>('/adminapi/kitchen_stock/kitchen_goods_stock?source=2', {
     method: 'GET',
     params: {
       ...params,

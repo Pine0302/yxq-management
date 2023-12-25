@@ -8,7 +8,7 @@ export async function buildingPageInfo(
   params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
-  return request<BuildingTableWrapper>('/adminapi/area/page_info?source=1', {
+  return request<BuildingTableWrapper>('/adminapi/area/page_info?source=2', {
     method: 'GET',
     params: {
       ...params,
