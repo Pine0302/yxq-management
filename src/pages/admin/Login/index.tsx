@@ -65,11 +65,26 @@ const Login: React.FC = () => {
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         /** 此方法会跳转到 redirect 参数所在的位置 */
-        console.log(history);
         if (!history) return;
+        console.log(1111);
+        //const newLocation = history.createHref({
+        //  pathname: '/welcome',
+        //});
+        history.location = {
+          pathname: '/welcome',
+        };
+        console.log(2222);
+        console.log(history.location);
         const { query } = history.location;
-        const { redirect } = query as { redirect: string };
-        history.push(redirect || '/');
+        console.log(query);
+        // const { redirect } = query as { redirect: string };
+        const { redirect = '/welcome' } = query as { redirect?: string };
+        console.log(5555);
+        //自动刷新页面跳转到'/welcome'页面
+        if (redirect) {
+          //history.push('/welcome'); // Assign the value '/welcome' to the redirect parameter
+        }
+        //history.push('/welcome');
         return;
       }
       // 如果失败去设置用户错误信息

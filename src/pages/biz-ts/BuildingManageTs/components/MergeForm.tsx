@@ -192,7 +192,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
               name="pickUpAddress"
               label="自提点"
               placeholder="请输入名称"
-              initialValue="杭州市体育馆"
+              initialValue=""
               hidden
             />
           </ProForm.Group>

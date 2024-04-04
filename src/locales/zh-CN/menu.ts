@@ -66,9 +66,12 @@ export default {
   'menu.biz.delivery-user': '配送员管理',
   'menu.biz.kitchen-user': '厨房用户管理',
 
-  'menu.biz-ts': '堂食业务管理',
-  'menu.biz-ts.building-manage-ts': '堂食楼宇管理',
-  'menu.biz-ts.kitchen-manage-ts': '堂食门店管理',
+  'menu.biz-ts': '门店业务管理',
+  'menu.biz-ts.building-manage-ts': '楼宇管理',
+  'menu.biz-ts.kitchen-manage-ts': '厨房管理',
+  'menu.biz-ts.kitchen-user-ts': '店长管理',
+  'menu.biz-ts.delivery-user-ts': '服务员管理',
+  'menu.order-manage-ts': '门店订单管理',
 
   'menu.marketing': '营销管理',
   'menu.marketing.coupon': '优惠券',

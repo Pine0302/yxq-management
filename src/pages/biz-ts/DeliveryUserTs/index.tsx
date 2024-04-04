@@ -7,7 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { deliveryUserPageInfo } from './service';
 import type { DeliveryUserTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
-import { buildingPageInfo } from '../BuildingManage/service';
+import { buildingPageInfo } from '../BuildingManageTs/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {

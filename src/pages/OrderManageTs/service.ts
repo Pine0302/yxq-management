@@ -5,7 +5,7 @@ import { OrderDataWrapper, TableListItem, OrderDetailWrapper } from './data';
 
 // 订单分页信息
 export async function orderPageInfo(params: any, options?: { [key: string]: any }) {
-  return request<OrderDataWrapper>('/adminapi/order/page_info?source=1', {
+  return request<OrderDataWrapper>('/adminapi/order/page_info?source=2', {
     method: 'GET',
     params: params,
     ...(options || {}),
@@ -21,7 +21,7 @@ export async function orderPrint(params: any, options?: { [key: string]: any }) 
 }
 
 export async function orderDetail(params: { id: number }, options?: { [key: string]: any }) {
-  return request<OrderDetailWrapper>('/adminapi/order/detail', {
+  return request<OrderDetailWrapper>('/adminapi/order/detailDinein', {
     method: 'GET',
     params: params,
     ...(options || {}),

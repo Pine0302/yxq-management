@@ -8,7 +8,7 @@ export async function deliveryUserPageInfo(
   params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
-  return request<DeliveryUserTableWrapper>('/adminapi/delivery_user/page_info', {
+  return request<DeliveryUserTableWrapper>('/adminapi/delivery_user/page_info?source=1', {
     method: 'GET',
     params: {
       ...params,

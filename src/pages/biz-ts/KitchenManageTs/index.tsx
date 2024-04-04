@@ -56,6 +56,10 @@ const TableList: React.FC = () => {
           text: '正常',
           status: 'Success',
         },
+        REST: {
+          text: '打烊',
+          status: 'Error',
+        },
         CLOSE: {
           text: '关闭',
           status: 'Error',

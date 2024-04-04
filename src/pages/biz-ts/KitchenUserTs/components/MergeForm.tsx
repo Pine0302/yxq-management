@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { message } from 'antd';
-import { buildingPageInfo } from '../../BuildingManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
-import { addDeliveryUser, updateDeliveryUser } from '../service';
+import { kitchenPageInfo } from '../../KitchenManageTs/service';
+import { addKitchenUser, updateKitchenUser } from '../service';
 
 type MergeFormProps = {
   visible?: boolean;
@@ -18,23 +18,23 @@ type DataItem = {
   id: number;
   name: string;
   phone: string;
-  code: string;
+  isAdmin: boolean;
   areaId: number;
 };
 
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
   if (!isEdit) {
-    return await addDeliveryUser(values);
+    return await addKitchenUser(values);
   } else {
-    return await updateDeliveryUser(values);
+    return await updateKitchenUser(values);
   }
 };
 
-const buildingSelectRequest = async () => {
-  const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
-  const zh = (res.data?.list || []).map((v) => {
+const kitchenSelectRequest = async () => {
+  const res = await kitchenPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
+  const zh = (res?.data?.list || []).map((v) => {
     return {
-      label: v.areaName,
+      label: v.name,
       value: v.id,
     };
   }) as RequestOptionsType[];
@@ -65,18 +65,39 @@ const columns: ProFormColumnsType<DataItem>[] = [
     },
   },
   {
-    title: '身份证',
-    dataIndex: 'code',
+    title: '所在厨房',
+    dataIndex: 'kitchenId',
+    valueType: 'select',
+    width: '100%',
+    request: kitchenSelectRequest,
     formItemProps: {
       rules: [{ required: true }],
     },
   },
   {
-    title: '工作楼宇',
-    dataIndex: 'areaId',
-    valueType: 'select',
-    request: buildingSelectRequest,
-    width: '100%',
+    title: '是否管理',
+    dataIndex: 'isAdmin',
+    valueType: 'radioButton',
+    request: async () => {
+      return [
+        { label: '是', value: 1 },
+        { label: '否', value: 0 },
+      ] as RequestOptionsType[];
+    },
+    formItemProps: {
+      rules: [{ required: true }],
+    },
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    valueType: 'radioButton',
+    request: async () => {
+      return [
+        { label: '正常', value: 1 },
+        { label: '禁用', value: 0 },
+      ] as RequestOptionsType[];
+    },
     formItemProps: {
       rules: [{ required: true }],
     },
@@ -93,7 +114,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
   return (
     <>
       <BetaSchemaForm<DataItem>
-        title={props?.isEdit ? '编辑配送员' : '新增配送员'}
+        title={props?.isEdit ? '编辑厨房用户' : '新增厨房用户'}
         formRef={formRef}
         width={500}
         layout="horizontal"

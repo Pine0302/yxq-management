@@ -18,6 +18,8 @@ type DataItem = {
   name: string;
   contact: string;
   phone: string;
+  startTime: string;
+  endTime: string;
 };
 
 const handleSubmit = async (values: any) => {
@@ -85,6 +87,30 @@ const columns: ProFormColumnsType<DataItem>[] = [
     },
   },
   {
+    title: '开店时间',
+    dataIndex: 'startTime',
+    formItemProps: {
+      rules: [
+        {
+          required: true,
+          message: '此项为必填项',
+        },
+      ],
+    },
+  },
+  {
+    title: '闭店时间',
+    dataIndex: 'endTime',
+    formItemProps: {
+      rules: [
+        {
+          required: true,
+          message: '此项为必填项',
+        },
+      ],
+    },
+  },
+  {
     title: 'source',
     dataIndex: 'source',
     formItemProps: {
@@ -99,6 +125,9 @@ const columns: ProFormColumnsType<DataItem>[] = [
     valueEnum: {
       OK: {
         text: '正常',
+      },
+      REST: {
+        text: '打烊',
       },
       CLOSE: {
         text: '关闭',

@@ -52,6 +52,12 @@ export default [
     component: './OrderManage',
   },
   {
+    name: 'order-manage-ts',
+    icon: 'smile',
+    path: '/order-manage-ts',
+    component: './OrderManageTs',
+  },
+  {
     name: 'goods',
     icon: 'smile',
     path: '/goods',
@@ -147,18 +153,18 @@ export default [
         path: '/biz-ts/building-manage-ts',
         component: './biz-ts/BuildingManageTs',
       },
-      // {
-      //   name: 'delivery-user-ts',
-      //   icon: 'smile',
-      //   path: '/biz/delivery-user-ts',
-      //   component: './biz/DeliveryUserTs',
-      // },
-      // {
-      //   name: 'kitchen-user-ts',
-      //   icon: 'smile',
-      //   path: '/biz/kitchen-user-ts',
-      //   component: './biz/KitchenUserTs',
-      // },
+      {
+        name: 'delivery-user-ts',
+        icon: 'smile',
+        path: '/biz-ts/delivery-user-ts',
+        component: './biz-ts/DeliveryUserTs',
+      },
+      {
+        name: 'kitchen-user-ts',
+        icon: 'smile',
+        path: '/biz-ts/kitchen-user-ts',
+        component: './biz-ts/KitchenUserTs',
+      },
       {
         component: './404',
       },

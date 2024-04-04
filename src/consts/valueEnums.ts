@@ -9,15 +9,15 @@ const orderStatusValueEnum = {
     status: 'Error',
   },
   MAKING: {
-    text: '制作中',
+    text: '待制作',
     status: 'Processing',
   },
   ON_THE_WAY: {
-    text: '配送中',
+    text: '制作中',
     status: 'Default',
   },
   ARRIVED: {
-    text: '已送达',
+    text: '已完成',
     status: 'Success',
   },
   COMMENTED: {
@@ -58,8 +58,8 @@ const payPlatformValueEnum = {
   },
   wx_app: {
     text: 'APP（微信）',
-    status: 'Success'
-  }
+    status: 'Success',
+  },
 };
 
 /** 早/中/晚餐 */

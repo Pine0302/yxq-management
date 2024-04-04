@@ -8,7 +8,7 @@ export async function kitchenUserPageInfo(
   params: { current?: number; pageSize?: number; pageNum?: number },
   options?: { [key: string]: any },
 ) {
-  return request<KitchenUserTableWrapper>('/adminapi/kitchen_user/page_info', {
+  return request<KitchenUserTableWrapper>('/adminapi/kitchen_user/page_info?source=1', {
     method: 'GET',
     params: {
       ...params,

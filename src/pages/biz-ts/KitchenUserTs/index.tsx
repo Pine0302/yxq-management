@@ -7,7 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { kitchenUserPageInfo } from './service';
 import type { KitchenUserTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
-import { kitchenPageInfo } from '../KitchenManage/service';
+import { kitchenPageInfo } from '../KitchenManageTs/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
