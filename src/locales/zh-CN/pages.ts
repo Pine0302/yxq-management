@@ -1,5 +1,5 @@
 export default {
-  'pages.layouts.userLayout.title': '优选饭堂，便宜实惠、好吃不贵',
+  'pages.layouts.userLayout.title': '一鲜七，便宜实惠、好吃不贵',
   'pages.login.accountLogin.tab': '账户密码登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码(admin/ant.design)',
   'pages.login.failure': '登录失败，请重试！',
