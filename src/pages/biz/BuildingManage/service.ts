@@ -54,3 +54,31 @@ export async function addRule(data: { [key: string]: any }, options?: { [key: st
     ...(options || {}),
   });
 }
+
+/** 获取楼宇的餐点 GET /adminapi/area/area_time */
+export async function getAreaDayDinnerConfig(
+  params: { [id: number]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area/area_time', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function updateAreaTimeConfigYxq(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area/modifyAreaTimeConfig', {
+    data,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}
