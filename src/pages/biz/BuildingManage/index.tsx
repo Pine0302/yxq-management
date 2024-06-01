@@ -9,6 +9,7 @@ import type { BuildingTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import QrCodeModal from './components/QrCodeModal';
 import DayDinnerForm from './components/DayDinnerForm';
+import WeekDinnerForm from './components/WeekDinnerForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await buildingPageInfo({
@@ -22,6 +23,7 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 const TableList: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
   const [dayDinnerFormVisible, setDayDinnerFormVisible] = useState<boolean>(false);
+  const [weekDinnerFormVisible, setWeekDinnerFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<any>();
@@ -128,6 +130,17 @@ const TableList: React.FC = () => {
         >
           餐次
         </a>,
+        <a
+          key="weekdinner"
+          onClick={() => {
+            setWeekDinnerFormVisible(true);
+            setIsEdit(true);
+            setCurrentRow(record);
+            console.log(record);
+          }}
+        >
+          周营业
+        </a>,
       ],
     },
   ];
@@ -179,6 +192,13 @@ const TableList: React.FC = () => {
       <DayDinnerForm
         visible={dayDinnerFormVisible}
         onCancel={() => setDayDinnerFormVisible(false)}
+        onSuccess={() => actionRef.current?.reload()}
+        isEdit={isEdit}
+        value={currentRow}
+      />
+      <WeekDinnerForm
+        visible={weekDinnerFormVisible}
+        onCancel={() => setWeekDinnerFormVisible(false)}
         onSuccess={() => actionRef.current?.reload()}
         isEdit={isEdit}
         value={currentRow}

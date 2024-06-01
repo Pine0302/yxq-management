@@ -68,12 +68,38 @@ export async function getAreaDayDinnerConfig(
     ...(options || {}),
   });
 }
-
+/** 更新楼宇的餐点 GET /adminapi/area/modifyAreaTimeConfig */
 export async function updateAreaTimeConfigYxq(
   data: { [key: string]: any },
   options?: { [key: string]: any },
 ) {
   return request<TableListItem>('/adminapi/area/modifyAreaTimeConfig', {
+    data,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}
+
+/** 获取楼宇的周营业 GET /adminapi/area/area_time */
+export async function getAreaWeek(params: { [id: number]: any }, options?: { [key: string]: any }) {
+  return request<TableListItem>('/adminapi/area/area_week', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新楼宇的周营业 UPDATE /adminapi/area/modifyAreaWeekConfig */
+export async function updateAreaWeekConfigYxq(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area/modifyAreaWeekConfig', {
     data,
     method: 'POST',
     headers: {
