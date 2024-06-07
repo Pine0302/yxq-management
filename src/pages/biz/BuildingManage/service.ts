@@ -108,3 +108,63 @@ export async function updateAreaWeekConfigYxq(
     ...(options || {}),
   });
 }
+
+/** 获取楼宇的活动 GET /adminapi/area/area_act */
+export async function getAreaAct(params: { [id: number]: any }, options?: { [key: string]: any }) {
+  return request<TableListItem>('/adminapi/area/area_act', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新楼宇的活动 UPDATE /adminapi/area/modifyAreaAct */
+export async function updateAreaActYxq(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area/modifyAreaActConfig', {
+    data,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}
+
+/** 获取活动关联的商品信息 GET /adminapi/area/area_act_goods */
+export async function getDishesByActId(
+  params: { [id: number]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area/areaActGoodsByActId', {
+    params: {
+      ...params,
+    },
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}
+
+/** 获取活动关联的商品信息 GET /adminapi/area/area_act_goods */
+export async function getAllDishes(
+  params?: { [id: number]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/goods/onsale_dishes', {
+    params: {
+      ...params,
+    },
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}

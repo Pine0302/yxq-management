@@ -1,0 +1,8 @@
+.input-number-container {
+  margin: 0;
+  padding: 0;
+}
+
+.ant-input-number {
+  width: 100%; // 确保InputNumber填满容器
+}
