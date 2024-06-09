@@ -73,6 +73,9 @@ export default {
   'menu.biz-ts.delivery-user-ts': '服务员管理',
   'menu.order-manage-ts': '门店订单管理',
 
+  'menu.report': '报表管理',
+  'menu.report.order-user': '楼宇下单用户',
+
   'menu.marketing': '营销管理',
   'menu.marketing.coupon': '优惠券',
   'menu.marketing.coupon.coupon-manage': '优惠券管理',

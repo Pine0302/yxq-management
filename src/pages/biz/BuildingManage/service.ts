@@ -168,3 +168,17 @@ export async function getAllDishes(
     ...(options || {}),
   });
 }
+
+/** 获取楼宇列表不分source */
+export async function buildingPageInfoNoSource(
+  params: { current?: number; pageSize?: number; pageNum?: number },
+  options?: { [key: string]: any },
+) {
+  return request<BuildingTableWrapper>('/adminapi/area/page_info', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

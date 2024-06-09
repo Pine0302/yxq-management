@@ -171,6 +171,22 @@ export default [
     ],
   },
   {
+    name: 'report',
+    icon: 'smile',
+    path: '/report',
+    routes: [
+      {
+        name: 'order-user',
+        icon: 'smile',
+        path: '/report/order-user',
+        component: './report/OrderUser',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     name: 'marketing',
     icon: 'smile',
     path: '/marketing',
