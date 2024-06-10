@@ -34,8 +34,15 @@ const buildingSelectRequest = async () => {
   return zh;
 };
 
-const printOrders = async (v: any) => {
-  await orderPrint(v);
+//const printOrders = async (v: any) => {
+//  await orderPrint(v);
+//};
+const printOrders = (params) => {
+  // 使用URLSearchParams来处理查询参数，使其能够通过URL传递
+  const query = new URLSearchParams(params).toString();
+  console.log(query);
+  // 直接改变浏览器的当前位置到下载接口，带上参数
+  window.location.href = `/adminapi/report/downloadOrderUserExcel?${query}`;
 };
 
 const TableList: React.FC = () => {
@@ -117,7 +124,7 @@ const TableList: React.FC = () => {
             ...dom.reverse(),
             <Popconfirm
               key="ppk"
-              title="确定要打印当前订单吗？"
+              title="确定要导出吗？"
               okText="确定"
               cancelText="取消"
               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}

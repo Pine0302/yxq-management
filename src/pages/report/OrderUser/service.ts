@@ -13,7 +13,7 @@ export async function orderUserPageInfo(params: any, options?: { [key: string]: 
 }
 
 export async function orderPrint(params: any, options?: { [key: string]: any }) {
-  return request<OrderDataWrapper>('/adminapi/report/export', {
+  return request<OrderDataWrapper>('/adminapi/report/downloadOrderUserExcel', {
     method: 'GET',
     params: params,
     ...(options || {}),
