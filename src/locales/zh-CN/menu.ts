@@ -75,6 +75,7 @@ export default {
 
   'menu.report': '报表管理',
   'menu.report.order-user': '楼宇下单用户',
+  'menu.report.goods-sale': '菜品销量',
 
   'menu.marketing': '营销管理',
   'menu.marketing.coupon': '优惠券',

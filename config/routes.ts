@@ -182,6 +182,12 @@ export default [
         component: './report/OrderUser',
       },
       {
+        name: 'goods-sale',
+        icon: 'smile',
+        path: '/report/goods-sale',
+        component: './report/GoodsSale',
+      },
+      {
         component: './404',
       },
     ],

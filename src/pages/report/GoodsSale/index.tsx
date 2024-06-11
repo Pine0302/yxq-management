@@ -2,7 +2,7 @@ import { message, Button, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { orderUserPageInfo } from './service';
+import { goodsSalePageInfo } from './service';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { TableListItem, TableListPagination } from './data';
 import { buildingPageInfo, buildingPageInfoNoSource } from '../../biz/BuildingManage/service';
@@ -11,8 +11,13 @@ import moment from 'moment'; // 引入moment用于日期处理
 
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
+interface RequestOptionsType {
+  label: string;
+  value: number;
+}
+
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
-  const res = await orderUserPageInfo({
+  const res = await goodsSalePageInfo({
     ...params,
     pageNum: params?.current,
   });
@@ -32,6 +37,22 @@ const buildingSelectRequest = async () => {
   return zh;
 };
 
+const kitchenSelectRequest = async () => {
+  const res = await buildingPageInfoNoSource({ current: 1, pageNum: 1, pageSize: 100 });
+  const seenKitchens = new Map<number, string>(); // 用来存储已经看到的 kitchenId 和 kitchenName
+
+  const zh = (res.data?.list || []).reduce((acc: RequestOptionsType[], v) => {
+    if (!seenKitchens.has(v.kitchenId)) {
+      // 检查该 kitchenId 是否已经被处理过
+      seenKitchens.set(v.kitchenId, v.kitchenName); // 记录这个 kitchenId 和 kitchenName
+      acc.push({ label: v.kitchenName, value: v.kitchenId });
+    }
+    return acc;
+  }, []) as RequestOptionsType[];
+
+  return zh;
+};
+
 //const printOrders = async (v: any) => {
 //  await orderPrint(v);
 //};
@@ -40,7 +61,7 @@ const printOrders = (params) => {
   const query = new URLSearchParams(params).toString();
   console.log(query);
   // 直接改变浏览器的当前位置到下载接口，带上参数
-  window.location.href = `/adminapi/report/downloadOrderUserExcel?${query}`;
+  window.location.href = `/adminapi/report/downloadGoodsSaleExcel?${query}`;
 };
 
 const TableList: React.FC = () => {
@@ -53,6 +74,12 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
   const columns: ProColumns<TableListItem>[] = [
+    {
+      title: '厨房',
+      dataIndex: 'kitchenId',
+      hideInTable: true,
+      request: kitchenSelectRequest,
+    },
     {
       title: '楼宇',
       dataIndex: 'areaId',
@@ -75,36 +102,14 @@ const TableList: React.FC = () => {
     },
 
     {
-      title: '用户姓名',
-      dataIndex: 'userName',
+      title: '菜品名称',
+      dataIndex: 'goodsName',
       hideInSearch: true,
     },
+
     {
-      title: '手机号',
-      dataIndex: 'userPhone',
-      hideInTable: true,
-      hideInSearch: true,
-    },
-    {
-      title: '楼宇',
-      dataIndex: 'areaName',
-      hideInSearch: true,
-    },
-    {
-      title: '下单次数',
+      title: '销量',
       dataIndex: 'totalOrders',
-      hideInSearch: true,
-    },
-    {
-      title: '首次下单时间',
-      dataIndex: 'firstOrderTime',
-      valueType: 'dateTime',
-      hideInSearch: true,
-    },
-    {
-      title: '最后一次下单时间',
-      dataIndex: 'lastOrderTime',
-      valueType: 'dateTime',
       hideInSearch: true,
     },
   ];
@@ -130,6 +135,7 @@ const TableList: React.FC = () => {
                 const values = searchConfig?.form?.getFieldsValue();
                 const params = {
                   areaId: values.areaId,
+                  kitchenId: values.kitchenId,
                 };
                 if (values.xxx) {
                   params['startTime'] = values.xxx[0].format('YYYY-MM-DD 00:00:00');
@@ -151,8 +157,8 @@ const TableList: React.FC = () => {
         rowSelection={false}
         beforeSearchSubmit={(params) => {
           // 检查必须字段是否已填
-          if (!params.areaId || !params.startTime || !params.endTime) {
-            message.error('请先选择楼宇和统计时间。');
+          if (!params.startTime || !params.endTime) {
+            message.error('请选择统计时间。');
             return false;
           }
 
