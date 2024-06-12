@@ -188,6 +188,12 @@ export default [
         component: './report/GoodsSale',
       },
       {
+        name: 'new-user',
+        icon: 'smile',
+        path: '/report/new-user',
+        component: './report/NewUser',
+      },
+      {
         component: './404',
       },
     ],
