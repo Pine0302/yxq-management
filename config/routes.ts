@@ -194,6 +194,12 @@ export default [
         component: './report/NewUser',
       },
       {
+        name: 'lost-user',
+        icon: 'smile',
+        path: '/report/lost-user',
+        component: './report/LostUser',
+      },
+      {
         component: './404',
       },
     ],
