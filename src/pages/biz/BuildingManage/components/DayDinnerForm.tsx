@@ -3,6 +3,7 @@ import { Form, Input, Table, Drawer, Button, Select, TimePicker } from 'antd';
 import { getAreaDayDinnerConfig, updateAreaTimeConfigYxq } from '../service';
 import moment from 'moment'; // Ensure you have moment.js installed for handling date-time objects
 import { message } from 'antd';
+import { set } from 'lodash';
 
 console.log(updateAreaTimeConfigYxq); // 输出应该显示函数代码，而不是undefined
 
@@ -150,6 +151,7 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
       .then(() => {
         message.success('所有更改已保存！');
         setTableData(draftData); // 更新原始数据，以反映新的状态
+        onCancel(); // 调用onCancel来关闭抽屉
       })
       .catch((error) => {
         message.error('提交更改失败：' + error.message);

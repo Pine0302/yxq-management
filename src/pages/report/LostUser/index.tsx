@@ -54,7 +54,7 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '楼宇1',
+      title: '楼宇',
       dataIndex: 'areaId',
       hideInTable: true,
       request: buildingSelectRequest,
@@ -140,8 +140,8 @@ const TableList: React.FC = () => {
         rowSelection={false}
         beforeSearchSubmit={(params) => {
           // 检查必须字段是否已填
-          if (!params.areaId || !params.startTime || !params.endTime) {
-            message.error('请先选择楼宇和统计时间。');
+          if (!params.startTime || !params.endTime) {
+            message.error('请先选择统计时间。');
             return false;
           }
 
@@ -156,7 +156,7 @@ const TableList: React.FC = () => {
           }
           if (endTime.diff(startTime, 'months', true) > 2) {
             message.error('结束时间不得超过开始时间两个月。');
-            // return false;
+            return false;
           }
 
           // 可以继续将转换后的日期发送到请求参数中

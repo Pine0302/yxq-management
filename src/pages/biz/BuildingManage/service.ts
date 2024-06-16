@@ -1,7 +1,12 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { BuildingTableWrapper, TableListItem } from './data';
+import {
+  BuildingTableWrapper,
+  TableListItem,
+  TemlateAddressTableItem,
+  TemlateAddressTableWrapper,
+} from './data';
 
 /** 获取楼宇列表 */
 export async function buildingPageInfo(
@@ -179,6 +184,86 @@ export async function buildingPageInfoNoSource(
     params: {
       ...params,
     },
+    ...(options || {}),
+  });
+}
+
+/** 获取地址模板列表 */
+export async function fetchAddressTemplate(
+  params: { current?: number; pageSize?: number; pageNum?: number },
+  options?: { [key: string]: any },
+) {
+  return request<TemlateAddressTableWrapper>('/adminapi/address/template_page_info?source=1', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 新建模板地址 POST /adminapi/address/add_template */
+export async function addAddressTemplate(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/address/add_template', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 更新模板地址 POST /adminapi/address/edit_template */
+export async function editAddressTemplate(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/address/edit_template', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 获取二级地址模板列表 */
+export async function fetchSubAddressTemplate(
+  params: { current?: number; pageSize?: number; pageNum?: number },
+  options?: { [key: string]: any },
+) {
+  return request<TemlateAddressTableWrapper>('/adminapi/address/sub_template_page_info?source=1', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 新建二级模板地址 POST /adminapi/address/add_sub_template */
+export async function addSubAddressTemplate(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/address/add_sub_template', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 删除模板地址 POST /adminapi/address/delete_template */
+export async function deleteAddressTemplate(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/address/delete_template', {
+    data,
+    method: 'POST',
+    requestType: 'form',
     ...(options || {}),
   });
 }

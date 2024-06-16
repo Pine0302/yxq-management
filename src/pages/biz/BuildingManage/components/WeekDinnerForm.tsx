@@ -95,6 +95,7 @@ const WeekDinnerForm: React.FC<WeekDinnerFormProps> = ({ visible, onCancel, valu
     try {
       const res = await updateAreaWeekConfigYxq(draftData);
       message.success('所有更改已保存！');
+      onCancel(); // 调用onCancel来关闭抽屉
       setTableData(draftData);
     } catch (error) {
       message.error('提交更改失败：' + error.message);

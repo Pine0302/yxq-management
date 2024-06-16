@@ -65,3 +65,19 @@ export type BuildingTableItem = {
   province: string;
   status: string;
 };
+
+export type TemlateAddressTableItem = {
+  id: number;
+  addressName: string;
+  areaId: number;
+  parentId: number;
+  sort: number;
+  isEdit: boolean;
+};
+
+export type TemlateAddressTableWrapper = {
+  data: {
+    total: number;
+    list: TemlateAddressTableItem[];
+  };
+};

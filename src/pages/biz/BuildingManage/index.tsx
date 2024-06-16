@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -11,6 +11,7 @@ import QrCodeModal from './components/QrCodeModal';
 import DayDinnerForm from './components/DayDinnerForm';
 import WeekDinnerForm from './components/WeekDinnerForm';
 import AreaActForm from './components/AreaActForm';
+import AddressTemplateForm from './components/AddresstemplateForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await buildingPageInfo({
@@ -32,6 +33,9 @@ const TableList: React.FC = () => {
 
   const [qrCodeModalOpen, setQrCodeModalOpen] = useState<boolean>(false);
 
+  const [addressTemplateFormVisible, setAddressTemplateFormVisible] = useState(false); // 控制地址模板列表的显示
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
+  const [key, setKey] = useState(0);
   const columns: ProColumns<BuildingTableItem>[] = [
     {
       title: '楼宇名称',
@@ -154,6 +158,15 @@ const TableList: React.FC = () => {
         >
           楼宇活动
         </a>,
+        <a
+          key="addressTemplate"
+          onClick={() => {
+            setCurrentRow(record);
+            setDrawerVisible(true); // 打开Drawer
+          }}
+        >
+          地址模板管理
+        </a>,
       ],
     },
   ];
@@ -161,6 +174,7 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<BuildingTableItem, TableListPagination>
+        key={key}
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -223,6 +237,33 @@ const TableList: React.FC = () => {
         isEdit={isEdit}
         value={currentRow}
       />
+
+      {drawerVisible && (
+        <Drawer
+          title="地址模板管理"
+          width={720}
+          onClose={() => setDrawerVisible(false)}
+          visible={drawerVisible}
+          bodyStyle={{ paddingBottom: 80 }}
+        >
+          <AddressTemplateForm
+            visible={drawerVisible}
+            onCancel={() => setDrawerVisible(false)}
+            areaId={currentRow?.id}
+          />
+        </Drawer>
+      )}
+
+      {/* <a
+        key="addressTemplate"
+        onClick={() => {
+          setCurrentRow(currentRow);
+          setDrawerVisible(true);
+          setKey((prev) => prev + 1); // 改变 key 强制刷新
+        }}
+      >
+        .
+      </a> */}
     </PageContainer>
   );
 };
