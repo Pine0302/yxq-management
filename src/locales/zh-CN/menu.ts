@@ -84,6 +84,9 @@ export default {
   'menu.marketing.coupon.coupon-manage': '优惠券管理',
   'menu.marketing.coupon.coupon-log': '优惠券记录',
 
+  'menu.live': '直播管理',
+  'menu.live.kitchen-live': '厨房直播',
+
   'menu.finance': '财务管理',
 
   'menu.system': '系统管理',

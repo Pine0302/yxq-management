@@ -205,6 +205,22 @@ export default [
     ],
   },
   {
+    name: 'live',
+    icon: 'smile',
+    path: '/live',
+    routes: [
+      {
+        name: 'kitchen-live',
+        icon: 'smile',
+        path: '/live/kitchen-live',
+        component: './live/KitchenLive',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     name: 'marketing',
     icon: 'smile',
     path: '/marketing',

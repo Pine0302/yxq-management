@@ -35,7 +35,7 @@ const CreateSubBuildingForm: React.FC<CreateSubBuildingFormProps> = ({
 
   return (
     <Modal
-      title={initialValues ? '编辑楼栋信息' : '新建楼栋信息'}
+      title={initialValues ? '编辑门牌信息' : '新建门牌信息'}
       visible={visible}
       onOk={() => {
         form
@@ -56,8 +56,8 @@ const CreateSubBuildingForm: React.FC<CreateSubBuildingFormProps> = ({
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
           name="addressName"
-          label="楼栋名称"
-          rules={[{ required: true, message: '请输入楼栋名称!' }]}
+          label="门牌名称"
+          rules={[{ required: true, message: '请输入门牌名称!' }]}
         >
           <Input />
         </Form.Item>
