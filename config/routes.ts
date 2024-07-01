@@ -216,6 +216,12 @@ export default [
         component: './live/KitchenLive',
       },
       {
+        name: 'kitchen-live-barrage',
+        icon: 'smile',
+        path: '/live/kitchen-live-barrage',
+        component: './live/KitchenLiveBarrage',
+      },
+      {
         component: './404',
       },
     ],

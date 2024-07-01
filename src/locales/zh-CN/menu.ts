@@ -86,6 +86,7 @@ export default {
 
   'menu.live': '直播管理',
   'menu.live.kitchen-live': '厨房直播',
+  'menu.live.kitchen-live-barrage': '直播弹幕',
 
   'menu.finance': '财务管理',
 
