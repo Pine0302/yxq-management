@@ -9,6 +9,7 @@ import type { KitchenLiveTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import { kitchenPageInfo } from '../../biz/KitchenManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
+import * as styles from './style.less';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await kitchenLivePageInfo({
@@ -111,6 +112,11 @@ const TableList: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'status',
+      valueType: 'select', // 指定为下拉选择框
+      valueEnum: {
+        1: { text: '开启', status: 'Processing' },
+        0: { text: '关闭', status: 'Default' },
+      },
       render: (_, record) => (
         <Switch
           checkedChildren="开启"
