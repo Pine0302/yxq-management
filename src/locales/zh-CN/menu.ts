@@ -91,4 +91,5 @@ export default {
   'menu.finance': '财务管理',
 
   'menu.system': '系统管理',
+  'menu.system.sys-role': '角色管理',
 };
