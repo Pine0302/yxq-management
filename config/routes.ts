@@ -280,6 +280,12 @@ export default [
         component: './system/SysRole',
       },
       {
+        name: 'sys-menu',
+        icon: 'smile',
+        path: '/system/sys-menu',
+        component: './system/SysMenu',
+      },
+      {
         component: './404',
       },
     ],

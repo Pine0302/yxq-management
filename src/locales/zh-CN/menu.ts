@@ -92,4 +92,5 @@ export default {
 
   'menu.system': '系统管理',
   'menu.system.sys-role': '角色管理',
+  'menu.system.sys-menu': '菜单配置',
 };

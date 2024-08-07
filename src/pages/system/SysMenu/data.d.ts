@@ -38,7 +38,7 @@ export type TableListParams = {
   sorter?: Record<string, any>;
 };
 
-/** 配送员分页数据 */
+/** menu数据 */
 export type KitchenUserTableWrapper = {
   code?: number;
   msg?: string;
@@ -52,6 +52,52 @@ export type KitchenUserTableWrapper = {
   };
 };
 
+export type SysMenuTableWrapper = {
+  code?: number;
+  msg?: string;
+  success?: boolean;
+  data?: {
+    list?: SysMenuTableItem[];
+  };
+};
+
+/** 配送员分页数据 - 单条数据 */
+/*
+private Long menuId;
+private List<SystemMenuResult> children;
+private Integer type;
+private String permission;
+private String title;
+private Integer menuSort;
+private String path;
+private String component;
+private Long pid;
+private Integer subCount;
+private Boolean iFrame;
+private Boolean cache;
+private Boolean hidden;
+private String componentName;
+private String icon;
+*/
+
+export type SysMenuTableItem = {
+  menuId: number;
+  children: List<SysMenuTableItem>;
+  type: number;
+  permission: string;
+  title: string;
+  menuSort: number;
+  path: string;
+  component: string;
+  pid: number;
+  subCount: number;
+  iFrame: boolean;
+  cache: boolean;
+  hidden: boolean;
+  componentName: string;
+  icon: string;
+};
+
 /** 配送员分页数据 - 单条数据 */
 export type KitchenLiveTableItem = {
   id: number;
@@ -62,7 +108,7 @@ export type KitchenLiveTableItem = {
 };
 
 /** 配送员分页数据 */
-export type SystemAdminTable = {
+export type SystemAdminTableWrapper = {
   code?: number;
   msg?: string;
   success?: boolean;
