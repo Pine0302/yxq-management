@@ -44,8 +44,8 @@ export async function updateSystemMenu(
 }
 
 /** 修改厨房用户 POST /adminapi/kitchen_user/modify */
-export async function deleteRole(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/adminapi/system/role/delete', {
+export async function deleteMenu(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<TableListItem>('/adminapi/system/menu/delete', {
     data,
     method: 'POST',
     requestType: 'form',

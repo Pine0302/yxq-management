@@ -16,6 +16,7 @@ type MergeFormProps = {
   viewMode?: boolean; // 新增属性，用于查看模式
   value?: any;
   onSuccess?: () => void;
+  parentID?: number | null; // 添加 parentID 属性，类型为 number 或 null
 };
 
 type DataItem = {
@@ -73,6 +74,12 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       children: item.children ? transformMenuData(item.children) : [],
     }));
   };
+
+  useEffect(() => {
+    if (props.parentID) {
+      formRef.current?.setFieldsValue({ pid: props.parentID });
+    }
+  }, [props.parentID]);
 
   useEffect(() => {
     if (props?.value) {
@@ -303,6 +310,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
             treeData={menuTreeData}
             placeholder="请选择父级菜单"
             treeDefaultExpandAll
+            disabled={!!props.parentID} // 当 parentID 存在时禁用选择
             onChange={(value) => {
               // 使用 formRef 来设置表单值
               formRef.current?.setFieldsValue({ pid: value });
