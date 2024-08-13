@@ -274,6 +274,12 @@ export default [
     path: '/system',
     routes: [
       {
+        name: 'sys-admin',
+        icon: 'smile',
+        path: '/system/sys-admin',
+        component: './system/SysAdmin',
+      },
+      {
         name: 'sys-role',
         icon: 'smile',
         path: '/system/sys-role',

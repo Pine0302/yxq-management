@@ -108,14 +108,12 @@ const TableList: React.FC = () => {
       dataIndex: 'realName',
     },
     {
-      title: '登录账号',
+      title: '账号',
       dataIndex: 'account',
-      hideInSearch: true,
     },
     {
       title: '手机号',
       dataIndex: 'phone',
-      hideInSearch: true,
     },
     {
       title: '所属公司',
@@ -143,7 +141,7 @@ const TableList: React.FC = () => {
       },
       hideInSearch: true, // 如果不需要在搜索栏中搜索此列，可以设置为true
     },
-    {
+    /*{
       title: '角色1',
       dataIndex: 'systemRoles',
       render: (_, record) => {
@@ -168,11 +166,18 @@ const TableList: React.FC = () => {
           : '无角色';
       },
       hideInSearch: true,
-    },
+    },*/
     {
       title: '状态',
-      dataIndex: '',
-      hideInSearch: true,
+      dataIndex: 'status',
+      key: 'status',
+      valueType: 'text',
+      search: false, // 禁用此列的搜索功能
+      // 使用 valueEnum 来转换数值为描述文本
+      valueEnum: {
+        1: { text: '禁用' },
+        0: { text: '启用' },
+      },
     },
     {
       title: '创建时间',

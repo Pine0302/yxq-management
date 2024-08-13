@@ -85,11 +85,38 @@ export type SystemAdminTableWrapper = {
   };
 };
 
+export type SystemAdmin = {
+  id: number;
+  account: string;
+  password: string;
+  realName: string;
+  nickName: string;
+  status: number;
+  statusInt: number;
+  lastIp: string;
+  deptId: number;
+  phone: string;
+  email: string;
+  avatarName: string;
+  avatarPath: string;
+  isAdmin: boolean;
+  createBy: string;
+  updateBy: string;
+  updateTime: string;
+  createTime: string;
+  pwd_reset_time: string;
+  isDel: number;
+  company: string;
+  dept: string;
+  position: string;
+};
+
 export type SystemAdminItem = {
   id: number;
   account: string;
   password: string;
   realName: string;
+  nickName: string;
   status: number;
   lastIp: string;
   deptId: number;
@@ -103,7 +130,7 @@ export type SystemAdminItem = {
   updateTime: string;
   createTime: string;
   pwd_reset_time: string;
-  is_del: number;
+  isDel: number;
   company: string;
   dept: string;
   position: string;

@@ -18,11 +18,11 @@ export async function sysAdminPageInfo(
 }
 
 /** 新建厨房用户 POST /adminapi/kitchen_user/add */
-export async function addSystemRole(
+export async function addSystemAdmin(
   data: { [key: string]: any },
   options?: { [key: string]: any },
 ) {
-  return request<TableListItem>('/adminapi/system/role/add', {
+  return request<TableListItem>('/adminapi/system/user/add', {
     data,
     method: 'POST',
     requestType: 'form',

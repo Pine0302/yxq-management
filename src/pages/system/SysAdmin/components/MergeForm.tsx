@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { message, Radio, Input } from 'antd';
-import { addSystemRole, updateSystemRole } from '../service';
+import { addSystemAdmin, updateSystemRole } from '../service';
+import { SystemAdmin } from '../data.d';
+
 import type { UploadFile } from 'antd/lib/upload/interface';
 import 'antd/dist/antd.css'; // 确保正确导入antd样式
 import 'antd/es/upload/style/index.css';
@@ -16,26 +18,18 @@ type MergeFormProps = {
   onSuccess?: () => void;
 };
 
-type DataItem = {
-  id: number;
-  name: string;
-  phone: string;
-  isAdmin: boolean;
-  areaId: number;
-};
-
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
   console.log('values', values);
   console.log('isEdit', isEdit);
   if (!isEdit) {
-    return await addSystemRole(values);
+    return await addSystemAdmin(values);
   } else {
     return await updateSystemRole(values);
   }
 };
 
 const MergeForm: React.FC<MergeFormProps> = (props) => {
-  const formRef = useRef<FormInstance<DataItem>>();
+  const formRef = useRef<FormInstance<SystemAdmin>>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
@@ -51,7 +45,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
     };
   }, [props.value]);
 
-  const columns: ProFormColumnsType<DataItem>[] = [
+  const columns: ProFormColumnsType<SystemAdmin>[] = [
     {
       title: 'id',
       dataIndex: 'roleId',
@@ -60,10 +54,55 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       },
     },
     {
-      title: '角色名称',
-      dataIndex: 'name',
+      title: '姓名',
+      dataIndex: 'realName',
       renderFormItem: (item, { defaultRender }) => {
-        return <Input {...item} disabled={props.viewMode} placeholder="请输入角色名称" />;
+        return <Input {...item} disabled={props.viewMode} placeholder="请输入姓名" />;
+      },
+      formItemProps: {
+        rules: [{ required: true }],
+      },
+    },
+    {
+      title: '登录账号',
+      dataIndex: 'account',
+      renderFormItem: (item, { defaultRender }) => {
+        return (
+          <Input
+            {...item}
+            disabled={props.viewMode}
+            placeholder="由a~z，0~9任意组成，不超过20个字符"
+          />
+        );
+      },
+      formItemProps: {
+        rules: [
+          { required: true, message: '请输入登录账号' },
+          { pattern: /^[a-zA-Z0-9]+$/, message: '登录账号只能包含英文字母和数字' },
+          { max: 20, message: '登录账号不能超过20个字符' },
+        ],
+      },
+    },
+
+    {
+      title: '手机号',
+      dataIndex: 'phone',
+      renderFormItem: (item, { defaultRender }) => {
+        return <Input {...item} disabled={props.viewMode} placeholder="请输入手机号" />;
+      },
+      formItemProps: {
+        rules: [
+          { required: true, message: '请输入手机号' },
+          { pattern: /^\d{10,11}$/, message: '请输入有效的手机号' },
+        ],
+      },
+    },
+
+    {
+      title: '职务',
+      dataIndex: 'position',
+      renderFormItem: (item, { defaultRender }) => {
+        return <Input {...item} disabled={props.viewMode} placeholder="" />;
       },
       formItemProps: {
         rules: [{ required: true }],
@@ -71,36 +110,82 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
     },
 
     {
-      title: '类型',
-      dataIndex: 'type_name',
-      renderFormItem: (_, { type, defaultRender }) => {
-        if (type === 'form') {
-          return (
-            <Radio.Group defaultValue={1} disabled>
-              <Radio value={1}>内置角色</Radio>
-            </Radio.Group>
-          );
-        }
-        return defaultRender(_);
+      title: '登录密码',
+      dataIndex: 'password',
+      renderFormItem: (item, { defaultRender }) => {
+        return (
+          <Input
+            {...item}
+            disabled={props.viewMode}
+            placeholder="密码由8-20位a-z，0-9，特殊符号的任意两种及以上组成"
+          />
+        );
+      },
+      formItemProps: {
+        rules: [
+          { required: true, message: '请输入密码' },
+          {
+            pattern:
+              /^(?:(?=.*\d)(?=.*[a-zA-Z])|(?=.*\d)(?=.*[^a-zA-Z0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]))[A-Za-z\d\W]{8,20}$/,
+            message: '密码必须由8-20位英文字母，数字，特殊符号的任意两种及以上组成',
+          },
+        ],
       },
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      renderFormItem: (item, { defaultRender }) => {
-        return <Input {...item} disabled={props.viewMode} placeholder="请输入角色名称" />;
+      title: '状态',
+      dataIndex: 'statusInt',
+      renderFormItem: (_, { type, defaultRender, ...rest }, form) => {
+        return (
+          <Radio.Group>
+            <Radio value={1}>启用</Radio>
+            <Radio value={0}>禁用</Radio>
+          </Radio.Group>
+        );
       },
       formItemProps: {
-        rules: [{ required: true }],
+        rules: [{ required: true, message: '请选择状态' }],
+        initialValue: 1, // 设置初始值，确保加载表单时有默认值
+        valuePropName: 'value', // 确保Radio.Group使用的属性是value
+      },
+    },
+    {
+      title: '昵称',
+      dataIndex: 'nickName',
+      renderFormItem: (item, { defaultRender }) => {
+        return <Input {...item} disabled={props.viewMode} placeholder="" />;
+      },
+      formItemProps: {
+        rules: [{ required: false }],
+      },
+    },
+    {
+      title: '所属公司',
+      dataIndex: 'company',
+      renderFormItem: (item, { defaultRender }) => {
+        return <Input {...item} disabled={true} placeholder="一鲜七" />;
+      },
+      formItemProps: {
+        rules: [{ required: false }],
+      },
+    },
+    {
+      title: '部门',
+      dataIndex: 'dept',
+      renderFormItem: (item, { defaultRender }) => {
+        return <Input {...item} disabled={props.viewMode} placeholder="" />;
+      },
+      formItemProps: {
+        rules: [{ required: false }],
       },
     },
   ];
 
   return (
     <>
-      <BetaSchemaForm<DataItem>
-        //title={props?.isEdit ? '编辑角色' : '新增角色'}
-        title={props?.viewMode ? '查看角色' : props?.isEdit ? '编辑角色' : '新增角色'}
+      <BetaSchemaForm<SystemAdmin>
+        //title={props?.isEdit ? '编辑账号' : '新增账号'}
+        title={props?.viewMode ? '查看账号' : props?.isEdit ? '编辑账号' : '新增账号'}
         formRef={formRef}
         width={500}
         layout="horizontal"
@@ -114,7 +199,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           try {
             const formData = {
               ...values,
-              cover: fileList.length > 0 ? fileList[0].thumbUrl || fileList[0].url : '',
             };
             console.log(formData);
             await handleSubmit(values, props?.isEdit);

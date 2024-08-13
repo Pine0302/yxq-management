@@ -1,23 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Modal, Switch } from 'antd';
-import React, { useState, useRef } from 'react';
+import { Button, message, Modal, Switch, FormInstance } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import ProTable, { ProTableProps } from '@ant-design/pro-table';
 import { sysRolePageInfo, deleteRole, updateKitchenLiveStatus, getRoleUserNum } from './service';
 import type { KitchenLiveTableItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import { kitchenPageInfo } from '../../biz/KitchenManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
-
-const tableRequest = async (params?: { pageSize: number; current: number }) => {
-  const res = await sysRolePageInfo({
-    ...params,
-    pageNum: params?.current,
-  });
-
-  return { data: res.data?.list, success: true, total: res.data?.total };
-};
+import { useLocation } from 'react-router-dom';
 
 const kitchenSelectRequest = async () => {
   const res = await kitchenPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
@@ -40,13 +32,50 @@ const handleSubmit = async (values: any, isEdit: boolean = false) => {
   }
 };
 
+interface TableRequestParams {
+  current?: number;
+  pageSize?: number;
+  pageNum?: number;
+  name?: string; // 添加搜索字段
+}
+
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const formRef = useRef<FormInstance>();
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState(false); // 新增 viewMode 状态
   const [currentRow, setCurrentRow] = useState<any>();
+
+  const location = useLocation();
+  const initialName = new URLSearchParams(location.search).get('search') ?? '';
+
   /** 国际化配置 */
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const name = query.get('search');
+    if (name) {
+      console.log('name', name);
+      const decodedName = decodeURIComponent(name);
+      // 直接在这里设置 ProTable 表单的初始值
+      formRef.current?.setFieldsValue({ name: decodedName });
+    }
+  }, [location]);
+
+  const tableRequest = async (params?: TableRequestParams) => {
+    // 在请求前打印看看传入的参数
+    console.log('即将发送的请求参数：', params);
+    if (formRef.current?.getFieldsValue().name) {
+      params.name = formRef.current?.getFieldsValue().name;
+    }
+    const res = await sysRolePageInfo({
+      ...params,
+      pageNum: params?.current,
+    });
+
+    return { data: res.data?.list, success: true, total: res.data?.total };
+  };
 
   // 使用POST方法删除数据的函数
   const handleDelete = async (record) => {
@@ -176,6 +205,7 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
+        formRef={formRef}
         toolBarRender={() => [
           <Button
             type="primary"
@@ -190,7 +220,11 @@ const TableList: React.FC = () => {
             <PlusOutlined /> 新建
           </Button>,
         ]}
-        request={tableRequest}
+        request={(params, sorter, filter) => {
+          // 输出看看表单当前的值
+          console.log(params.name); // 输出搜索参数值
+          return tableRequest(params);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
