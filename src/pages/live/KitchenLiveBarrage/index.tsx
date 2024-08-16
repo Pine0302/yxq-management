@@ -56,7 +56,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '弹幕',
-      dataIndex: 'userName',
+      dataIndex: 'remark',
       hideInSearch: true,
       copyable: true,
     },
