@@ -25,6 +25,7 @@ type DataItem = {
   phone: string;
   isAdmin: boolean;
   areaId: number;
+  pic: string;
 };
 
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
@@ -61,15 +62,15 @@ type TabProps = {
   form: DataItem;
   parentCallback: (data: DataItem) => void;
   sourceKey: 'source1' | 'source2';
-  inputKey: 'weixinLiveId' | 'liveParams';
+  inputKey: 'miniVideoKey' | 'streamName';
 };
 
 const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) => {
   const [tabForm, setTabForm] = useState<DataItem>({
     source1: 'val1',
     source2: 'val2',
-    weixinLiveId: '',
-    liveParams: '',
+    miniVideoKey: '',
+    streamName: '',
   });
 
   useEffect(() => {
@@ -109,10 +110,10 @@ const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) 
       </div>
       <div>
         <label className="label-box">
-          {inputKey === 'weixinLiveId' ? '微信视频号ID' : '直播参数'}：
+          {inputKey === 'miniVideoKey' ? '微信视频号ID' : '直播参数'}：
         </label>
         <Input
-          placeholder={`请输入${inputKey === 'weixinLiveId' ? '微信视频号ID' : '直播参数'}`}
+          placeholder={`请输入${inputKey === 'miniVideoKey' ? '微信视频号ID' : '直播参数'}`}
           style={{ width: 200 }}
           value={tabForm[inputKey]}
           onChange={(e) => handleInputChange(e.target.value)}
@@ -139,13 +140,13 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       //回显
       setFullForm(props.value);
 
-      if (props.value.cover) {
+      if (props.value.pic) {
         setFileList([
           {
             uid: '-1',
             name: '封面图',
             status: 'done',
-            url: props.value.cover,
+            url: props.value.pic,
           },
         ]);
       }
@@ -173,8 +174,29 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
 
   const handleCancel = () => setPreviewVisible(false);
 
-  const handleChange = ({ fileList: newFileList }: { fileList: UploadFile[] }) => {
+  const handleChange = ({
+    fileList: newFileList,
+    file,
+  }: {
+    fileList: UploadFile[];
+    file: UploadFile;
+  }) => {
+    console.log('File change:', file); // 查看文件的状态和响应
     setFileList(newFileList);
+
+    if (file.status === 'done' && file.response) {
+      const imageUrl = file.response.data; // 从响应的data字段获取URL
+      console.log('Image uploaded, URL:', imageUrl); // 查看上传的图片URL
+
+      formRef.current?.setFieldsValue({
+        pic: imageUrl,
+      });
+
+      setFullForm((prevForm) => ({
+        ...prevForm,
+        pic: imageUrl,
+      }));
+    }
   };
 
   const items = [
@@ -186,7 +208,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           form={fullForm}
           parentCallback={handleCallback}
           sourceKey="source1"
-          inputKey="weixinLiveId"
+          inputKey="miniVideoKey"
         />
       ),
     },
@@ -198,7 +220,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           form={fullForm}
           parentCallback={handleCallback}
           sourceKey="source2"
-          inputKey="liveParams"
+          inputKey="streamName"
         />
       ),
     },
@@ -247,16 +269,17 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
     },
     {
       title: '默认展示图',
-      dataIndex: 'cover',
+      dataIndex: 'pic',
       renderFormItem: (_, { type, defaultRender, ...rest }, form) => {
         return (
           <>
             <Upload
+              action="/file/upload"
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
               onChange={handleChange}
-              beforeUpload={() => false}
+              //beforeUpload={() => false}
             >
               {fileList.length >= 1 ? null : <div>上传图片</div>}
             </Upload>
@@ -303,15 +326,14 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 22 }}
         onFinish={async (values) => {
-          // const formData = {
-          //   ...values,
-          //   cover: fileList.length > 0 ? fileList[0].thumbUrl || fileList[0].url : '',
-          // };
+          console.log('Form values before processing:', values);
           const formData = {
             ...values,
             ...childData,
+            pic: values.pic || fullForm.pic, // 尝试从当前表单值或完整表单状态获取封面图URL
           };
-          console.log(formData);
+          console.log('Final form data to submit:', formData);
+
           await handleSubmit(formData, props?.isEdit);
           message.success('操作成功');
           props?.onSuccess?.();
