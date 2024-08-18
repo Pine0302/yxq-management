@@ -26,6 +26,8 @@ type DataItem = {
   isAdmin: boolean;
   areaId: number;
   pic: string;
+  miniVideoKey: string;
+  streamName: string;
 };
 
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
@@ -59,72 +61,96 @@ const getBase64 = (file: RcFile | undefined) => {
 };
 
 type TabProps = {
-  form: DataItem;
-  parentCallback: (data: DataItem) => void;
+  initialValues: DataItem;
+  onDataChange: (data: DataItem) => void;
   sourceKey: 'source1' | 'source2';
   inputKey: 'miniVideoKey' | 'streamName';
+  miniVideoKey: string;
+  streamName: string;
 };
 
-const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) => {
-  const [tabForm, setTabForm] = useState<DataItem>({
-    source1: 'val1',
-    source2: 'val2',
-  });
+const Tab: React.FC<TabProps> = ({ initialValues, onDataChange }) => {
+  const [miniVideoKey, setInput1] = useState(initialValues?.miniVideoKey || '');
+  const [streamName, setInput2] = useState(initialValues?.streamName || '');
+  const [source1, setSource1] = useState(initialValues.source1 || 'val1');
+  const [source2, setSource2] = useState(initialValues.source2 || 'val2');
+  const [tabKey, setTabKey] = useState('1');
 
   useEffect(() => {
-    if (!form.source1) {
-      form.source1 = 'val1';
-    }
-    if (!form.source2) {
-      form.source2 = 'val2';
-    }
-    setTabForm({
-      ...form,
-    });
-  }, [form]);
-  const sendDataToParent = () => {
-    parentCallback(tabForm);
+    setInput1(initialValues.miniVideoKey || '');
+    setInput2(initialValues.streamName || '');
+  }, [initialValues]);
+
+  const items = [
+    {
+      key: '1',
+      label: 'H5小程序端',
+    },
+    {
+      key: '2',
+      label: 'APP端',
+    },
+  ];
+
+  const handleInputChange1 = (e) => {
+    setInput1(e.target.value);
+    onDataChange({ miniVideoKey: e.target.value, streamName }); // 提交数据给父组件
   };
-
-  useEffect(() => {
-    sendDataToParent();
-  }, [tabForm.miniVideoKey, tabForm.streamName]);
-
-  const handleInputChange = (value: string) => {
-    setTabForm((prevTabForm) => ({
-      ...prevTabForm,
-      [inputKey]: value,
-    }));
+  const handleInputChange2 = (e) => {
+    setInput2(e.target.value);
+    onDataChange({ miniVideoKey, streamName: e.target.value }); // 提交数据给父组件
   };
-
+  const onChange = (key) => {
+    setTabKey(key);
+  };
   return (
     <>
-      <div>
-        <label className="label-box">直播间来源：</label>
-        <Radio.Group disabled value={tabForm[sourceKey]}>
-          <Radio value="val1"> 微信视频号直播间 </Radio>
-          <Radio value="val2"> 其他直播间 </Radio>
-        </Radio.Group>
+      <Tabs
+        type="card"
+        activeKey={tabKey}
+        onChange={onChange}
+        items={items.map((item) => {
+          return {
+            label: item.label,
+            key: item.key,
+          };
+        })}
+      />
+      <div style={{ display: tabKey === '1' ? 'block' : 'none' }}>
+        <div>
+          <label className="label-box">直播间来源：</label>
+          <Radio.Group disabled value={source1}>
+            <Radio value="val1"> 微信视频号直播间 </Radio>
+            <Radio value="val2"> 其他直播间 </Radio>
+          </Radio.Group>
+        </div>
+        <label className="label-box">微信视频号ID：</label>
+        <Input
+          placeholder={`请输入微信视频号ID`}
+          style={{ width: 200 }}
+          value={miniVideoKey}
+          onChange={(e) => {
+            handleInputChange1(e);
+          }}
+        />
       </div>
-      <div>
-        <div style={{ display: inputKey === 'miniVideoKey' ? 'block' : 'none' }}>
-          <label className="label-box">微信视频号ID：</label>
-          <Input
-            placeholder={`请输入微信视频号ID`}
-            style={{ width: 200 }}
-            value={tabForm.miniVideoKey}
-            onChange={(e) => handleInputChange(e.target.value)}
-          />
+      <div style={{ display: tabKey === '2' ? 'block' : 'none' }}>
+        <div>
+          <label className="label-box">直播间来源：</label>
+          <Radio.Group disabled value={source2}>
+            <Radio value="val1"> 微信视频号直播间 </Radio>
+            <Radio value="val2"> 其他直播间 </Radio>
+          </Radio.Group>
         </div>
-        <div style={{ display: inputKey === 'streamName' ? 'block' : 'none' }}>
-          <label className="label-box">直播参数：</label>
-          <Input
-            placeholder={`请输入直播参数`}
-            style={{ width: 200 }}
-            value={tabForm.streamName}
-            onChange={(e) => handleInputChange(e.target.value)}
-          />
-        </div>
+        <label className="label-box">直播参数：</label>
+        <Input
+          placeholder={`请输入直播参数`}
+          style={{ width: 200 }}
+          value={streamName}
+          onChange={(e) => {
+            handleInputChange2(e);
+          }}
+        />
       </div>
     </>
   );
@@ -134,11 +160,11 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState<string>('');
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
-  const [fullForm, setFullForm] = useState<DataItem>({});
+  const [fullForm, setFullForm] = useState<DataItem>();
   const [childData, setChildData] = useState({});
 
   const handleCallback = (data) => {
-    setChildData({ ...childData, ...data });
+    setChildData({ ...data });
   };
 
   useEffect(() => {
@@ -158,6 +184,11 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         ]);
       }
     } else {
+      setPreviewVisible(false);
+      setPreviewImage('');
+      setFileList([]);
+      setFullForm({});
+      formRef.current?.resetFields();
     }
     return () => {
       setPreviewVisible(false);
@@ -166,7 +197,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       setFullForm({});
       formRef.current?.resetFields();
     };
-  }, [props.visible]);
+  }, [props.value]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -202,33 +233,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       }));
     }
   };
-
-  const items = [
-    {
-      key: '1',
-      label: 'H5小程序端',
-      children: (
-        <Tab
-          form={fullForm}
-          parentCallback={handleCallback}
-          sourceKey="source1"
-          inputKey="miniVideoKey"
-        />
-      ),
-    },
-    {
-      key: '2',
-      label: 'APP端',
-      children: (
-        <Tab
-          form={fullForm}
-          parentCallback={handleCallback}
-          sourceKey="source2"
-          inputKey="streamName"
-        />
-      ),
-    },
-  ];
 
   const columns: ProFormColumnsType<DataItem>[] = [
     {
@@ -300,16 +304,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         return (
           <>
             <div className="text-title text-bg">直播间参数设置</div>
-            <Tabs
-              type="card"
-              items={items.map((item) => {
-                return {
-                  label: item.label,
-                  key: item.key,
-                  children: item.children,
-                };
-              })}
-            />
+            <Tab initialValues={fullForm} onDataChange={handleCallback} />
           </>
         );
       },
@@ -336,7 +331,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
             ...childData,
             pic: values.pic || fullForm.pic, // 尝试从当前表单值或完整表单状态获取封面图URL
           };
-          console.log('Final form data to submit:', formData);
 
           await handleSubmit(formData, props?.isEdit);
           message.success('操作成功');
