@@ -178,7 +178,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       setPreviewImage('');
       setFullForm({});
     };
-  }, [props.value]);
+  }, [props.visible]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -358,6 +358,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         columns={columns}
         visible={props?.visible}
         onVisibleChange={(v) => {
+          debugger;
           if (!v) {
             props?.onCancel?.();
           }
