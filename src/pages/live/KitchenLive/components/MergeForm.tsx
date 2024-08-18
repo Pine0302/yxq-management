@@ -252,6 +252,16 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       },
     },
     {
+      title: '所属厨房',
+      dataIndex: 'kitchenId',
+      valueType: 'select',
+      width: '100%',
+      request: kitchenSelectRequest,
+      formItemProps: {
+        rules: [{ required: true }],
+      },
+    },
+    {
       title: '直播间名称',
       dataIndex: 'liveName',
       formItemProps: {
@@ -265,16 +275,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         rules: [{ required: true }],
       },
     },
-    {
-      title: '所属厨房',
-      dataIndex: 'kitchenId',
-      valueType: 'select',
-      width: '100%',
-      request: kitchenSelectRequest,
-      formItemProps: {
-        rules: [{ required: true }],
-      },
-    },
+
     {
       title: '默认展示图',
       dataIndex: 'pic',
@@ -329,9 +330,10 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
           const formData = {
             ...values,
             ...childData,
-            pic: values.pic || fullForm.pic, // 尝试从当前表单值或完整表单状态获取封面图URL
+            //pic: values.pic || fullForm.pic, // 尝试从当前表单值或完整表单状态获取封面图URL
+            pic: fileList.length > 0 && fileList[0].status === 'done' ? values.pic : fullForm.pic, // 使用条件检查以确定是否更新 pic 字段
           };
-
+          console.log('Final form data to submit:', formData);
           await handleSubmit(formData, props?.isEdit);
           message.success('操作成功');
           props?.onSuccess?.();
