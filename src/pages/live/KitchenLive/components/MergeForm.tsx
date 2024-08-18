@@ -112,12 +112,28 @@ const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) 
         <label className="label-box">
           {inputKey === 'miniVideoKey' ? '微信视频号ID' : '直播参数'}：
         </label>
-        <Input
-          placeholder={`请输入${inputKey === 'miniVideoKey' ? '微信视频号ID' : '直播参数'}`}
-          style={{ width: 200 }}
-          value={tabForm[inputKey]}
-          onChange={(e) => handleInputChange(e.target.value)}
-        />
+        {inputKey === 'miniVideoKey' && ( // 控制显示隐藏
+          <div>
+            <label className="label-box">微信视频号ID：</label>
+            <Input
+              placeholder={`请输入微信视频号ID`}
+              style={{ width: 200 }}
+              value={tabForm.miniVideoKey}
+              onChange={(e) => handleInputChange(e.target.value)}
+            />
+          </div>
+        )}
+        {inputKey === 'streamName' && ( // 控制显示隐藏
+          <div>
+            <label className="label-box">直播参数：</label>
+            <Input
+              placeholder={`请输入直播参数`}
+              style={{ width: 200 }}
+              value={tabForm.streamName}
+              onChange={(e) => handleInputChange(e.target.value)}
+            />
+          </div>
+        )}
       </div>
     </>
   );
