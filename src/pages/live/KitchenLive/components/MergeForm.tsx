@@ -69,8 +69,6 @@ const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) 
   const [tabForm, setTabForm] = useState<DataItem>({
     source1: 'val1',
     source2: 'val2',
-    miniVideoKey: '',
-    streamName: '',
   });
 
   useEffect(() => {
@@ -90,7 +88,7 @@ const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) 
 
   useEffect(() => {
     sendDataToParent();
-  }, [tabForm[inputKey]]);
+  }, [tabForm.miniVideoKey, tabForm.streamName]);
 
   const handleInputChange = (value: string) => {
     setTabForm((prevTabForm) => ({
@@ -109,31 +107,24 @@ const Tab: React.FC<TabProps> = ({ form, parentCallback, sourceKey, inputKey }) 
         </Radio.Group>
       </div>
       <div>
-        <label className="label-box">
-          {inputKey === 'miniVideoKey' ? '微信视频号ID' : '直播参数'}：
-        </label>
-        {inputKey === 'miniVideoKey' && ( // 控制显示隐藏
-          <div>
-            <label className="label-box">微信视频号ID：</label>
-            <Input
-              placeholder={`请输入微信视频号ID`}
-              style={{ width: 200 }}
-              value={tabForm.miniVideoKey}
-              onChange={(e) => handleInputChange(e.target.value)}
-            />
-          </div>
-        )}
-        {inputKey === 'streamName' && ( // 控制显示隐藏
-          <div>
-            <label className="label-box">直播参数：</label>
-            <Input
-              placeholder={`请输入直播参数`}
-              style={{ width: 200 }}
-              value={tabForm.streamName}
-              onChange={(e) => handleInputChange(e.target.value)}
-            />
-          </div>
-        )}
+        <div style={{ display: inputKey === 'miniVideoKey' ? 'block' : 'none' }}>
+          <label className="label-box">微信视频号ID：</label>
+          <Input
+            placeholder={`请输入微信视频号ID`}
+            style={{ width: 200 }}
+            value={tabForm.miniVideoKey}
+            onChange={(e) => handleInputChange(e.target.value)}
+          />
+        </div>
+        <div style={{ display: inputKey === 'streamName' ? 'block' : 'none' }}>
+          <label className="label-box">直播参数：</label>
+          <Input
+            placeholder={`请输入直播参数`}
+            style={{ width: 200 }}
+            value={tabForm.streamName}
+            onChange={(e) => handleInputChange(e.target.value)}
+          />
+        </div>
       </div>
     </>
   );
@@ -167,16 +158,13 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         ]);
       }
     } else {
-      formRef.current?.resetFields();
-      setFileList([]);
-      setFullForm({});
     }
-
     return () => {
-      setFileList([]);
       setPreviewVisible(false);
       setPreviewImage('');
+      setFileList([]);
       setFullForm({});
+      formRef.current?.resetFields();
     };
   }, [props.visible]);
 
@@ -358,7 +346,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         columns={columns}
         visible={props?.visible}
         onVisibleChange={(v) => {
-          debugger;
           if (!v) {
             props?.onCancel?.();
           }
