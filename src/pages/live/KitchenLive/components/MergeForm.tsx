@@ -343,7 +343,6 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         visible={props?.visible}
         onVisibleChange={(v) => {
           if (!v) {
-            setFullForm({});
             props?.onCancel?.();
           }
         }}
