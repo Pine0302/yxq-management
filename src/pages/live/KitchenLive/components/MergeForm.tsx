@@ -168,6 +168,17 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
   };
 
   useEffect(() => {
+    // 检查弹窗是否打开并确认是新建模式
+    if (props.visible && !props.isEdit) {
+      formRef.current?.resetFields(); // 重置表单字段
+      setFileList([]); // 清空文件列表
+      setFullForm({}); // 清空可能的表单数据状态
+      setPreviewImage(''); // 清除预览图片
+      setPreviewVisible(false); // 关闭图片预览窗口
+    }
+  }, [props.visible, props.isEdit]); // 添加 props.isEdit 为依赖项，确保在编辑和新建状态切换时响应
+
+  useEffect(() => {
     if (props?.value) {
       formRef.current?.setFieldsValue(props.value);
       //回显
