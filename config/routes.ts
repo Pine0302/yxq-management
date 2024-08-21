@@ -292,6 +292,12 @@ export default [
         component: './system/SysMenu',
       },
       {
+        name: 'sys-role-menu-user',
+        icon: 'smile',
+        path: '/system/sys-role-menu-user',
+        component: './system/SysRoleMenuUser',
+      },
+      {
         component: './404',
       },
     ],

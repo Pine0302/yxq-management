@@ -6,6 +6,7 @@ import MergeForm from './components/MergeForm';
 import { Button, Modal, message } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
 import { deleteMenu } from './service';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const removeNode = (nodes, id) => {
   return nodes
@@ -226,7 +227,7 @@ const TreeTable = () => {
     setQueryFilter(filters);
   };
   return (
-    <>
+    <PageContainer>
       <ProTable
         columns={columns}
         request={fetchTableData}
@@ -266,7 +267,7 @@ const TreeTable = () => {
           console.log('qwertyu');
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 

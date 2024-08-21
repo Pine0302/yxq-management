@@ -5,7 +5,79 @@
   flex-direction: row;
   flex-wrap: nowrap;
 }
-
 .marginLeft {
   margin-left: 10px;
+}
+.text-box {
+  margin-bottom: 0 !important;
+}
+
+.text-bg::before {
+  display: inline-block;
+  width: 3px;
+  height: 15px;
+  margin-top: 2px;
+  margin-right: 4px;
+  vertical-align: text-top;
+  background: @primary-color;
+  content: '';
+}
+.label-box {
+  display: inline-block;
+  width: 125px;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.info-item strong {
+  display: block;
+  margin-bottom: 4px; // 控制标签和内容之间的间距
+}
+
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; // 控制每个项之间的间距
+}
+
+.info-item {
+  display: flex;
+  flex: 1 1 calc(50% - 16px); // 每行两个项，每个项宽度为容器的一半减去间距
+  align-items: center; // 垂直居中对齐
+  margin-bottom: 16px; // 控制每行的底部间距
+}
+
+.info-label {
+  margin-right: 8px; // 控制键名和键值之间的间距
+  font-weight: bold;
+}
+
+.info-value {
+  flex: 1; // 让值占据剩余空间
+}
+
+.text-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.text-bg {
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.roles-container {
+  display: flex; // 使用Flexbox进行布局
+  flex-wrap: wrap; // 允许项目在需要时换行
+  margin-top: 16px; // 与上面的标签增加间距
+}
+
+.role-badge {
+  margin-right: 8px; // 右边距
+  margin-bottom: 8px; // 下边距
+  padding: 4px 8px; // 内边距
+  background-color: #f0f0f0; // 设置背景色
+  border: 1px solid #d9d9d9; // 边框
+  border-radius: 4px; // 边角圆滑
 }

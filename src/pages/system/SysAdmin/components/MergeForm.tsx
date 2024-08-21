@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormInstance, ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
 import { message, Radio, Input } from 'antd';
-import { addSystemAdmin, updateSystemRole } from '../service';
+import { addSystemAdmin, updateSystemAdmin } from '../service';
 import { SystemAdmin } from '../data.d';
 
 import type { UploadFile } from 'antd/lib/upload/interface';
@@ -24,7 +24,7 @@ const handleSubmit = async (values: any, isEdit: boolean = false) => {
   if (!isEdit) {
     return await addSystemAdmin(values);
   } else {
-    return await updateSystemRole(values);
+    return await updateSystemAdmin(values);
   }
 };
 
@@ -48,7 +48,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
   const columns: ProFormColumnsType<SystemAdmin>[] = [
     {
       title: 'id',
-      dataIndex: 'roleId',
+      dataIndex: 'id',
       formItemProps: {
         hidden: true,
       },
@@ -116,20 +116,23 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
         return (
           <Input
             {...item}
-            disabled={props.viewMode}
+            disabled={props.viewMode || props.isEdit}
             placeholder="密码由8-20位a-z，0-9，特殊符号的任意两种及以上组成"
           />
         );
       },
       formItemProps: {
-        rules: [
-          { required: true, message: '请输入密码' },
-          {
-            pattern:
-              /^(?:(?=.*\d)(?=.*[a-zA-Z])|(?=.*\d)(?=.*[^a-zA-Z0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]))[A-Za-z\d\W]{8,20}$/,
-            message: '密码必须由8-20位英文字母，数字，特殊符号的任意两种及以上组成',
-          },
-        ],
+        rules: props.isEdit
+          ? []
+          : [
+              // 如果是编辑模式，则不设校验规则
+              { required: true, message: '请输入密码' },
+              {
+                pattern:
+                  /^(?:(?=.*\d)(?=.*[a-zA-Z])|(?=.*\d)(?=.*[^a-zA-Z0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]))[A-Za-z\d\W]{8,20}$/,
+                message: '密码必须由8-20位英文字母，数字，特殊符号的任意两种及以上组成',
+              },
+            ],
       },
     },
     {

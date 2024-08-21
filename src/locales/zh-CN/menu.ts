@@ -94,4 +94,5 @@ export default {
   'menu.system.sys-admin': '系统账号',
   'menu.system.sys-role': '角色管理',
   'menu.system.sys-menu': '菜单配置',
+  'menu.system.sys-role-menu-user': '角色权限配置',
 };

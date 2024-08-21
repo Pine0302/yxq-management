@@ -31,11 +31,23 @@ export async function addSystemAdmin(
 }
 
 /** 修改厨房用户 POST /adminapi/kitchen_user/modify */
-export async function updateSystemRole(
+export async function updateSystemAdmin(
   data: { [key: string]: any },
   options?: { [key: string]: any },
 ) {
-  return request<TableListItem>('/adminapi/system/role/edit', {
+  return request<TableListItem>('/adminapi/system/user/edit', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+export async function updateSystemUserPwd(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/system/user/editPwd', {
     data,
     method: 'POST',
     requestType: 'form',
@@ -44,8 +56,11 @@ export async function updateSystemRole(
 }
 
 /** 修改厨房用户 POST /adminapi/kitchen_user/modify */
-export async function deleteRole(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<TableListItem>('/adminapi/system/role/delete', {
+export async function deleteSystemUser(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/system/user/delete', {
     data,
     method: 'POST',
     requestType: 'form',
@@ -55,11 +70,11 @@ export async function deleteRole(data: { [key: string]: any }, options?: { [key:
 
 // 假设这是更新状态的API函数
 // 导出updateKitchenLiveStatus函数，与deleteKitchenLive样式相同
-export async function updateKitchenLiveStatus(
+export async function updateSystemUserStatus(
   data: { id: number | string; status: number | string },
   options?: { [key: string]: any },
 ) {
-  return request<TableListItem>('/adminapi/kitchen_live/updateLiveStatus', {
+  return request<TableListItem>('/adminapi/system/user/updateSystemUserStatus', {
     data,
     method: 'POST',
     requestType: 'form',

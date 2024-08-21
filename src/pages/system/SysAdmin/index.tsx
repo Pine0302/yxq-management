@@ -4,7 +4,12 @@ import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { sysAdminPageInfo, deleteRole, updateKitchenLiveStatus, getRoleUserNum } from './service';
+import {
+  sysAdminPageInfo,
+  deleteSystemUser,
+  updateSystemUserStatus,
+  getRoleUserNum,
+} from './service';
 import type {
   KitchenLiveTableItem,
   TableListPagination,
@@ -12,6 +17,8 @@ import type {
   SystemAdminItem,
 } from './data';
 import MergeForm from './components/MergeForm';
+import ChangePwdForm from './components/ChangePwdForm';
+import ShowForm from './components/ShowForm';
 import { kitchenPageInfo } from '../../biz/KitchenManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { useHistory } from 'react-router-dom'; // 引入 useHistory 钩子
@@ -46,9 +53,28 @@ const handleSubmit = async (values: any, isEdit: boolean = false) => {
   }
 };
 
+const handleStatusChange = async (record, enable) => {
+  const status = enable ? 1 : 0; // 状态设置为1启用，0禁用
+  const id = record.id;
+  try {
+    const res = await updateSystemUserStatus({ id, status });
+    if (res.success) {
+      message.success(`${enable ? '启用' : '禁用'}成功`);
+      actionRef.current?.reload(); // 刷新表格数据
+    } else {
+      throw new Error(res.message);
+    }
+  } catch (error) {
+    message.error(`${enable ? '启用' : '禁用'}失败: ` + error.message);
+    actionRef.current?.reload();
+  }
+};
+
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
+  const [changePwdFormVisible, setChangePwdFormVisible] = useState<boolean>(false);
+  const [showFormVisible, setShowFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState(false); // 新增 viewMode 状态
   const [currentRow, setCurrentRow] = useState<any>();
@@ -56,19 +82,8 @@ const TableList: React.FC = () => {
 
   // 使用POST方法删除数据的函数
   const handleDelete = async (record) => {
-    let mess = '删除后不可恢复，确定删除“' + record.name + '”角色？';
+    const mess = '删除后不可恢复，确定删除账号“' + record.account + '”？';
 
-    const result = await getRoleUserNum({ roleId: record.roleId });
-    console.log('result');
-    console.table(result.data);
-    // 如果需要根据 result.data 进行后续处理，请在这里进行判断
-    if (result.data != null && result.data.length > 0) {
-      let size = result.data.length;
-      mess =
-        '角色已被使用，若强制删除，会将该角色跟系统账号（已授权' +
-        size +
-        '个）的关联关系，角色跟权限的关联关系一并清除，确定继续删除？';
-    }
     Modal.confirm({
       title: '确定删除这条记录吗？',
       content: mess,
@@ -76,7 +91,7 @@ const TableList: React.FC = () => {
       okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
-        const res = await deleteRole(record);
+        const res = await deleteSystemUser(record);
         console.log(res);
         message.success('删除成功');
         actionRef.current?.reload(); // 刷新表格数据
@@ -88,7 +103,7 @@ const TableList: React.FC = () => {
     const status = checked ? 1 : 0; // 假设1代表开启，0代表关闭
     const id = record.id;
     try {
-      const res = await updateKitchenLiveStatus({ id, status });
+      const res = await updateSystemUserStatus({ id, status });
       if (res.success) {
         message.success('状态更新成功');
         actionRef.current?.reload(); // 刷新表格数据
@@ -110,10 +125,12 @@ const TableList: React.FC = () => {
     {
       title: '账号',
       dataIndex: 'account',
+      hideInSearch: true,
     },
     {
       title: '手机号',
       dataIndex: 'phone',
+      hideInSearch: true,
     },
     {
       title: '所属公司',
@@ -175,8 +192,8 @@ const TableList: React.FC = () => {
       search: false, // 禁用此列的搜索功能
       // 使用 valueEnum 来转换数值为描述文本
       valueEnum: {
-        1: { text: '禁用' },
-        0: { text: '启用' },
+        OK: { text: '启用' },
+        DISABLED: { text: '禁用' },
       },
     },
     {
@@ -190,33 +207,46 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => {
         // 判断是否是超级管理员
-        const isSuperAdmin = record.roleId === 1;
+        const isSuperAdmin = record.isAdmin === true;
 
         // 根据 isSuperAdmin 变量决定是否显示编辑和删除按钮
         return [
+          <a
+            key="edit"
+            onClick={() => {
+              setMergeFormVisible(true);
+              setIsEdit(true);
+              setViewMode(false); // 取消设置为查看模式
+              setCurrentRow(record);
+              console.log(record);
+            }}
+          >
+            编辑
+          </a>,
+          !isSuperAdmin && (
+            <a key="delete" onClick={() => handleDelete(record)}>
+              删除
+            </a>
+          ),
           !isSuperAdmin && (
             <a
-              key="edit"
+              key="changePwd"
               onClick={() => {
-                setMergeFormVisible(true);
+                setChangePwdFormVisible(true);
                 setIsEdit(true);
                 setViewMode(false); // 取消设置为查看模式
                 setCurrentRow(record);
                 console.log(record);
               }}
             >
-              编辑
+              修改密码
             </a>
           ),
-          !isSuperAdmin && (
-            <a key="delete" onClick={() => handleDelete(record)}>
-              删除
-            </a>
-          ),
+
           <a
             key="view"
             onClick={() => {
-              setMergeFormVisible(true);
+              setShowFormVisible(true);
               setIsEdit(false);
               setViewMode(true); // 设置为查看模式
               setCurrentRow(record);
@@ -225,6 +255,25 @@ const TableList: React.FC = () => {
           >
             查看
           </a>,
+          !isSuperAdmin && (
+            <a
+              key="toggleStatus"
+              onClick={() => {
+                const isEnabling = record.statusInt === 0;
+                Modal.confirm({
+                  title: `确定${isEnabling ? '启用' : '禁用'}该用户吗？`,
+                  content: isEnabling
+                    ? '启用后，该人员将恢复正常使用，确定继续启用？'
+                    : '禁用后，该账号无法登录和使用相关权限的功能，确定继续禁用？',
+                  okText: '确认',
+                  cancelText: '取消',
+                  onOk: () => handleStatusChange(record, isEnabling),
+                });
+              }}
+            >
+              {record.statusInt === 0 ? '启用' : '禁用'}
+            </a>
+          ),
         ];
       },
     },
@@ -269,6 +318,23 @@ const TableList: React.FC = () => {
         value={currentRow}
         isEdit={isEdit}
         viewMode={viewMode} // 传递 viewMode 状态
+        onSuccess={() => actionRef.current?.reload()}
+      />
+
+      <ChangePwdForm
+        visible={changePwdFormVisible}
+        onCancel={() => setChangePwdFormVisible(false)}
+        value={currentRow}
+        isEdit={isEdit}
+        viewMode={viewMode} // 传递 viewMode 状态
+        onSuccess={() => actionRef.current?.reload()}
+      />
+      <ShowForm
+        visible={showFormVisible}
+        onCancel={() => setShowFormVisible(false)}
+        value={currentRow}
+        isEdit={false}
+        viewMode={viewMode}
         onSuccess={() => actionRef.current?.reload()}
       />
     </PageContainer>

@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SettingFilled } from '@ant-design/icons';
 import { Button, message, Modal, Switch, FormInstance } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -10,6 +10,7 @@ import MergeForm from './components/MergeForm';
 import { kitchenPageInfo } from '../../biz/KitchenManage/service';
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'; // 导入 useHistory 进行导航
 
 const kitchenSelectRequest = async () => {
   const res = await kitchenPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
@@ -46,6 +47,7 @@ const TableList: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState(false); // 新增 viewMode 状态
   const [currentRow, setCurrentRow] = useState<any>();
+  const history = useHistory(); // 使用 useHistory 钩子
 
   const location = useLocation();
   const initialName = new URLSearchParams(location.search).get('search') ?? '';
@@ -125,6 +127,11 @@ const TableList: React.FC = () => {
     }
   };
 
+  const handlePermissionClick = (id: number) => {
+    // 实现跳转逻辑，假设目标页面的路径为 '/permissions'
+    history.push(`/system/sys-role-menu-user?id=${id}`);
+  };
+
   const columns: ProColumns<KitchenLiveTableItem>[] = [
     {
       title: '角色',
@@ -149,6 +156,12 @@ const TableList: React.FC = () => {
       title: '权限',
       dataIndex: 'createTime',
       hideInSearch: true,
+      render: (_, record) => (
+        <SettingFilled
+          onClick={() => handlePermissionClick(record.roleId)}
+          style={{ cursor: 'pointer', color: 'blue' }}
+        />
+      ),
     },
     {
       title: '操作',

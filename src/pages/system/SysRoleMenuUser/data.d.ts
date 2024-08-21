@@ -38,7 +38,7 @@ export type TableListParams = {
   sorter?: Record<string, any>;
 };
 
-/** 配送员分页数据 */
+/** menu数据 */
 export type KitchenUserTableWrapper = {
   code?: number;
   msg?: string;
@@ -52,6 +52,52 @@ export type KitchenUserTableWrapper = {
   };
 };
 
+export type SysMenuTableWrapper = {
+  code?: number;
+  msg?: string;
+  success?: boolean;
+  data?: {
+    list?: SysMenuTableItem[];
+  };
+};
+
+/** 配送员分页数据 - 单条数据 */
+/*
+private Long menuId;
+private List<SystemMenuResult> children;
+private Integer type;
+private String permission;
+private String title;
+private Integer menuSort;
+private String path;
+private String component;
+private Long pid;
+private Integer subCount;
+private Boolean iFrame;
+private Boolean cache;
+private Boolean hidden;
+private String componentName;
+private String icon;
+*/
+
+export type SysMenuTableItem = {
+  menuId: number;
+  children: List<SysMenuTableItem>;
+  type: number;
+  permission: string;
+  title: string;
+  menuSort: number;
+  path: string;
+  component: string;
+  pid: number;
+  subCount: number;
+  iFrame: boolean;
+  cache: boolean;
+  hidden: boolean;
+  componentName: string;
+  icon: string;
+};
+
 /** 配送员分页数据 - 单条数据 */
 export type KitchenLiveTableItem = {
   id: number;
@@ -62,54 +108,13 @@ export type KitchenLiveTableItem = {
 };
 
 /** 配送员分页数据 */
-export type SystemAdminTable = {
-  code?: number;
-  msg?: string;
-  success?: boolean;
-  data?: {
-    list?: SystemAdminItem[];
-  };
-};
-
-/** 配送员分页数据 */
 export type SystemAdminTableWrapper = {
   code?: number;
   msg?: string;
   success?: boolean;
   data?: {
     list?: SystemAdminItem[];
-    pageNum?: number;
-    current?: number;
-    pageSize?: number;
-    total?: number;
   };
-};
-
-export type SystemAdmin = {
-  id: number;
-  account: string;
-  password: string;
-  realName: string;
-  nickName: string;
-  status: number;
-  statusInt: number;
-  lastIp: string;
-  deptId: number;
-  phone: string;
-  email: string;
-  avatarName: string;
-  avatarPath: string;
-  isAdmin: boolean;
-  createBy: string;
-  updateBy: string;
-  updateTime: string;
-  createTime: string;
-  pwdResetTime: string;
-  isDel: number;
-  company: string;
-  dept: string;
-  position: string;
-  passwordConfirm: string;
 };
 
 export type SystemAdminItem = {
@@ -117,7 +122,6 @@ export type SystemAdminItem = {
   account: string;
   password: string;
   realName: string;
-  nickName: string;
   status: number;
   lastIp: string;
   deptId: number;
@@ -130,17 +134,22 @@ export type SystemAdminItem = {
   updateBy: string;
   updateTime: string;
   createTime: string;
-  pwdResetTime: string;
-  isDel: number;
+  pwd_reset_time: string;
+  is_del: number;
   company: string;
   dept: string;
   position: string;
-  list?: systemRoles[];
 };
 
-export type systemRoles = {
+export type SysRoleMenuUser = {
   roleId: number;
   name: string;
+  level: number;
   description: string;
-  typeName: string;
+  typename: string;
+  systemUserNumber: number;
+  totalUser: number;
+  userList?: SystemAdminItem[];
+  menuList?: SysMenuTableItem[];
+  allUserList?: SystemAdminItem[];
 };
