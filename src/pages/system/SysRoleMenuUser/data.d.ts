@@ -153,3 +153,13 @@ export type SysRoleMenuUser = {
   menuList?: SysMenuTableItem[];
   allUserList?: SystemAdminItem[];
 };
+
+/** 配送员分页数据 */
+export type SysRoleMenuUserUpdate = {
+  code?: number;
+  msg?: string;
+  success?: boolean;
+  data?: {
+    list?: SystemAdminItem[];
+  };
+};

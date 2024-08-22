@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { SysRoleMenuUser } from './data';
+import { SysRoleMenuUser, SysRoleMenuUserUpdate } from './data';
 
 //获取某个角色对应绑定的用户
 export async function getSysRoleUserMenuInfo(
@@ -29,6 +29,19 @@ export async function removeRoleUser(
     params: {
       ...params,
     },
+    ...(options || {}),
+  });
+}
+
+interface UpdateUserData {
+  roleId: number;
+  targetKeys: string[];
+}
+
+export async function updateUser(data: UpdateUserData, options?: { [key: string]: any }) {
+  return request<SysRoleMenuUserUpdate>('/adminapi/system/role/updateRoleUser', {
+    data,
+    method: 'POST',
     ...(options || {}),
   });
 }

@@ -1,12 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { Layout, Tabs, Modal, Avatar, Tag, Row, Col, message } from 'antd';
-
+import { Layout, Tabs, Modal, Avatar, Tag, Row, Col, message, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入回退图标
 import { PageContainer } from '@ant-design/pro-layout';
 import { useLocation } from 'react-router-dom';
 import { getSysRoleUserMenuInfo, removeRoleUser } from './service';
 import AddUserModal from './components/AddUserModal'; // 确保路径正确
-
+import './style.less';
 const { Content } = Layout;
 
 const SRMU: React.FC = () => {
@@ -17,15 +17,27 @@ const SRMU: React.FC = () => {
   const [modalStyle, setModalStyle] = useState({});
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false); // 新增用户模态框的可见状态
 
-  useEffect(() => {
-    // 解析 URL 查询参数
-    const queryParams = new URLSearchParams(location.search);
-    const id = queryParams.get('id');
-
-    // 使用获取的 id 参数发起请求
-    if (id) {
-      fetchData(id);
+  const fetchUserData = async () => {
+    try {
+      const id = new URLSearchParams(location.search).get('id');
+      if (id) {
+        const response = await getSysRoleUserMenuInfo({ roleId: id });
+        if (response.code === 200 && response.success) {
+          console.log('Updated data:', response);
+          setData(response.data); // 更新状态
+          message.success('用户数据更新成功！');
+        } else {
+          throw new Error('数据更新失败');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      message.error('获取数据失败');
     }
+  };
+
+  useEffect(() => {
+    fetchUserData();
   }, [location]);
 
   const showModal = (user, event) => {
@@ -125,13 +137,29 @@ const SRMU: React.FC = () => {
   return (
     <PageContainer>
       <Layout>
-        <Content>
-          <div>
-            <h2>角色名称: {data?.name}</h2>
-            <p>描述: {data?.description}</p>
-          </div>
+        <Content className="content-divider">
+          <Row align="middle" style={{ padding: '20px' }}>
+            <Col span={2}>
+              <Avatar style={{ backgroundColor: '#f56a00' }}>ico</Avatar>
+            </Col>
+            <Col span={20}>
+              <div>
+                <h2 style={{ margin: 0 }}> {data?.name}</h2>
+                <p style={{ color: 'gray' }}>描述: {data?.description}</p>
+              </div>
+            </Col>
+            <Col span={2}>
+              <Button
+                shape="round"
+                icon={<ArrowLeftOutlined />}
+                onClick={() => window.history.back()}
+              >
+                回退
+              </Button>
+            </Col>
+          </Row>
         </Content>
-        <Content>
+        <Content className="tab-content-bg">
           <Tabs
             defaultActiveKey="1"
             onChange={onChange}
@@ -141,65 +169,43 @@ const SRMU: React.FC = () => {
                 key: '1',
                 children: (
                   <>
-                    <div>
-                      人数: {data?.systemUserNumber}/{data?.totalUser}
-                    </div>
-                    <div>成员:</div>
-                    {data?.systemUsers && data.systemUsers.length > 0 ? (
-                      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                        {data.systemUsers.map((user, index) => (
-                          <div key={index} style={{ textAlign: 'center', margin: 10 }}>
-                            <div style={{ position: 'relative', display: 'inline-block' }}>
-                              {' '}
-                              {/* 确保这里是头像的直接父容器 */}
+                    <div className="user-info">
+                      <div className="user-count">
+                        人数: {data?.systemUserNumber}/{data?.totalUser}
+                      </div>
+                      <div className="user-members">
+                        <div className="user-count">成员:</div>
+                        <div className="user-display">
+                          {data?.systemUsers.map((user, index) => (
+                            <div key={index} className="user-item">
                               <Avatar
+                                className="avatar"
                                 src={
                                   user.avatarPath ||
                                   'http://img.nidcai.com//2021/12/18/7bf8bd2a750b0f14420a3004c0adc236.png'
                                 }
                                 size="large"
                                 onClick={(e) => showModal(user, e)}
-                                style={{ cursor: 'pointer', marginBottom: 8 }}
                               />
-                              <span
-                                style={{
-                                  position: 'absolute',
-                                  top: -15,
-                                  right: -5,
-                                  cursor: 'pointer',
-                                  color: 'red', // Make "x" visible
-                                  fontSize: '20px', // Adjust size
-                                  fontWeight: 'bold', // Make "x" bold
-                                }}
-                                onClick={(e) => onTagClose(user, e)}
-                              >
+                              <span className="remove-icon" onClick={(e) => onTagClose(user, e)}>
                                 ×
                               </span>
+                              <div>{user.realName}</div>
                             </div>
-                            <div>{user.realName}</div>
-                          </div>
-                        ))}
-                        {/* Add circle with plus sign */}
-                        <div style={{ textAlign: 'center', margin: 10 }}>
-                          <div style={{ position: 'relative', display: 'inline-block' }}>
+                          ))}
+                          {/* 添加新用户按钮 */}
+                          <div className="add-user-item">
                             <Avatar
-                              style={{
-                                backgroundColor: '#f0f2f5',
-                                border: '2px dashed #d9d9d9',
-                                cursor: 'pointer',
-                                color: '#1890ff',
-                              }}
+                              className="add-user-icon"
                               size="large"
                               icon={<PlusOutlined />}
                               onClick={handleAddNewUser}
                             />
+                            <div>Add New</div>
                           </div>
-                          <div>Add New</div>
                         </div>
                       </div>
-                    ) : (
-                      <div>暂无用户</div>
-                    )}
+                    </div>
                   </>
                 ),
               },
@@ -208,11 +214,6 @@ const SRMU: React.FC = () => {
                 key: '2',
                 children: `Content of Tab Pane 2`,
               },
-              // {
-              //   label: `Tab 3`,
-              //   key: '3',
-              //   children: `Content of Tab Pane 3`,
-              // },
             ]}
           />
         </Content>
@@ -246,7 +247,12 @@ const SRMU: React.FC = () => {
         )}
       </Modal>
 
-      <AddUserModal isVisible={isAddUserModalVisible} onClose={handleCloseModal} data={data} />
+      <AddUserModal
+        isVisible={isAddUserModalVisible}
+        onClose={handleCloseModal}
+        data={data}
+        fetchUserData={fetchUserData}
+      />
     </PageContainer>
   );
 };
