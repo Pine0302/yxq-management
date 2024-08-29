@@ -69,6 +69,7 @@ export type GoodsTableItem = {
   status?: boolean;
   type?: string;
   pepper?: number;
+  belong?: number;
 };
 
 export type GoodsDetailWrapper = {

@@ -68,6 +68,27 @@ const TableList: React.FC = () => {
       },
     },
     {
+      title: '经营归属',
+      dataIndex: 'belong',
+      valueType: 'select', // 指定为下拉选择框
+      valueEnum: {
+        1: { text: '厨房', status: 'kitchen' },
+        2: { text: '楼宇', status: 'area' },
+      },
+      renderFormItem: (_, { type, defaultRender, ...rest }, form) => {
+        if (type === 'form') {
+          return null;
+        }
+        return defaultRender(_);
+      },
+      fieldProps: (form, { rowIndex }) => ({
+        rules: [{ required: true, message: '请选择经营归属' }],
+      }),
+      render: (_, record) => (
+        <>{record.belong === 1 ? '厨房' : record.belong === 2 ? '楼宇' : ''}</>
+      ),
+    },
+    {
       title: '价格',
       dataIndex: 'price',
       hideInSearch: true,
@@ -106,6 +127,7 @@ const TableList: React.FC = () => {
         </Popconfirm>
       ),
     },
+
     {
       title: '操作',
       dataIndex: 'option',

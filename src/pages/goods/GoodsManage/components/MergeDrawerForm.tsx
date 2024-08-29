@@ -99,6 +99,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           limitNum: 0,
           status: false,
           sideDishGoods: [],
+          belong: undefined, // 确保新增时经营归属没有初始值
         });
         setShowPackageStep(false);
         setFileList([]);
@@ -143,6 +144,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
       status,
       sideDishGoods,
       pepper,
+      belong,
     } = formData;
     let { pic } = formData;
     const sideDishIds: { gid: any; relationType: any }[] = [];
@@ -176,6 +178,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         pic,
         sideDishIds,
         pepper,
+        belong,
       };
       await editGoods(postData);
     } else {
@@ -196,6 +199,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         sideDishDTOS: sideDishIds,
         pepper,
         source: 1,
+        belong,
       };
       await addGoods(postData);
     }
@@ -329,6 +333,20 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
               rules={[{ required: true }]}
             />
           )}
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormRadio.Group
+            name="belong"
+            label="经营归属"
+            rules={[{ required: true, message: '请选择经营归属' }]}
+            options={[
+              { label: '厨房', value: 1 },
+              { label: '楼宇', value: 2 },
+            ]}
+            labelCol={{ span: 9 }}
+            wrapperCol={{ span: 22 }}
+          />
         </ProForm.Group>
       </DrawerForm>
       <Modal
