@@ -10,6 +10,8 @@ console.log(updateAreaTimeConfigYxq); // 输出应该显示函数代码，而不
 interface DayDinnerFormProps {
   visible: boolean;
   onCancel: () => void;
+  onSave: (startTime: string | null, endTime: string | null) => void;
+  onSuccess: () => void;
   value?: {
     id: number;
     type: number;
@@ -22,6 +24,8 @@ interface DayDinnerFormProps {
     phone: string | null;
     contacts: string | null;
     pickUpTime: string;
+    startTime: string;
+    endTime: string;
   };
 }
 
@@ -37,6 +41,8 @@ interface TableItem {
   phone: string | null;
   contacts: string | null;
   pickUpTime: string;
+  startTime: string;
+  endTime: string;
 }
 
 const pickupOptions = [
@@ -77,11 +83,17 @@ const getStatusText = (status: boolean): string => {
   }
 };
 
-const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value }) => {
+const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value, onSave }) => {
   const [form] = Form.useForm();
   const [tableData, setTableData] = useState<TableItem[]>([]);
   const [draftData, setDraftData] = useState([]); // 用于编辑的草稿数据
   const [] = useState(false);
+  const [startTime, setStartTime] = useState<Moment | null>(
+    value ? moment(value.startTime, 'HH:mm') : null,
+  );
+  const [endTime, setEndTime] = useState<Moment | null>(
+    value ? moment(value.endTime, 'HH:mm') : null,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +112,12 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
     if (visible) {
       fetchData();
     }
-  }, [visible]);
+    if (visible && value) {
+      // Ensure that you are setting Moment objects or null appropriately
+      setStartTime(value.startTime ? moment(value.startTime, 'HH:mm') : null);
+      setEndTime(value.endTime ? moment(value.endTime, 'HH:mm') : null);
+    }
+  }, [visible, value]);
 
   const updateAreaTimeConfig = async (data: never[]) => {
     try {
@@ -146,11 +163,19 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
 
   // 3: 保存所有更改
   const handleSaveAllChanges = () => {
+    const updatedTimes = {
+      startTime: startTime ? moment(startTime).format('HH:mm') : null,
+      endTime: endTime ? moment(endTime).format('HH:mm') : null,
+    };
+    const updateData = { ...updatedTimes, draftData };
+
     // 假设你有一个 API 函数 updateAllData 来处理更新
-    updateAreaTimeConfig(draftData)
+    updateAreaTimeConfig(updateData)
       .then(() => {
         message.success('所有更改已保存！');
         setTableData(draftData); // 更新原始数据，以反映新的状态
+        console.log('updatedTimes:', updatedTimes);
+        onSave(updatedTimes.startTime, updatedTimes.endTime); // 调用回调函数，传递更新的时间数据
         onCancel(); // 调用onCancel来关闭抽屉
       })
       .catch((error) => {
@@ -220,7 +245,7 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
       },
     },
     {
-      title: '截单时间',
+      title: '点餐截单时间',
       dataIndex: 'deadLine',
       render: (text, record) => {
         if (record.isEditing) {
@@ -284,6 +309,8 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
         </div>
       }
     >
+      <div>| 厨房经营的餐次</div>
+
       <Form form={form} layout="vertical" initialValues={{ list: tableData }}>
         <Form.List name="list">
           {() => (
@@ -296,6 +323,14 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value 
             />
           )}
         </Form.List>
+
+        <div>| 实体店订单（水果饮品等）取餐时间</div>
+        <Form.Item label="开始时间">
+          <TimePicker value={startTime} onChange={setStartTime} format={'HH:mm'} />
+        </Form.Item>
+        <Form.Item label="结束时间">
+          <TimePicker value={endTime} onChange={setEndTime} format={'HH:mm'} />
+        </Form.Item>
       </Form>
     </Drawer>
   );

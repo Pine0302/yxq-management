@@ -78,7 +78,7 @@ export async function updateAreaTimeConfigYxq(
   data: { [key: string]: any },
   options?: { [key: string]: any },
 ) {
-  return request<TableListItem>('/adminapi/area/modifyAreaTimeConfig', {
+  return request<TableListItem>('/adminapi/area/modifyAreaTimeConfigNew', {
     data,
     method: 'POST',
     headers: {

@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Drawer } from 'antd';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -13,15 +13,6 @@ import WeekDinnerForm from './components/WeekDinnerForm';
 import AreaActForm from './components/AreaActForm';
 import AddressTemplateForm from './components/AddresstemplateForm';
 
-const tableRequest = async (params?: { pageSize: number; current: number }) => {
-  const res = await buildingPageInfo({
-    ...params,
-    pageNum: params?.current,
-  });
-
-  return { data: res.data?.list, success: true, total: res.data?.total };
-};
-
 const TableList: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
   const [dayDinnerFormVisible, setDayDinnerFormVisible] = useState<boolean>(false);
@@ -30,12 +21,15 @@ const TableList: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<any>();
+  const [tableData, setTableData] = useState<BuildingTableItem[]>([]);
 
   const [qrCodeModalOpen, setQrCodeModalOpen] = useState<boolean>(false);
 
   const [addressTemplateFormVisible, setAddressTemplateFormVisible] = useState(false); // 控制地址模板列表的显示
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
   const [key, setKey] = useState(0);
+  const [openDayDinnerForm, setOpenDayDinnerForm] = useState(false);
+
   const columns: ProColumns<BuildingTableItem>[] = [
     {
       title: '楼宇名称',
@@ -130,6 +124,7 @@ const TableList: React.FC = () => {
           onClick={() => {
             setDayDinnerFormVisible(true);
             setIsEdit(true);
+            setOpenDayDinnerForm(true); // 设置打开餐次详情的请求
             setCurrentRow(record);
             console.log(record);
           }}
@@ -171,6 +166,56 @@ const TableList: React.FC = () => {
     },
   ];
 
+  const tableRequest = async (params?: { pageSize: number; current: number }) => {
+    const res = await buildingPageInfo({
+      ...params,
+      pageNum: params?.current,
+    });
+
+    return { data: res.data?.list, success: true, total: res.data?.total };
+  };
+
+  useEffect(() => {
+    setKey((prevKey) => prevKey + 1);
+  }, [tableData]); // 当 tableData 更新时，更改 key 强制刷新 ProTable
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await tableRequest();
+      if (response.success) {
+        setTableData(response.data);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (openDayDinnerForm && currentRow) {
+      setDayDinnerFormVisible(true);
+      setOpenDayDinnerForm(false); // 重置打开标记
+    }
+  }, [openDayDinnerForm, currentRow]); // 监听 openDayDinnerForm 和 currentRow
+
+  const updateBuildingTimes = (id, startTime, endTime) => {
+    console.log('updateBuildingTimes-id:', id);
+    console.log('updateBuildingTimes-starttime:', startTime);
+    console.log('updateBuildingTimes-endtime:', endTime);
+    const updatedData = tableData.map((item) => {
+      console.log('Current item in loop:', item);
+      if (item.id === id) {
+        console.log('Updating item:', item);
+        return { ...item, startTime, endTime };
+      }
+      return item;
+    });
+    console.log('Updated data:', updatedData);
+    setTableData(updatedData);
+    // 更新当前选中的行以反映最新数据
+    const newCurrentRow = updatedData.find((item) => item.id === id);
+    if (newCurrentRow) {
+      setCurrentRow(newCurrentRow);
+    }
+  };
   return (
     <PageContainer>
       <ProTable<BuildingTableItem, TableListPagination>
@@ -217,11 +262,22 @@ const TableList: React.FC = () => {
         onCancel={() => setQrCodeModalOpen(false)}
       />
       <DayDinnerForm
+        key={currentRow ? currentRow.id : 'new'}
         visible={dayDinnerFormVisible}
         onCancel={() => setDayDinnerFormVisible(false)}
-        onSuccess={() => actionRef.current?.reload()}
+        onSuccess={() => {
+          // 在餐次信息成功更新后触发列表的重新加载
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
         isEdit={isEdit}
         value={currentRow}
+        onSave={(startTime, endTime) => {
+          console.log('Reloading data...');
+          updateBuildingTimes(currentRow.id, startTime, endTime);
+          //  forceUpdate(); // 调用更新函数来强制重新渲染列表
+        }}
       />
       <WeekDinnerForm
         visible={weekDinnerFormVisible}

@@ -64,6 +64,8 @@ export type BuildingTableItem = {
   pickUpType: string;
   province: string;
   status: string;
+  startTime: string;
+  endTime: string;
 };
 
 export type TemlateAddressTableItem = {
