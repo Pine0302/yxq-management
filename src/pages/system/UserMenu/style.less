@@ -1,0 +1,33 @@
+@import '~antd/es/style/themes/default.less';
+
+.goodWrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.marginLeft {
+  margin-left: 10px;
+}
+.text-box {
+  margin-bottom: 0 !important;
+}
+.text-title {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.text-bg::before {
+  display: inline-block;
+  width: 3px;
+  height: 15px;
+  margin-top: 2px;
+  margin-right: 4px;
+  vertical-align: text-top;
+  background: @primary-color;
+  content: '';
+}
+.label-box {
+  display: inline-block;
+  width: 125px;
+  margin-bottom: 10px;
+  text-align: right;
+}

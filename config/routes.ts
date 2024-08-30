@@ -274,6 +274,12 @@ export default [
     path: '/system',
     routes: [
       {
+        name: 'user-menu',
+        icon: 'smile',
+        path: '/system/user-menu',
+        component: './system/UserMenu',
+      },
+      {
         component: './404',
       },
     ],
