@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Table, Drawer, Button, Select, TimePicker } from 'antd';
+import { Form, Input, Table, Drawer, Button, Select, TimePicker, Col, Row } from 'antd';
 import { getAreaDayDinnerConfig, updateAreaTimeConfigYxq } from '../service';
 import moment from 'moment'; // Ensure you have moment.js installed for handling date-time objects
 import { message } from 'antd';
 import { set } from 'lodash';
-
+import '../style.less';
 console.log(updateAreaTimeConfigYxq); // 输出应该显示函数代码，而不是undefined
 
 interface DayDinnerFormProps {
@@ -309,8 +309,7 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value,
         </div>
       }
     >
-      <div>| 厨房经营的餐次</div>
-
+      <div className="section-title">| 厨房经营的餐次</div>
       <Form form={form} layout="vertical" initialValues={{ list: tableData }}>
         <Form.List name="list">
           {() => (
@@ -324,12 +323,20 @@ const DayDinnerForm: React.FC<DayDinnerFormProps> = ({ visible, onCancel, value,
           )}
         </Form.List>
 
-        <div>| 实体店订单（水果饮品等）取餐时间</div>
-        <Form.Item label="开始时间">
-          <TimePicker value={startTime} onChange={setStartTime} format={'HH:mm'} />
-        </Form.Item>
-        <Form.Item label="结束时间">
-          <TimePicker value={endTime} onChange={setEndTime} format={'HH:mm'} />
+        <div className="section-title">| 实体店订单（水果饮品等）取餐时间</div>
+
+        <Form.Item label="取餐时间 :" style={{ marginBottom: 0 }}>
+          <Row gutter={8} align="middle">
+            <Col>
+              <TimePicker value={startTime} onChange={setStartTime} format={'HH:mm'} />
+            </Col>
+            <Col>
+              <span>至</span>
+            </Col>
+            <Col>
+              <TimePicker value={endTime} onChange={setEndTime} format={'HH:mm'} />
+            </Col>
+          </Row>
         </Form.Item>
       </Form>
     </Drawer>
