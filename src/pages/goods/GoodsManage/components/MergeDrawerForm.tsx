@@ -161,47 +161,63 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
       });
     }
 
-    if (id) {
-      // edit
-      const postData = {
-        id,
-        cid,
-        gname,
-        content,
-        type,
-        originalPrice,
-        price,
-        packageFee,
-        limitBuy,
-        limitNum,
-        status,
-        pic,
-        sideDishIds,
-        pepper,
-        belong,
-      };
-      await editGoods(postData);
-    } else {
-      // add
-      const postData = {
-        id,
-        cid,
-        gname,
-        content,
-        type,
-        originalPrice,
-        price,
-        packageFee,
-        limitBuy,
-        limitNum,
-        status,
-        pic,
-        sideDishDTOS: sideDishIds,
-        pepper,
-        source: 1,
-        belong,
-      };
-      await addGoods(postData);
+    try {
+      let response;
+      if (id) {
+        // 编辑商品
+        const postData = {
+          id,
+          cid,
+          gname,
+          content,
+          type,
+          originalPrice,
+          price,
+          packageFee,
+          limitBuy,
+          limitNum,
+          status,
+          pic,
+          sideDishIds,
+          pepper,
+          belong,
+        };
+        response = await editGoods(postData);
+      } else {
+        // 新增商品
+        const postData = {
+          id,
+          cid,
+          gname,
+          content,
+          type,
+          originalPrice,
+          price,
+          packageFee,
+          limitBuy,
+          limitNum,
+          status,
+          pic,
+          sideDishDTOS: sideDishIds,
+          pepper,
+          source: 1,
+          belong,
+        };
+        response = await addGoods(postData);
+      }
+
+      // 根据返回的响应结果显示不同的提示
+      if (response && response.success) {
+        message.success('提交成功'); // 只有在成功时才显示提交成功
+      } else {
+        message.error(response?.msg || '提交失败，请检查数据');
+        return false; // 提交失败时终止后续逻辑
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      message.error('提交失败，商品归属与其所属类目不匹配');
+
+      return false;
     }
 
     onCancel();
@@ -219,7 +235,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         width={999}
         onFinish={async (values) => {
           mergeSubmit(values);
-          message.success('提交成功');
+          // message.success('提交成功');
         }}
       >
         <ProFormText name="id" hidden />
