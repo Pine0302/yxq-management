@@ -16,6 +16,14 @@ const orderStatusValueEnum = {
     text: '制作中',
     status: 'Default',
   },
+  DISH_ARRIVED: {
+    text: '餐已到店',
+    status: 'Processing',
+  },
+  DISH_TO_AREA_STORE: {
+    text: '餐已到店',
+    status: 'Processing',
+  },
   ARRIVED: {
     text: '已完成',
     status: 'Success',
