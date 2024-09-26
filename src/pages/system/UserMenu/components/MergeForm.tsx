@@ -21,8 +21,13 @@ type DataItem = {
 };
 
 const handleSubmit = async (values: any) => {
-  if (values?.id) {
-    return await updateMenuUser(values);
+  if (values?.id !== undefined && values.id !== null) {
+    // 注意这里使用 !== 来严格检查不是 undefined 和 null
+    if (values.id === 0) {
+      return await updateMenuUser(values);
+    } else {
+      return await updateMenuUser(values);
+    }
   } else {
     return await addKitchenLive(values);
   }
