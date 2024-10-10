@@ -26,11 +26,11 @@ const CouponManage: React.FC = () => {
 
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '优惠券名称',
+      title: '卡券名称',
       dataIndex: 'name',
     },
     {
-      title: '类型',
+      title: '卡券种类',
       dataIndex: 'type',
       valueEnum: {
         DISCOUNT: {
@@ -45,24 +45,68 @@ const CouponManage: React.FC = () => {
     },
     {
       title: '面值',
-      dataIndex: 'xx',
+      dataIndex: 'reduce',
       hideInForm: true,
       hideInSearch: true,
       renderText: (_, record) => {
-        return `${record.discount}`;
+        return `${record.reduce}`;
+      },
+    },
+    {
+      title: '有效期',
+      dataIndex: '',
+      hideInForm: true,
+      hideInSearch: true,
+      render: (_, record) => {
+        const startDate = record.startTime ? new Date(record.startTime) : null;
+        const endDate = record.endTime ? new Date(record.endTime) : null;
+
+        if (!startDate || !endDate) {
+          return '无效日期';
+        }
+
+        const formatDate = (date: Date) => {
+          return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
+            date.getDate(),
+          ).padStart(2, '0')}`;
+        };
+
+        return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+      },
+    },
+
+    {
+      title: '使用规则',
+      dataIndex: 'remark',
+      hideInForm: true,
+      hideInSearch: true,
+      render: (_, record) => {
+        const rd = record.remark && (
+          <Popover content={record.remark}>
+            <MessageOutlined />
+          </Popover>
+        );
+        return rd;
       },
     },
     {
       title: '适用楼宇',
-      dataIndex: 'callNo',
+      dataIndex: 'activityAreas',
       hideInForm: true,
       hideInSearch: true,
+      renderText: (activityAreas: any[]) => {
+        if (!activityAreas || activityAreas.length === 0) {
+          return '不限制';
+        }
+        return activityAreas.map((area) => area.areaName).join('，');
+      },
     },
     {
       title: '适用商品',
-      dataIndex: 'callNo',
+      dataIndex: 'gids',
       hideInForm: true,
       hideInSearch: true,
+      render: (text) => (text === '-1' || !text ? '不限制' : text),
     },
     {
       title: '免包装费',
@@ -79,29 +123,68 @@ const CouponManage: React.FC = () => {
       render: (_, record) => (record.deliveryFree ? <CheckOutlined /> : <CloseOutlined />),
     },
     {
-      title: '限额',
-      tooltip: '每用户限额',
-      dataIndex: 'limitPerUser',
+      title: '领取方式',
+      dataIndex: 'sendType',
       hideInForm: true,
       hideInSearch: true,
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      hideInForm: true,
-      hideInSearch: true,
-      render: (_, record) => {
-        const rd = record.remark && (
-          <Popover content={record.remark}>
-            <MessageOutlined />
-          </Popover>
-        );
-        return rd;
+      renderText: (sendType: string) => {
+        switch (sendType) {
+          case 'PLATFORM':
+            return '平台赠送';
+          case 'SCENE':
+            return '场景触发';
+          case 'PUBLIC':
+            return '公开投放';
+          default:
+            return sendType; // 如果是未知类型,返回原始值
+        }
       },
     },
     {
-      title: '总数',
+      title: '状态',
+      dataIndex: 'sendStatus',
+      hideInForm: true,
+      hideInSearch: true,
+      renderText: (sendStatus: number) => {
+        switch (sendStatus) {
+          case 0:
+            return '未投放';
+          case 1:
+            return '已投放';
+          case 2:
+            return '已结束';
+          default:
+            return sendStatus; // 如果是未知类型,返回原始值
+        }
+      },
+    },
+    {
+      title: '投放时间',
+      dataIndex: 'sendTime',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '投放总数',
       dataIndex: 'totalAmount',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '已领取',
+      dataIndex: '',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '已使用',
+      dataIndex: '',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '已过期',
+      dataIndex: '',
       hideInForm: true,
       hideInSearch: true,
     },
@@ -112,30 +195,68 @@ const CouponManage: React.FC = () => {
       hideInSearch: true,
       valueType: 'dateTime',
     },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      hideInForm: true,
-      render: (_, record) => {
-        return <Switch checked={record.status} />;
-      },
-    },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   hideInForm: true,
+    //   render: (_, record) => {
+    //     return <Switch checked={record.status} />;
+    //   },
+    // },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [
-        <a
-          key="edit"
-          onClick={() => {
-            setMergeFormVisible(true);
-            setIsEdit(true);
-            setCurrentRow(record);
-          }}
-        >
-          修改
-        </a>,
-      ],
+      render: (_, record) => {
+        switch (record.sendStatus) {
+          case 0: // 未投放
+            return [
+              <a
+                key="edit"
+                onClick={() => {
+                  setMergeFormVisible(true);
+                  setIsEdit(true);
+                  setCurrentRow(record);
+                }}
+              >
+                编辑
+              </a>,
+              <a key="launch" onClick={() => handleLaunch(record)}>
+                投放
+              </a>,
+              <a key="delete" onClick={() => handleDelete(record)}>
+                删除
+              </a>,
+            ];
+          case 1: // 已投放
+            return [
+              <a key="details" onClick={() => handleDetails(record)}>
+                详情
+              </a>,
+              <a
+                key="modify"
+                onClick={() => {
+                  setMergeFormVisible(true);
+                  setIsEdit(true);
+                  setCurrentRow(record);
+                }}
+              >
+                修改
+              </a>,
+              <a key="end" onClick={() => handleEnd(record)}>
+                结束
+              </a>,
+            ];
+          case 2: // 已结束投放
+            return [
+              <a key="details" onClick={() => handleDetails(record)}>
+                详情
+              </a>,
+            ];
+          default:
+            return [];
+        }
+      },
     },
   ];
 

@@ -5,6 +5,7 @@ export type TableListItem = {
   deliveryFree: boolean;
   packageFree: boolean;
   totalAmount: number;
+  reduce: number;
   //   activityAreas: [,…]
   // activityGoods: [{id: 5, cid: 1, gname: "黄豆猪蹄套餐", price: 26.8, originalPrice: 32.88,…},…]
   discount: number; //折扣
@@ -20,6 +21,7 @@ export type TableListItem = {
   // reduce: 50
   remark: string;
   status: boolean;
+  sendStatus: number;
 };
 
 export type TableListPagination = {
