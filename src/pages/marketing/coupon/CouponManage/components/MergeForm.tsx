@@ -79,13 +79,19 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       visible={visible}
       onFinish={async (values) => {
         try {
-          if (values.applicableBuildingsType === 'specific') {
-            values.fixedArea = values.fixedArea.join(',');
+          if (values.applicableBuildingsType === 'all') {
+            values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
+          } else if (values.applicableBuildingsType === 'specific') {
+            values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
           }
           console.log('开始提交');
-          // 确保 submitToBackend 返回 Promise
           await handleSubmit(values, isEdit);
           message.success('提交成功');
+          if (onSuccess) {
+            onSuccess(); // 调用 onSuccess 回调函数
+          } else {
+            window.location.reload(); // 刷新页面
+          }
         } catch (error) {
           console.error('提交失败:', error);
           message.error('提交失败，请重试');
@@ -250,7 +256,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             fieldProps={{
               style: { width: '100px' }, // 设置输入框宽度
             }}
-            rules={[{ required: true, message: '请输入用券有效��间' }]}
+            rules={[{ required: true, message: '请输入用券有效时间' }]}
           />
         </Col>
       </Row>
@@ -374,7 +380,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             labelCol={{ span: 0 }}
             wrapperCol={{ span: 20 }}
             initialValue={true}
-            transform={(checked) => (checked ? '1' : '0')} // 根据选中状态转换值为字符串
+            transform={(checked) => ({ receiveRemind: checked ? '1' : '0' })} // 确保转换后的值被正确传递
           >
             领取成功时提醒
           </ProFormCheckbox>
@@ -389,7 +395,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
               label="过期提醒："
               labelCol={{ span: 12 }}
               wrapperCol={{ span: 20 }}
-              transform={(checked) => (checked ? '1' : '0')} // 根据选中状态转换值为字符串
+              transform={(checked) => ({ expireRemind: checked ? '1' : '0' })} // 确保转换后的值被正确传递
             >
               到期
             </ProFormCheckbox>

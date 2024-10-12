@@ -35,3 +35,12 @@ export async function editCoupon(data: { [key: string]: any }, options?: { [key:
     ...(options || {}),
   });
 }
+/** 发送优惠券 POST /adminapi/coupon/modify */
+export async function sendCoupon(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/coupon/send', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}

@@ -7,6 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { couponPageInfo } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import LaunchForm from './components/LaunchForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await couponPageInfo({
@@ -21,6 +22,7 @@ const CouponManage: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
+  const [launchFormVisible, setLaunchFormVisible] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
 
@@ -211,16 +213,16 @@ const CouponManage: React.FC = () => {
         switch (record.sendStatus) {
           case 0: // 未投放
             return [
-              <a
-                key="edit"
-                onClick={() => {
-                  setMergeFormVisible(true);
-                  setIsEdit(true);
-                  setCurrentRow(record);
-                }}
-              >
-                编辑
-              </a>,
+              // <a
+              //   key="edit"
+              //   onClick={() => {
+              //     setMergeFormVisible(true);
+              //     setIsEdit(true);
+              //     setCurrentRow(record);
+              //   }}
+              // >
+              //   编辑
+              // </a>,
               <a key="launch" onClick={() => handleLaunch(record)}>
                 投放
               </a>,
@@ -233,16 +235,16 @@ const CouponManage: React.FC = () => {
               <a key="details" onClick={() => handleDetails(record)}>
                 详情
               </a>,
-              <a
-                key="modify"
-                onClick={() => {
-                  setMergeFormVisible(true);
-                  setIsEdit(true);
-                  setCurrentRow(record);
-                }}
-              >
-                修改
-              </a>,
+              // <a
+              //   key="modify"
+              //   onClick={() => {
+              //     setMergeFormVisible(true);
+              //     setIsEdit(true);
+              //     setCurrentRow(record);
+              //   }}
+              // >
+              //   修改
+              // </a>,
               <a key="end" onClick={() => handleEnd(record)}>
                 结束
               </a>,
@@ -259,6 +261,11 @@ const CouponManage: React.FC = () => {
       },
     },
   ];
+
+  const handleLaunch = (record: any) => {
+    setLaunchFormVisible(true);
+    setCurrentRow(record);
+  };
 
   return (
     <PageContainer>
@@ -294,7 +301,20 @@ const CouponManage: React.FC = () => {
         isEdit={isEdit}
         value={currentRow}
         onCancel={() => setMergeFormVisible(false)}
-        onSuccess={() => actionRef.current?.reload()}
+        onSuccess={() => {
+          actionRef.current?.reload(); // 刷新表格数据
+          setMergeFormVisible(false); // 将 MergeForm 设为不可见
+        }}
+      />
+      <LaunchForm
+        visible={launchFormVisible}
+        isEdit={isEdit}
+        value={currentRow}
+        onCancel={() => setLaunchFormVisible(false)}
+        onSuccess={() => {
+          actionRef.current?.reload(); // 刷新表格数据
+          setLaunchFormVisible(false); // 将 MergeForm 设为不可见
+        }}
       />
     </PageContainer>
   );
