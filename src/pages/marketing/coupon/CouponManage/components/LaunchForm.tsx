@@ -9,6 +9,7 @@ import {
   ProFormDependency,
   ProFormDatePicker,
   ProFormTextArea,
+  ProFormCheckbox,
 } from '@ant-design/pro-form';
 import { Col, Row, Divider, message } from 'antd';
 
@@ -133,7 +134,7 @@ const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuc
         </Col>
       </Row>
 
-      <Divider orientation="left">投放优惠券</Divider>
+      <Divider orientation="left">投放优优惠券</Divider>
 
       <Row>
         <Col span={16}>
@@ -159,9 +160,38 @@ const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuc
             ]}
             initialValue="SCENE"
             rules={[{ required: true, message: '请选择投放领取方式' }]}
+            fieldProps={{
+              onChange: (e) => {
+                if (e.target.value === 'SCENE') {
+                  formRef.current?.setFieldsValue({ sceneType: ['NEW_USER_REGISTER'] });
+                } else {
+                  formRef.current?.setFieldsValue({ sceneType: [] });
+                }
+              },
+            }}
           />
         </Col>
       </Row>
+
+      <ProFormDependency name={['sendType']}>
+        {({ sendType }) => {
+          if (sendType === 'SCENE') {
+            return (
+              <Row>
+                <Col span={16}>
+                  <ProFormCheckbox.Group
+                    name="sceneType"
+                    label="场景选择"
+                    options={[{ label: '新用户注册成功时，自动领取', value: 'NEW_REGISTER' }]}
+                    rules={[{ required: true, message: '请选择场景' }]}
+                  />
+                </Col>
+              </Row>
+            );
+          }
+          return null;
+        }}
+      </ProFormDependency>
 
       <ProFormDependency name={['sendType', 'userChoose']}>
         {({ sendType, userChoose }) => {
