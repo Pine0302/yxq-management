@@ -8,7 +8,7 @@ import { couponPageInfo } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import LaunchForm from './components/LaunchForm';
-
+import CouponDetailForm from './components/CouponDetailForm';
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await couponPageInfo({
     ...params,
@@ -23,7 +23,7 @@ const CouponManage: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
   const [launchFormVisible, setLaunchFormVisible] = useState<boolean>(false);
-
+  const [couponDetailFormVisible, setCouponDetailFormVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
 
   const columns: ProColumns<TableListItem>[] = [
@@ -267,6 +267,11 @@ const CouponManage: React.FC = () => {
     setCurrentRow(record);
   };
 
+  const handleDetails = (record: any) => {
+    setCouponDetailFormVisible(true);
+    setCurrentRow(record);
+  };
+
   return (
     <PageContainer>
       <ProTable<TableListItem, TableListPagination>
@@ -315,6 +320,11 @@ const CouponManage: React.FC = () => {
           actionRef.current?.reload(); // 刷新表格数据
           setLaunchFormVisible(false); // 将 MergeForm 设为不可见
         }}
+      />
+      <CouponDetailForm
+        visible={couponDetailFormVisible}
+        record={currentRow}
+        onCancel={() => setCouponDetailFormVisible(false)}
       />
     </PageContainer>
   );
