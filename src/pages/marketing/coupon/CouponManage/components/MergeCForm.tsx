@@ -3,7 +3,6 @@ import type { FormInstance } from '@ant-design/pro-form';
 import ProForm from '@ant-design/pro-form';
 import {
   ModalForm,
-  ProFormDateTimePicker,
   ProFormDigit,
   ProFormRadio,
   ProFormSelect,
@@ -12,13 +11,12 @@ import {
   ProFormDatePicker,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
-import { Col, Row, Divider, message, Checkbox, Input, Space } from 'antd';
+import { Col, Row, Divider, message } from 'antd';
 
 import { buildingPageInfo } from '../../../../biz/BuildingManage/service';
-import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { addCoupon, editCoupon } from '../service';
 
-type MergeFormProps = {
+type MergeCFormProps = {
   visible?: boolean;
   onCancel?: () => void;
   isEdit?: boolean;
@@ -53,9 +51,10 @@ const handleSubmit = async (values: any, isEdit: boolean = false) => {
 
 const requiredRule = { rules: [{ required: true }] };
 
-const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
+const MergeCForm: React.FC<MergeCFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
   const formRef = useRef<FormInstance<any>>();
   const [buildingOptions, setBuildingOptions] = useState<{ label: string; value: string }[]>([]);
+  const [initialFixedAreas, setInitialFixedAreas] = useState([]);
 
   useEffect(() => {
     // 获取楼宇选项
@@ -71,17 +70,19 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     if (visible && value) {
       const areaIds =
         value.activityAreas && value.activityAreas.length > 0
-          ? value.activityAreas.map((area: any) => area.id)
+          ? value.activityAreas.map((area: any) => ({ label: area.name, value: area.id }))
           : [];
       console.log('areaIds:', areaIds);
+
       formRef.current?.setFieldsValue({
         ...value,
         applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
         fixedArea: areaIds,
       });
-      console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据
+      setInitialFixedAreas(areaIds); // Set initial areas here
     } else if (!visible) {
       formRef.current?.resetFields();
+      setInitialFixedAreas([]);
     }
   }, [visible, value, isEdit]);
 
@@ -100,6 +101,18 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       visible={visible}
       onFinish={async (values) => {
         try {
+          if (values.applicableBuildingsType === 'specific') {
+            const currentAreaIds = values.fixedArea.map((item) => item.value);
+            const initialAreaIds = initialFixedAreas.map((item) => item.value);
+
+            // 检查是否有楼宇被移除
+            const hasRemoved = initialAreaIds.some((id) => !currentAreaIds.includes(id));
+            if (hasRemoved) {
+              message.error('不能减少原来选择的楼宇');
+              return;
+            }
+          }
+
           console.log('values.fixedArea1:', values.fixedArea);
           if (values.applicableBuildingsType === 'all') {
             // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
@@ -139,6 +152,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             ]}
             name="type"
             label="卡券类型"
+            disabled={true}
           />
         </Col>
       </Row>
@@ -147,6 +161,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={16}>
           <ProFormText
             name="name"
+            disabled={true}
             label="券名称"
             placeholder="请输入卡券名称，限20字"
             fieldProps={{
@@ -168,7 +183,17 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             name="totalAmount"
             width="sm"
             min={1}
-            rules={[{ required: true, message: '请输入总投放数' }]}
+            rules={[
+              { required: true, message: '请输入总投放数' },
+              () => ({
+                validator(_, val) {
+                  if (val && val < value?.totalAmount) {
+                    return Promise.reject(new Error('新的总投放数不能小于原来的数值'));
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
           />
         </Col>
       </Row>
@@ -176,6 +201,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={16}>
           <ProFormDigit
             label="面值"
+            disabled={true}
             name="reduce"
             width="sm"
             min={0}
@@ -195,6 +221,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={16}>
           <ProFormDigit
             label="门槛金额"
+            disabled={true}
             name="payFull"
             placeholder="订单满 x 可用，数量不能为且不能低于面值金额"
             fieldProps={{
@@ -213,6 +240,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={16}>
           <ProFormText
             name="remark"
+            disabled={true}
             label="使用规则："
             placeholder="满xx元可用"
             rules={[{ required: true, message: '请输入使用规则说明' }]}
@@ -224,6 +252,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       <ProFormRadio.Group
         name="receiveTimeLimit"
         label="领取时限："
+        disabled={true}
         labelCol={{ span: 4 }} // 控制标签的宽度
         wrapperCol={{ span: 20 }} // 控制输入框的宽度
         options={[
@@ -261,6 +290,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
       <ProFormDigit
         name="limitPerUser"
+        disabled={true}
         label="每人限领次数："
         labelCol={{ span: 4 }} // 控制标签的宽度
         wrapperCol={{ span: 20 }} // 控制输入框的宽度
@@ -278,6 +308,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={24}>
           <ProFormDigit
             name="useDuration"
+            disabled={true}
             label="用券有效时间："
             placeholder="请输入用有效时间（天）"
             min={1} // 最小为1
@@ -296,6 +327,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={12}>
           <ProFormRadio.Group
             {...requiredRule}
+            disabled={true}
             name="deliveryFree"
             label="减免配送费"
             labelCol={{ span: 8 }} // 控制标签的宽度
@@ -310,6 +342,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={12}>
           <ProFormRadio.Group
             {...requiredRule}
+            disabled={true}
             name="packageFree"
             label="减免打包费"
             labelCol={{ span: 8 }} // 控制标签的宽度
@@ -327,6 +360,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={24}>
           <ProFormRadio.Group
             name="gids"
+            disabled={true}
             label="适用商品"
             labelCol={{ span: 4 }} // 控制标签的宽度
             wrapperCol={{ span: 20 }} // 控制输入框的宽度
@@ -349,7 +383,11 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             wrapperCol={{ span: 20 }}
             options={[
               { label: '通用', value: 'all' },
-              { label: '指定楼宇', value: 'specific' },
+              {
+                label: '指定楼宇',
+                value: 'specific',
+                disabled: value?.fixedArea == null,
+              },
             ]}
             initialValue="all"
             rules={[{ required: true, message: '请选择适用楼类型' }]}
@@ -373,8 +411,19 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
                     fieldProps={{
                       placeholder: '请选择参与楼宇',
                       labelInValue: true,
-                      onChange: (val) => {
+                      onChange: (val: { label: string; value: string }[]) => {
                         console.log('Selected buildings:', val); // 直接打印选中的值，确保它们是对象数组
+                        const selectedValues = val.map((item) => item.value);
+                        const initialValues = initialFixedAreas.map((item) => item.value);
+                        console.log(selectedValues);
+                        console.log(initialValues);
+                        // 检查是否有楼宇被移除
+                        const hasRemoved = initialValues.some((id) => !selectedValues.includes(id));
+                        if (hasRemoved) {
+                          message.error('不能减少原来选择的楼宇');
+                          // 还原到原始选中状态
+                          formRef.current?.setFieldsValue({ fixedArea: initialFixedAreas });
+                        }
                       },
                     }}
                     rules={[{ required: true, message: '请选择参与楼宇' }]}
@@ -391,6 +440,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       <Row gutter={16}>
         <Col span={24}>
           <ProFormRadio.Group
+            disabled={true}
             name="multiple"
             label="是否允许叠加"
             labelCol={{ span: 4 }}
@@ -409,6 +459,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       <Row gutter={16}>
         <Col span={24}>
           <ProFormCheckbox
+            disabled={true}
             name="receiveRemind"
             label="领取提醒："
             labelCol={{ span: 0 }}
@@ -424,6 +475,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         <Col span={24}>
           <ProForm.Group>
             <ProFormCheckbox
+              disabled={true}
               name="expireRemind"
               initialValue={true}
               label="过期提醒："
@@ -434,6 +486,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
               到期
             </ProFormCheckbox>
             <ProFormDigit
+              disabled={true}
               name="expireRemindDays"
               width="xs"
               min={1}
@@ -454,4 +507,4 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   );
 };
 
-export default MergeForm;
+export default MergeCForm;

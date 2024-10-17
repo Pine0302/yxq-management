@@ -44,3 +44,13 @@ export async function sendCoupon(data: { [key: string]: any }, options?: { [key:
     ...(options || {}),
   });
 }
+
+/** s删除优惠券 POST /adminapi/kitchen_user/modify */
+export async function deleteCoupon(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/coupon/delete', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}

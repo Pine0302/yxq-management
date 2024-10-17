@@ -1,12 +1,13 @@
 import { CheckOutlined, CloseOutlined, MessageOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Popover, Switch } from 'antd';
+import { Button, Popover, Modal, message } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { couponPageInfo } from './service';
+import { couponPageInfo, deleteCoupon } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
+import MergeCForm from './components/MergeCForm';
 import LaunchForm from './components/LaunchForm';
 import CouponDetailForm from './components/CouponDetailForm';
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
@@ -20,6 +21,7 @@ const tableRequest = async (params?: { pageSize: number; current: number }) => {
 
 const CouponManage: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
+  const [mergeCFormVisible, setMergeCFormVisible] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<any>();
   const [launchFormVisible, setLaunchFormVisible] = useState<boolean>(false);
@@ -40,6 +42,32 @@ const CouponManage: React.FC = () => {
     setMergeFormVisible(true);
     setIsEdit(true);
     setCurrentRow(record);
+  };
+
+  const handleCEdit = (record: any) => {
+    setMergeCFormVisible(true);
+    setIsEdit(true);
+    setCurrentRow(record);
+  };
+
+  // 使用POST方法删除数据的函数
+  const handleDelete = (record: any) => {
+    Modal.confirm({
+      title: '确定删除这条记录吗？',
+      content: '删除后无法恢复，请确认！',
+      okText: '确认',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const res = await deleteCoupon(record);
+          message.success('删除成功');
+          actionRef.current?.reload(); // 刷新表格数据
+        } catch (error) {
+          message.error('删除操作失败: ' + error.message);
+        }
+      },
+    });
   };
 
   const columns: ProColumns<TableListItem>[] = [
@@ -244,16 +272,9 @@ const CouponManage: React.FC = () => {
               <a key="details" onClick={() => handleDetails(record)}>
                 详情
               </a>,
-              // <a
-              //   key="modify"
-              //   onClick={() => {
-              //     setMergeFormVisible(true);
-              //     setIsEdit(true);
-              //     setCurrentRow(record);
-              //   }}
-              // >
-              //   修改
-              // </a>,
+              <a key="modify" onClick={() => handleCEdit(record)}>
+                修改
+              </a>,
               <a key="end" onClick={() => handleEnd(record)}>
                 结束
               </a>,
@@ -324,6 +345,16 @@ const CouponManage: React.FC = () => {
         visible={couponDetailFormVisible}
         record={currentRow}
         onCancel={() => setCouponDetailFormVisible(false)}
+      />
+      <MergeCForm
+        visible={mergeCFormVisible}
+        isEdit={isEdit}
+        value={currentRow}
+        onCancel={() => setMergeCFormVisible(false)}
+        onSuccess={() => {
+          actionRef.current?.reload(); // 刷新表格数据
+          setMergeCFormVisible(false); // 将 MergeForm 设为不可见
+        }}
       />
     </PageContainer>
   );
