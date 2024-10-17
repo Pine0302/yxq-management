@@ -26,6 +26,22 @@ const CouponManage: React.FC = () => {
   const [couponDetailFormVisible, setCouponDetailFormVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
 
+  const handleLaunch = (record: any) => {
+    setLaunchFormVisible(true);
+    setCurrentRow(record);
+  };
+
+  const handleDetails = (record: any) => {
+    setCouponDetailFormVisible(true);
+    setCurrentRow(record);
+  };
+
+  const handleEdit = (record: any) => {
+    setMergeFormVisible(true);
+    setIsEdit(true);
+    setCurrentRow(record);
+  };
+
   const columns: ProColumns<TableListItem>[] = [
     {
       title: '卡券名称',
@@ -213,16 +229,9 @@ const CouponManage: React.FC = () => {
         switch (record.sendStatus) {
           case 0: // 未投放
             return [
-              // <a
-              //   key="edit"
-              //   onClick={() => {
-              //     setMergeFormVisible(true);
-              //     setIsEdit(true);
-              //     setCurrentRow(record);
-              //   }}
-              // >
-              //   编辑
-              // </a>,
+              <a key="edit" onClick={() => handleEdit(record)}>
+                编辑
+              </a>,
               <a key="launch" onClick={() => handleLaunch(record)}>
                 投放
               </a>,
@@ -261,16 +270,6 @@ const CouponManage: React.FC = () => {
       },
     },
   ];
-
-  const handleLaunch = (record: any) => {
-    setLaunchFormVisible(true);
-    setCurrentRow(record);
-  };
-
-  const handleDetails = (record: any) => {
-    setCouponDetailFormVisible(true);
-    setCurrentRow(record);
-  };
 
   return (
     <PageContainer>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { FormInstance } from '@ant-design/pro-form';
 import ProForm from '@ant-design/pro-form';
 import {
@@ -28,19 +28,17 @@ type MergeFormProps = {
 
 const buildingSelectRequest = async () => {
   const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
-  const zh = (res.data?.list || []).map((v) => {
-    return {
-      label: v.areaName,
-      value: v.id,
-    };
-  }) as RequestOptionsType[];
-
-  return zh;
+  return (res.data?.list || []).map((v) => ({
+    label: v.areaName,
+    value: v.id,
+  }));
 };
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
   // Placeholder for submit logic
-  console.log('Submit', values);
+
   console.log('Submit-valu_id', values?.id);
+  console.table(values.fixedArea);
+  return;
   if (!values?.id) {
     console.log('add');
     return await addCoupon(values);
@@ -55,14 +53,35 @@ const requiredRule = { rules: [{ required: true }] };
 
 const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
   const formRef = useRef<FormInstance<any>>();
+  const [buildingOptions, setBuildingOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
-    if (value) {
-      formRef.current?.setFieldsValue(value);
-    } else {
+    // 获取楼宇选项
+    const fetchBuildingOptions = async () => {
+      const options = await buildingSelectRequest();
+      setBuildingOptions(options);
+    };
+    fetchBuildingOptions();
+  }, []);
+
+  useEffect(() => {
+    console.log('activityAreas:', value?.activityAreas);
+    if (visible && value) {
+      const areaIds =
+        value.activityAreas && value.activityAreas.length > 0
+          ? value.activityAreas.map((area: any) => area.id)
+          : [];
+      console.log('areaIds:', areaIds);
+      formRef.current?.setFieldsValue({
+        ...value,
+        applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
+        fixedArea: areaIds,
+      });
+      console.table(value);
+    } else if (!visible) {
       formRef.current?.resetFields();
     }
-  }, [value]);
+  }, [visible, value, isEdit]);
 
   return (
     <ModalForm
@@ -72,7 +91,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       labelCol={{ span: 4 }}
       wrapperCol={{ span: 20 }}
       modalProps={{
-        destroyOnClose: true,
+        destroyOnClose: true, // 确保关闭时销毁表单
         onCancel: onCancel,
         bodyStyle: { maxHeight: '80vh', overflow: 'auto' },
       }}
@@ -80,7 +99,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       onFinish={async (values) => {
         try {
           if (values.applicableBuildingsType === 'all') {
-            values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
+            // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
           } else if (values.applicableBuildingsType === 'specific') {
             values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
           }
@@ -90,7 +109,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           if (onSuccess) {
             onSuccess(); // 调用 onSuccess 回调函数
           } else {
-            window.location.reload(); // 刷新页面
+            //  window.location.reload(); // 刷新页面
           }
         } catch (error) {
           console.error('提交失败:', error);
@@ -99,12 +118,17 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       }}
     >
       <Divider orientation="left">基本信息</Divider>
+      <ProFormText
+        name="id"
+        hidden={true} // 隐藏输入框
+        initialValue={isEdit ? value?.id : undefined} // 在编辑状态下设置初始值
+      />
       <Row>
         <Col span={16}>
           <ProFormSelect
             {...requiredRule}
             request={async () => [
-              { value: 'DISCOUNT', label: '折扣券' },
+              // { value: 'DISCOUNT', label: '折扣券' },
               { value: 'FULL_REDUCE', label: '满减券' },
             ]}
             name="type"
@@ -250,7 +274,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             name="useDuration"
             label="用券有效时间："
             placeholder="请输入用有效时间（天）"
-            min={1} // 最小值为1
+            min={1} // 最小为1
             labelCol={{ span: 4 }} // 控制标签的宽度
             wrapperCol={{ span: 20 }} // 控制输入框的宽度
             fieldProps={{
@@ -287,7 +311,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             radioType="button"
             options={[
               { label: '是', value: true },
-              { label: '否', value: false },
+              { label: '���', value: false },
             ]}
           />
         </Col>
@@ -339,9 +363,10 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 20 }}
                     mode="multiple"
-                    request={buildingSelectRequest}
+                    options={buildingOptions}
                     fieldProps={{
                       placeholder: '请选择参与楼宇',
+                      labelInValue: true,
                     }}
                     rules={[{ required: true, message: '请选择参与楼宇' }]}
                   />
