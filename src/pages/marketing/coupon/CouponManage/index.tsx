@@ -216,24 +216,24 @@ const CouponManage: React.FC = () => {
       hideInForm: true,
       hideInSearch: true,
     },
-    // {
-    //   title: '已领取',
-    //   dataIndex: '',
-    //   hideInForm: true,
-    //   hideInSearch: true,
-    // },
-    // {
-    //   title: '已使用',
-    //   dataIndex: '',
-    //   hideInForm: true,
-    //   hideInSearch: true,
-    // },
-    // {
-    //   title: '已过期',
-    //   dataIndex: '',
-    //   hideInForm: true,
-    //   hideInSearch: true,
-    // },
+    {
+      title: '已领取',
+      dataIndex: 'getAmount',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '已使用',
+      dataIndex: 'useAmount',
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: '已过期',
+      dataIndex: 'expireAmount',
+      hideInForm: true,
+      hideInSearch: true,
+    },
     {
       title: '失效时间',
       dataIndex: 'endTime',
