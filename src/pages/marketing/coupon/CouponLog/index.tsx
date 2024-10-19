@@ -5,6 +5,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { couponLogPageInfo } from './service';
 import type { TableListItem, TableListPagination } from './data';
+import { Tag } from 'antd';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await couponLogPageInfo({
@@ -20,15 +21,15 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '名称',
+      title: '卡券名称',
       dataIndex: 'couponName',
     },
+    // {
+    //   title: 'uid',
+    //   dataIndex: 'uid',
+    // },
     {
-      title: 'uid',
-      dataIndex: 'uid',
-    },
-    {
-      title: '类型',
+      title: '卡券类型',
       dataIndex: 'type',
       hideInSearch: true,
       valueEnum: {
@@ -43,38 +44,98 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '免打包费',
-      dataIndex: 'packageFree',
-      hideInSearch: true,
-      render: (_, record) => (record.packageFree ? <CheckOutlined /> : <CloseOutlined />),
+      title: '序列号',
+      dataIndex: 'code',
     },
     {
-      title: '免配送费',
-      dataIndex: 'deliveryFree',
-      hideInSearch: true,
-      render: (_, record) => (record.deliveryFree ? <CheckOutlined /> : <CloseOutlined />),
+      title: '面值',
+      dataIndex: 'reduce',
     },
+    {
+      title: '门槛金额',
+      dataIndex: 'payFull',
+    },
+    {
+      title: '投放人',
+      dataIndex: 'adminAccount',
+    },
+    {
+      title: '发放方式',
+      dataIndex: 'sendType',
+      hideInForm: true,
+      hideInSearch: true,
+      renderText: (sendType: string) => {
+        switch (sendType) {
+          case 'PLATFORM':
+            return '平台赠送';
+          case 'SCENE':
+            return '场景触发';
+          case 'PUBLIC':
+            return '公开投放';
+          default:
+            return sendType; // 如果是未知类型,返回原始值
+        }
+      },
+    },
+    {
+      title: '投放时间',
+      dataIndex: 'sendTime',
+    },
+    {
+      title: '领取人',
+      dataIndex: 'mobile',
+    },
+    {
+      title: '领取时间',
+      dataIndex: 'ctime',
+    },
+
+    // {
+    //   title: '免打包费',
+    //   dataIndex: 'packageFree',
+    //   hideInSearch: true,
+    //   render: (_, record) => (record.packageFree ? <CheckOutlined /> : <CloseOutlined />),
+    // },
+    // {
+    //   title: '免配送费',
+    //   dataIndex: 'deliveryFree',
+    //   hideInSearch: true,
+    //   render: (_, record) => (record.deliveryFree ? <CheckOutlined /> : <CloseOutlined />),
+    // },
     {
       title: '状态',
-      dataIndex: 'status',
+      dataIndex: 'sendStatus',
       hideInSearch: true,
-      render: (_, record) => (record.status ? <CheckOutlined /> : <CloseOutlined />),
+      render: (_, record) => {
+        if (record.expire === true) {
+          return <Tag color="gray">已过期</Tag>;
+        } else if (record.status === true) {
+          return <Tag color="blue">未使用</Tag>;
+        } else {
+          return <Tag color="green">已使用</Tag>;
+        }
+      },
     },
     {
-      title: '操作',
-      dataIndex: 'option',
-      valueType: 'option',
-      render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            console.log(record);
-          }}
-        >
-          操作
-        </a>,
-      ],
+      title: '使用时间',
+      dataIndex: 'useTime',
     },
+
+    // {
+    //   title: '操作',
+    //   dataIndex: 'option',
+    //   valueType: 'option',
+    //   render: (_, record) => [
+    //     <a
+    //       key="config"
+    //       onClick={() => {
+    //         console.log(record);
+    //       }}
+    //     >
+    //       操作
+    //     </a>,
+    //   ],
+    // },
   ];
 
   return (

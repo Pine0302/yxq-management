@@ -1,5 +1,6 @@
 export type TableListItem = {
   id: number;
+  expire: boolean;
   couponName: string;
   status: boolean;
   // activityGoods: [{id: 6, cid: 1, gname: "鱼香肉丝套餐", price: 8.8, originalPrice: 38.88,…},…]
@@ -16,7 +17,7 @@ export type TableListItem = {
   // remark: null
   // startTime: "2021-10-26T17:09:39"
   type: string;
-  uid: 1
+  uid: 1;
 };
 
 export type TableListPagination = {
