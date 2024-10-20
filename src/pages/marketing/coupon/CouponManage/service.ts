@@ -54,3 +54,13 @@ export async function deleteCoupon(data: { [key: string]: any }, options?: { [ke
     ...(options || {}),
   });
 }
+
+/** 发送优惠券人数预计 POST /adminapi/coupon/modify */
+export async function sendEstimate(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/coupon/sendEstimate', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}

@@ -11,9 +11,10 @@ import {
   ProFormTextArea,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
-import { Col, Row, Divider, message } from 'antd';
+import { Col, Row, Divider, message, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-import { addCoupon, editCoupon, sendCoupon } from '../service';
+import { addCoupon, sendEstimate, sendCoupon } from '../service';
 
 type LaunchFormProps = {
   visible?: boolean;
@@ -42,13 +43,21 @@ const requiredRule = { rules: [{ required: true }] };
 const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuccess }) => {
   const formRef = useRef<FormInstance<any>>();
 
+  // useEffect(() => {
+  //   if (value) {
+  //     formRef.current?.setFieldsValue(value);
+  //   } else {
+  //     formRef.current?.resetFields();
+  //   }
+  // }, [value]);
+
   useEffect(() => {
-    if (value) {
+    if (visible && value) {
       formRef.current?.setFieldsValue(value);
-    } else {
+    } else if (visible) {
       formRef.current?.resetFields();
     }
-  }, [value]);
+  }, [value, visible]); // 添加 visible 作为依赖项
 
   return (
     <ModalForm
@@ -65,18 +74,47 @@ const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuc
       visible={visible}
       onFinish={async (values) => {
         try {
-          console.log('开始提交');
-          await handleSubmit(values);
-          message.success('提交成功');
-          if (onSuccess) {
-            onSuccess(); // 调用 onSuccess 回调函数
-          } else {
-            window.location.reload(); // 刷新页面
-          }
+          // 调用 sendEstimate 接口获取预计投放人数
+          const estimateResult = await sendEstimate(values);
+          console.log('estimateResult', estimateResult);
+          const estimatedCount = estimateResult.data.number; // 假设接口返回的数据中包含预计人数
+
+          Modal.confirm({
+            title: '确认投放',
+            icon: <ExclamationCircleOutlined />,
+            content: `预计投放人数：${estimatedCount}。您确定要投放这些优惠券吗？`,
+            okText: '确定',
+            cancelText: '取消',
+            onOk: async () => {
+              try {
+                console.log('开始提交');
+                const result = await handleSubmit(values);
+                if (result.code === 200 && result.success) {
+                  const { realNumber, failNumber } = result.data;
+                  if (realNumber === 0 && failNumber === 0) {
+                    message.success('投放成功！');
+                  } else {
+                    message.success(`投放成功！共赠送成功${realNumber}人，失败${failNumber}人`);
+                  }
+                  if (onSuccess) {
+                    onSuccess();
+                  } else {
+                    window.location.reload();
+                  }
+                } else {
+                  message.error('提交失败，请重试');
+                }
+              } catch (error) {
+                console.error('提交失败:', error);
+                message.error('提交失败，请重试');
+              }
+            },
+          });
         } catch (error) {
-          console.error('提交失败:', error);
-          message.error('提交失败，请重试');
+          console.error('获取预计投放人数失败:', error);
+          message.error('获取预计投放人数失败，请重试');
         }
+        return false; // 阻止 ModalForm 自动关闭
       }}
     >
       <Divider orientation="left">基本信息</Divider>
@@ -163,7 +201,7 @@ const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuc
             fieldProps={{
               onChange: (e) => {
                 if (e.target.value === 'SCENE') {
-                  formRef.current?.setFieldsValue({ sceneType: ['NEW_USER_REGISTER'] });
+                  formRef.current?.setFieldsValue({ sceneType: ['NEW_REGISTER'] });
                 } else {
                   formRef.current?.setFieldsValue({ sceneType: [] });
                 }
@@ -219,7 +257,7 @@ const LaunchForm: React.FC<LaunchFormProps> = ({ visible, onCancel, value, onSuc
                       <ProFormTextArea
                         name="mobiles"
                         label="输入手机号"
-                        placeholder="多个用户时，用空格或逗号隔开"
+                        placeholder="多个用户时，用逗号隔开(,)"
                         rules={[{ required: true, message: '请输入手机号' }]}
                       />
                     </Col>
