@@ -51,7 +51,15 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = (props) => {
     setDetailLoading(true);
     const res = await orderDetail({ id: id });
 
-    const { orderAddressDTO, payment, cartDTOS, packageFee, deliveryFee, serialNumber, deliveryTime } = res.data || {};
+    const {
+      orderAddressDTO,
+      payment,
+      cartDTOS,
+      packageFee,
+      deliveryFee,
+      serialNumber,
+      deliveryTime,
+    } = res.data || {};
     setUserInfoDs({ ...orderAddressDTO });
     setPayInfoDs({ ...payment, packageFee, deliveryFee, serialNumber, deliveryTime });
     setCartDs(cartDTOS);
@@ -129,7 +137,11 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = (props) => {
             }}
           />
           <ProDescriptions.Item dataIndex="serialNumber" label="订单流水号" />
-          <ProDescriptions.Item dataIndex="deliveryTime" label="预计送达时间" valueType='dateTime' />
+          <ProDescriptions.Item
+            dataIndex="deliveryTime"
+            label="预计送达时间"
+            valueType="dateTime"
+          />
         </ProDescriptions>
         <div className={styles.title}>商品明细</div>
         <ProTable

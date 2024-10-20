@@ -66,9 +66,12 @@ export type OrderDetailDTO = {
 
   packageFee: number;
   deliveryFee: number;
+  couponPrice: number;
+  originalPrice: number;
 
   cartDTOS?: cartItemDTO[];
   orderAddressDTO?: OrderAddressDTO;
+  userCouponDTO?: UserCouponDTO;
   payment?: PaymentDTO;
   serialNumber: string;
   deliveryTime: string;
@@ -87,6 +90,14 @@ export type OrderAddressDTO = {
   oid: number;
   phone: string;
   uid: number;
+};
+
+export type UserCouponDTO = {
+  couponName: string;
+  reduce: number;
+  startTime: string;
+  endTime: string;
+  status: string;
 };
 
 export type PaymentDTO = {

@@ -8,6 +8,9 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { payPlatformValueEnum } from '@/consts/valueEnums';
+import CouponInfoModal from './CouponInfoModal';
+import { Typography } from 'antd';
+const { Link } = Typography;
 
 type OrderDetailModalProps = {
   visible?: boolean;
@@ -58,10 +61,18 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = (props) => {
   const [userInfoDs, setUserInfoDs] = useState<any>();
   const [payInfoDs, setPayInfoDs] = useState<any>();
   const [cartDs, setCartDs] = useState<any>();
+  const [couponModalVisible, setCouponModalVisible] = useState(false);
+  const [couponInfo, setCouponInfo] = useState<any>();
+
+  const handleCouponClick = () => {
+    // 假设 `userCouponDTO` 是 `payInfoDs` 的一部分
+    console.log('Coupon clicked, setting modal visible');
+    setCouponModalVisible(true);
+  };
 
   const fetchOrderDetail = async (id: number) => {
     const res = await orderDetail({ id: id });
-
+    console.log('orderDetail', res);
     const {
       orderAddressDTO,
       payment,
@@ -70,9 +81,25 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = (props) => {
       deliveryFee,
       serialNumber,
       deliveryTime,
+      couponPrice,
+      originalPrice,
+      userCouponDTO,
     } = res.data || {};
     setUserInfoDs({ ...orderAddressDTO });
-    setPayInfoDs({ ...payment, packageFee, deliveryFee, serialNumber, deliveryTime });
+    setPayInfoDs({
+      ...payment,
+      packageFee,
+      deliveryFee,
+      serialNumber,
+      deliveryTime,
+      couponPrice,
+      originalPrice,
+    });
+    setCouponInfo({
+      ...(userCouponDTO || {}), // 如果 userCouponDTO 未定义，则使用空对象
+      couponPrice: couponPrice,
+      originalPrice: originalPrice,
+    });
     setCartDs(cartDTOS);
 
     console.log('orderDetail', res);
@@ -146,8 +173,15 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = (props) => {
           label="支付方式"
           valueEnum={payPlatformValueEnum}
         />
+        <ProDescriptions.Item dataIndex="originalPrice" label="商品总价" valueType="money" />
         <ProDescriptions.Item dataIndex="packageFee" label="打包费" valueType="money" />
         <ProDescriptions.Item dataIndex="deliveryFee" label="配送费" valueType="money" />
+        <ProDescriptions.Item
+          dataIndex="couponPrice"
+          label="优惠券优惠"
+          valueType="money"
+          render={(value) => <Link onClick={handleCouponClick}>{value}</Link>}
+        />
         <ProDescriptions.Item
           dataIndex="fee"
           label="实付金额"
@@ -173,6 +207,12 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = (props) => {
       />
 
       <ProFormText name="oid" hidden />
+
+      <CouponInfoModal
+        visible={couponModalVisible}
+        onClose={() => setCouponModalVisible(false)}
+        couponInfo={couponInfo}
+      />
     </ModalForm>
   );
 };
