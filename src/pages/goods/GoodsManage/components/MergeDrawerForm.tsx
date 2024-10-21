@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import { ProFormRadio } from '@ant-design/pro-form';
 import { DrawerForm } from '@ant-design/pro-form';
@@ -68,6 +68,16 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const formRef = useRef<ProFormInstance>();
 
   const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (props.modalVisible && props.value) {
+      if (props.value.limitBuy) {
+        setLimitBuyState(true);
+      } else {
+        setLimitBuyState(false);
+      }
+    }
+  }, [props.modalVisible, props.value]); // 添加 visible 作为依赖项
 
   const drawerVisiableChangeHandle = async (visiable: boolean) => {
     if (visiable) {
