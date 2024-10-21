@@ -64,3 +64,13 @@ export async function sendEstimate(data: { [key: string]: any }, options?: { [ke
     ...(options || {}),
   });
 }
+
+/** 结束优惠券 POST /adminapi/kitchen_user/modify */
+export async function endCoupon(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/coupon/end', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}

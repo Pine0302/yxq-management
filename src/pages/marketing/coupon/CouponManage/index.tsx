@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { couponPageInfo, deleteCoupon } from './service';
+import { couponPageInfo, deleteCoupon, endCoupon } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import MergeForm from './components/MergeForm';
 import MergeCForm from './components/MergeCForm';
@@ -61,6 +61,26 @@ const CouponManage: React.FC = () => {
       onOk: async () => {
         try {
           const res = await deleteCoupon(record);
+          message.success('删除成功');
+          actionRef.current?.reload(); // 刷新表格数据
+        } catch (error) {
+          message.error('删除操作失败: ' + error.message);
+        }
+      },
+    });
+  };
+
+  // 使用POST方法删除数据的函数
+  const handleEnd = (record: any) => {
+    Modal.confirm({
+      title: '确定要结束这个优惠券马',
+      content: '结束后无法生效，请确认！',
+      okText: '确认',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const res = await endCoupon(record);
           message.success('删除成功');
           actionRef.current?.reload(); // 刷新表格数据
         } catch (error) {
