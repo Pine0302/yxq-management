@@ -18,6 +18,7 @@ type DataItem = {
   name: string;
   contact: string;
   phone: string;
+  hidden: boolean;
 };
 
 const handleSubmit = async (values: any) => {
@@ -54,7 +55,11 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
     if (props?.value) {
       // 这里可能需要转换 cates 数据为适合 Select 组件的形式
       const transformedCates = props.value.cates.map((cate) => cate.id);
-      formRef.current?.setFieldsValue({ ...props.value, cates: transformedCates });
+      formRef.current?.setFieldsValue({
+        ...props.value,
+        hidden: props.value.hidden ? 'true' : 'false',
+        cates: transformedCates,
+      });
     } else {
       formRef.current?.resetFields();
     }
@@ -120,20 +125,20 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
       dataIndex: 'hidden',
       valueType: 'radioButton',
       valueEnum: {
-        0: {
+        false: {
           text: '正常',
         },
-        1: {
+        true: {
           text: '关闭',
         },
       },
-      initialValue: '0',
-      // request: async () => {
-      //   return [
-      //     { label: '正常', value: 'OK' },
-      //     { label: '关闭', value: 'CLOSE' },
-      //   ] as RequestOptionsType[];
-      // },
+      initialValue: 'false',
+      fieldProps: {
+        onChange: (e) => {
+          const boolValue = e.target.value === 'true';
+          formRef.current?.setFieldValue('hidden', boolValue);
+        },
+      },
       formItemProps: {
         rules: [
           {
