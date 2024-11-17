@@ -83,3 +83,22 @@ export type TemlateAddressTableWrapper = {
     list: TemlateAddressTableItem[];
   };
 };
+
+export type TemlateAreaGoodsTableItem = {
+  id: number;
+  gname: string;
+  areaId: number;
+  status: boolean;
+  total: number;
+  sellnum: number;
+  sellout: number;
+  originStatus: boolean;
+  isEdit: boolean;
+};
+
+export type TemlateAreaGoodsTableWrapper = {
+  data: {
+    total: number;
+    list: TemlateAreaGoodsTableItem[];
+  };
+};

@@ -267,3 +267,17 @@ export async function deleteAddressTemplate(
     ...(options || {}),
   });
 }
+
+/** 获取楼宇商品模板列表 */
+export async function fetchAreaGoodsTemplate(
+  params: { current?: number; pageSize?: number; pageNum?: number },
+  options?: { [key: string]: any },
+) {
+  return request<TemlateAddressTableWrapper>('/adminapi/area_goods/template_page_info?source=1', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
