@@ -12,6 +12,7 @@ import DayDinnerForm from './components/DayDinnerForm';
 import WeekDinnerForm from './components/WeekDinnerForm';
 import AreaActForm from './components/AreaActForm';
 import AddressTemplateForm from './components/AddresstemplateForm';
+import AreaGoodsTemplateForm from './components/AreaGoodstemplateForm';
 
 const TableList: React.FC = () => {
   const [mergeFormVisible, setMergeFormVisible] = useState<boolean>(false);
@@ -29,7 +30,8 @@ const TableList: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
   const [key, setKey] = useState(0);
   const [openDayDinnerForm, setOpenDayDinnerForm] = useState(false);
-
+  const [areaGoodsTemplateFormVisible, setAreaGoodsTemplateFormVisible] = useState(false); // 控制楼宇商品模板列表的显示
+  const [areaGoodsDrawerVisible, setAreaGoodsDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
   const columns: ProColumns<BuildingTableItem>[] = [
     {
       title: '楼宇名称',
@@ -161,6 +163,15 @@ const TableList: React.FC = () => {
           }}
         >
           地址模板管理
+        </a>,
+        <a
+          key="areaGoodsTemplate"
+          onClick={() => {
+            setCurrentRow(record);
+            setAreaGoodsDrawerVisible(true); // 打开Drawer
+          }}
+        >
+          商品管理
         </a>,
       ],
     },
@@ -305,6 +316,22 @@ const TableList: React.FC = () => {
           <AddressTemplateForm
             visible={drawerVisible}
             onCancel={() => setDrawerVisible(false)}
+            areaId={currentRow?.id}
+          />
+        </Drawer>
+      )}
+
+      {areaGoodsDrawerVisible && (
+        <Drawer
+          title="楼宇商品模板管理"
+          width={720}
+          onClose={() => setAreaGoodsDrawerVisible(false)}
+          visible={areaGoodsDrawerVisible}
+          bodyStyle={{ paddingBottom: 80 }}
+        >
+          <AreaGoodsTemplateForm
+            visible={drawerVisible}
+            onCancel={() => setAreaGoodsDrawerVisible(false)}
             areaId={currentRow?.id}
           />
         </Drawer>
