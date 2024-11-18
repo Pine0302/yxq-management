@@ -281,3 +281,39 @@ export async function fetchAreaGoodsTemplate(
     ...(options || {}),
   });
 }
+
+/** 更新楼宇商品地址 POST /adminapi/area_goods/edit_goods */
+export async function editAreaGoodsTemplate(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/area_goods/edit_goods', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 更新楼宇商品数量*/
+export async function editAreaStock(
+  data: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request<Common.ResponseWrapper>('/adminapi/area_goods/edit_area_goods_stock', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 下架楼宇商品*/
+export async function downSell(data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<Common.ResponseWrapper>('/adminapi/area_goods/down_sell_area_goods', {
+    data,
+    method: 'POST',
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
