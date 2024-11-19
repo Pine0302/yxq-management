@@ -107,7 +107,7 @@ const TableList: React.FC = () => {
       valueType: 'money',
     },
     {
-      title: '上/下架',
+      title: '启/禁用',
       dataIndex: 'status',
       hideInSearch: true,
       render: (_, record) => (
@@ -119,8 +119,8 @@ const TableList: React.FC = () => {
           }}
         >
           <Switch
-            checkedChildren="上架"
-            unCheckedChildren="下架"
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
             checked={record.status}
             defaultChecked
           />
@@ -186,11 +186,11 @@ const TableList: React.FC = () => {
               },
               {
                 key: 'up',
-                label: <span>上架</span>,
+                label: <span>启用</span>,
               },
               {
                 key: 'down',
-                label: <span>下架</span>,
+                label: <span>禁用</span>,
               },
             ],
             onChange: (key) => {
