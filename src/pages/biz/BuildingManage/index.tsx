@@ -323,8 +323,8 @@ const TableList: React.FC = () => {
 
       {areaGoodsDrawerVisible && (
         <Drawer
-          title="楼宇商品模板管理"
-          width={720}
+          title="楼宇商品管理"
+          width={1080}
           onClose={() => setAreaGoodsDrawerVisible(false)}
           visible={areaGoodsDrawerVisible}
           bodyStyle={{ paddingBottom: 80 }}

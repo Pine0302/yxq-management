@@ -18,6 +18,7 @@ interface CreateBuildingFormProps {
 interface BuildingFormValues {
   id: number;
   gname: string;
+  goodsClass: string;
   areaId: number;
   status: boolean;
   total: number;
@@ -77,6 +78,49 @@ const EditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
       }}
     >
       <Form form={form} layout="vertical" name="form_in_modal">
+        {/* 商品信息展示部分 */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '24px' }}>
+          {/* 商品图像 */}
+          {initialValues?.pic && (
+            <div style={{ flexShrink: 0, marginRight: '16px' }}>
+              <img
+                src={initialValues.pic}
+                alt="商品图像"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  objectFit: 'cover',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                }}
+              />
+            </div>
+          )}
+
+          {/* 商品信息 */}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '8px' }}>
+              {initialValues?.gname || '商品名称'}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                fontSize: '14px',
+                color: '#666',
+                alignItems: 'center',
+                marginBottom: '0px',
+              }}
+            >
+              <div style={{ marginRight: '16px' }}>{initialValues?.goodsClass || '商品类型'}</div>
+              <div>
+                参考价：
+                <span style={{ color: '#f40' }}>¥{initialValues?.originalPrice || '0.00'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* 分割线 */}
+        <hr style={{ border: '1px solid #eee', marginBottom: '24px' }} />
         <ProForm.Group>
           <ProFormMoney label="划线价格" name="originalPrice" rules={[{ required: true }]} />
           <ProFormMoney label="单价价格" name="price" rules={[{ required: true }]} />
