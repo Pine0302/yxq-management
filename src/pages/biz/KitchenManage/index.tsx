@@ -72,17 +72,17 @@ const TableList: React.FC = () => {
         >
           编辑
         </a>,
-        <a
-          key="edit_stock"
-          onClick={() => {
-            // setMergeModalVisible(true);
-            // setIsEdit(true);
-            setKitchenStockModalOpen(true);
-            setCurrentRow(record);
-          }}
-        >
-          调库存
-        </a>,
+        // <a
+        //   key="edit_stock"
+        //   onClick={() => {
+        //     // setMergeModalVisible(true);
+        //     // setIsEdit(true);
+        //     setKitchenStockModalOpen(true);
+        //     setCurrentRow(record);
+        //   }}
+        // >
+        //   调库存
+        // </a>,
       ],
     },
   ];
