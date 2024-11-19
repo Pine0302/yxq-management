@@ -322,9 +322,9 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           </ProForm.Item>
         )}
         <ProForm.Group>
-          <ProFormMoney label="划线价格" name="originalPrice" rules={[{ required: true }]} />
-          <ProFormMoney label="单价价格" name="price" rules={[{ required: true }]} />
-          <ProFormMoney label="打包费用" name="packageFee" rules={[{ required: true }]} />
+          <ProFormMoney label="划线价格" name="originalPrice" initialValue={99} hidden />
+          <ProFormMoney label="单价价格" name="price" initialValue={99} hidden />
+          <ProFormMoney label="打包费用" name="packageFee" initialValue={99} hidden />
         </ProForm.Group>
         <ProForm.Group>
           <ProFormRadio.Group
@@ -347,6 +347,8 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
             label="是否限购"
             name="limitBuy"
             width="sm"
+            initialValue={false}
+            hidden
             fieldProps={{
               onChange: (v) => setLimitBuyState(v),
             }}
@@ -356,6 +358,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
               label="限购数量"
               name="limitNum"
               width="sm"
+              hidden
               rules={[{ required: true }]}
             />
           )}
