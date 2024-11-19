@@ -173,7 +173,7 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
 
   const columns: ProColumns<TemlateAreaGoodsTableItem>[] = [
     {
-      title: '商品名称',
+      title: '商品名称 ',
       dataIndex: 'gname',
       search: {
         transform: (value) => ({ gname: value }), // 自定义检索字段
@@ -197,12 +197,13 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
         true: { text: '启用' },
         false: { text: '禁用' },
       },
-      search: {
-        transform: (value) => ({ originStatus: value }), // 自定义检索字段
-      },
+      search: false,
+      // search: {
+      //   transform: (value) => ({ originStatus: value }), // 自定义检索字段
+      // },
     },
     {
-      title: '上下架状态',
+      title: '上/下架状态 ',
       dataIndex: 'status',
       render: (text, record) => {
         if (record.total === 0) {
@@ -326,7 +327,7 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
               setCurrentRecord(null); // 清空当前行记录，确保表单为空
             }}
           >
-            <PlusOutlined /> 新建
+            {/* <PlusOutlined /> 新建 */}
           </Button>,
         ]}
         request={tableRequest}
