@@ -66,6 +66,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const [fileList, setFileList] = useState<any>([]);
   const [previewState, setPreviewState] = useState<UploadPreviewState>();
   const formRef = useRef<ProFormInstance>();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
 
@@ -139,6 +140,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   };
 
   const mergeSubmit = async (formData: any) => {
+    setIsSubmitting(true); // 提交前禁用按钮
     console.log(formData);
     const {
       id,
@@ -219,14 +221,16 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
       // 根据返回的响应结果显示不同的提示
       if (response && response.success) {
         message.success('提交成功'); // 只有在成功时才显示提交成功
+        setIsSubmitting(false);
       } else {
         message.error(response?.msg || '提交失败，请检查数据');
+        setIsSubmitting(false);
         return false; // 提交失败时终止后续逻辑
       }
     } catch (error) {
       console.error('Error:', error);
       message.error('提交失败，商品归属与其所属类目不匹配');
-
+      setIsSubmitting(false);
       return false;
     }
 
@@ -243,6 +247,11 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         onVisibleChange={drawerVisiableChangeHandle}
         layout="horizontal"
         width={999}
+        submitter={{
+          submitButtonProps: {
+            disabled: isSubmitting, // 根据状态控制按钮是否禁用
+          },
+        }}
         onFinish={async (values) => {
           mergeSubmit(values);
           // message.success('提交成功');
