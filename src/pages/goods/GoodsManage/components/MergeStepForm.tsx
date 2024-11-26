@@ -85,7 +85,7 @@ const MergeStepForm: React.FC<MergeFormProps> = (props) => {
             uid: data?.pic,
             name: data?.pic,
             status: 'done',
-            url: `https://img.nidcai.com${data?.pic}`,
+            url: `https://img.hzex7.com${data?.pic}`,
           },
         ]);
       };

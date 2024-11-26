@@ -47,7 +47,7 @@ const TableList: React.FC = () => {
         <>
           <div className={styles.goodWrapper}>
             <span>
-              <Image width={55} src={`http://img.nidcai.com/${record.pic}`} fallback={nullImage} />
+              <Image width={55} src={`https://img.hzex7.com/${record.pic}`} fallback={nullImage} />
             </span>
             <span className={styles.marginLeft}>
               <div>{record?.gname}</div>

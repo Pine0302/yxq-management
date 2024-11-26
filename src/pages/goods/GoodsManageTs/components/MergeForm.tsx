@@ -113,7 +113,7 @@ const MergeForm: React.FC<MergeFormProps> = (props) => {
               uid: props?.value?.pic,
               name: props?.value?.pic,
               status: 'done',
-              url: `https://img.nidcai.com${props?.value?.pic}`,
+              url: `https://img.hzex7.com${props?.value?.pic}`,
             },
           ]);
         } else {

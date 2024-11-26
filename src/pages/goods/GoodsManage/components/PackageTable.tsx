@@ -51,7 +51,7 @@ const PackageTable: React.FC<PackageTableProps> = (props) => {
       hideInSearch: true,
       renderFormItem: () => null,
       render: (_, row) => (
-        <Image width={50} src={`https://img.nidcai.com${row.pic}`} fallback={nullImage} />
+        <Image width={50} src={`https://img.hzex7.com${row.pic}`} fallback={nullImage} />
       ),
     },
     {
