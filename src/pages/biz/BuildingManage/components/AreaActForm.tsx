@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Table, Drawer, Button, InputNumber, Switch, Select, message, Modal } from 'antd';
 
-import { getAreaAct, updateAreaActYxq, getDishesByActId, getAllDishes } from '../service';
+import {
+  getAreaAct,
+  updateAreaActYxq,
+  getDishesByActId,
+  getAllDishes,
+  getAllAreaDishes,
+} from '../service';
 
 interface AreaActFormProps {
   visible: boolean;
@@ -77,8 +83,8 @@ const AreaActForm: React.FC<AreaActFormProps> = ({ visible, onCancel, value }) =
       }
     };
 
-    const fetchAllDishes = async () => {
-      const response = await getAllDishes();
+    const fetchAllDishes = async (areaId) => {
+      const response = await getAllAreaDishes({ id: areaId });
       if (response.data) {
         setAllDishes(response.data);
       }
@@ -86,7 +92,7 @@ const AreaActForm: React.FC<AreaActFormProps> = ({ visible, onCancel, value }) =
 
     if (visible) {
       fetchData();
-      fetchAllDishes();
+      fetchAllDishes(value?.id);
     }
   }, [visible, value?.id]);
 

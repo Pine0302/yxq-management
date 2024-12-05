@@ -317,3 +317,20 @@ export async function downSell(data: { [key: string]: any }, options?: { [key: s
     ...(options || {}),
   });
 }
+
+/** 获取活动关联的商品信息 GET /adminapi/area/area_act_goods */
+export async function getAllAreaDishes(
+  params?: { [id: number]: any },
+  options?: { [key: string]: any },
+) {
+  return request<TableListItem>('/adminapi/goods/onsale_dishes_area', {
+    params: {
+      ...params,
+    },
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...(options || {}),
+  });
+}
