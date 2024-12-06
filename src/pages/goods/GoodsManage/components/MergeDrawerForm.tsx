@@ -331,9 +331,9 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           </ProForm.Item>
         )}
         <ProForm.Group>
-          <ProFormMoney label="划线价格" name="originalPrice" initialValue={99} hidden />
-          <ProFormMoney label="单价价格" name="price" initialValue={99} hidden />
-          <ProFormMoney label="打包费用" name="packageFee" initialValue={99} hidden />
+          <ProFormMoney label="划线价格" name="originalPrice" initialValue={99} />
+          <ProFormMoney label="单价价格" name="price" initialValue={99} />
+          <ProFormMoney label="打包费用" name="packageFee" initialValue={99} />
         </ProForm.Group>
         <ProForm.Group>
           <ProFormRadio.Group
