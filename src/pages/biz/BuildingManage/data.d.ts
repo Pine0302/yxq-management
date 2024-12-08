@@ -94,6 +94,12 @@ export type TemlateAreaGoodsTableItem = {
   sellout: number;
   originStatus: boolean;
   isEdit: boolean;
+  limitBuy: boolean;
+  limitNum: number;
+  originalPrice: number;
+  packageFee: number;
+  price: number;
+  belong: number;
 };
 
 export type TemlateAreaGoodsTableWrapper = {

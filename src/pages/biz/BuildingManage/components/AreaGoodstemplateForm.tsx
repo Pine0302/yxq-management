@@ -50,7 +50,6 @@ type DataItem = {
   sold: number;
   newStock: number;
 };
-
 const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
   visible,
   onCancel,
@@ -173,7 +172,7 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
 
   const columns: ProColumns<TemlateAreaGoodsTableItem>[] = [
     {
-      title: '商品名称 ',
+      title: '商品名称',
       dataIndex: 'gname',
       search: {
         transform: (value) => ({ gname: value }), // 自定义检索字段
@@ -190,17 +189,38 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
       search: false,
     },
     {
-      title: '启用状态',
-      dataIndex: 'originStatus',
-      render: (text, record) => (record.originStatus ? '启用' : '禁用'),
+      title: '是否限购',
+      dataIndex: 'limitBuy',
+      render: (text, record) => (record.limitBuy ? '是' : '否'),
       valueEnum: {
-        true: { text: '启用' },
-        false: { text: '禁用' },
+        true: { text: '是' },
+        false: { text: '否' },
       },
       search: false,
       // search: {
       //   transform: (value) => ({ originStatus: value }), // 自定义检索字段
       // },
+    },
+    {
+      title: '限购数量',
+      dataIndex: 'limitNum',
+      search: false,
+      render: (text, record) => (record.limitBuy ? text : '-'),
+    },
+    {
+      title: '划线价格',
+      dataIndex: 'originalPrice',
+      search: false,
+    },
+    {
+      title: '价格',
+      dataIndex: 'price',
+      search: false,
+    },
+    {
+      title: '打包费',
+      dataIndex: 'packageFee',
+      search: false,
     },
     {
       title: '上/下架状态 ',
@@ -231,6 +251,18 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
               return { total: -1 };
           }
         },
+      },
+    },
+    {
+      title: '商品归属',
+      dataIndex: 'belong',
+      valueEnum: {
+        1: { text: '厨房' },
+        2: { text: '楼宇' },
+      },
+      render: (_, record) => (record.belong === 1 ? '厨房' : '楼宇'),
+      search: {
+        transform: (value) => ({ belong: value }),
       },
     },
     {
@@ -312,7 +344,12 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
   };
 
   return (
-    <PageContainer>
+    <PageContainer
+    //header={{
+    //title: false, // 隐藏标题
+    //breadcrumb: undefined, // 隐藏面包屑
+    //}}
+    >
       <ProTable<TemlateAddressTableItem, TableListPagination>
         actionRef={actionRef}
         rowKey="id"
@@ -355,7 +392,7 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
       />
 
       <Drawer
-        title="楼宇商品管理"
+        title="楼宇商品管理1"
         width={720}
         onClose={() => {
           setSubDrawerVisible(false); // 关闭抽屉
