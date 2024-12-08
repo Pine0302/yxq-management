@@ -25,6 +25,7 @@ import ProTable from '@ant-design/pro-table';
 import CreateBuildingForm from './CreateBuildingForm'; // 确保路径正确
 import SubAddressTemplateForm from './SubAddresstemplateForm'; // 确保路径正确
 import EditAreaGoodsForm from './EditAreaGoodsForm'; // 确保路径正确
+import SubEditAreaGoodsForm from './SubEditAreaGoodsForm'; // 确保路径正确
 import { Stock } from '@ant-design/charts';
 
 interface AreaGoodsTemplateFormProps {
@@ -58,6 +59,7 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
   const actionRef = useRef<ActionType>();
   const [modalVisible, setModalVisible] = useState(false);
   const [subModalVisible, setSubModalVisible] = useState(false);
+  const [sub2ModalVisible, setSub2ModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [currentRecord, setCurrentRecord] = useState<BuildingFormValues | null>(null);
   const [subDrawerVisible, setSubDrawerVisible] = useState<boolean>(false); // 控制subDrawer的显示
@@ -69,6 +71,22 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
   };
 
   const handleCreate = async (values: BuildingFormValues) => {
+    console.log('Form values:', values);
+    const postData = { parentId: 0, areaId: areaId, ...values };
+
+    // 可以在这里添加提交到服器的代码
+    const response = await addAddressTemplate(postData);
+    if (response && response.success) {
+      message.success('地址模板添加成功');
+      setModalVisible(false); // 关闭模态框
+      actionRef.current?.reload(); // 刷新ProTable
+    } else {
+      message.error('添加失败，请检查数据');
+    }
+    setModalVisible(false);
+  };
+
+  const handleSubCreate = async (values: BuildingFormValues) => {
     console.log('Form values:', values);
     const postData = { parentId: 0, areaId: areaId, ...values };
 
@@ -142,11 +160,36 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
     }
   };
 
+  const handleSubEditDone = async (values: TemlateAddressTableItem) => {
+    console.log('Form values for edit:', values);
+    const postData = { id: values.id, ...values };
+    console.log('Form values for edit:', postData);
+    // 可以在这里添加提交到服务器的代码
+    const response = await editAreaGoodsTemplate(postData);
+    if (response && response.success) {
+      message.success('楼宇商品更新成功');
+      values.isEdit = false;
+      setSub2ModalVisible(false); // 关闭模态框
+      actionRef.current?.reload(); // 刷新ProTable
+    } else {
+      setSub2ModalVisible(true);
+      message.error('修改失败，请检查数据');
+    }
+  };
+
   const handleSubAddressManagement = (record: TemlateAddressTableItem) => {
     console.log('Opening sub-address management for:', record);
     setModalVisible(false); // 确保关闭任何已经打开的编辑模态框
     setCurrentRecord(record); // 更新当前记录
+    setSub2ModalVisible(false); // 确保关闭任何已经打开的编辑模态框
     setSubModalVisible(true);
+  };
+  const handleSub2AddressManagement = (record: TemlateAddressTableItem) => {
+    console.log('Opening sub-address management for:', record);
+    setModalVisible(false); // 确保关闭任何已经打开的编辑模态框
+    setCurrentRecord(record); // 更新当前记录
+    setSubModalVisible(false);
+    setSub2ModalVisible(true);
   };
 
   const handleDelete = async (record: TemlateAddressTableItem) => {
@@ -277,12 +320,18 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
 
         if (record.status === false) {
           return [
+            <a key="subAddressTemplate" onClick={() => handleSub2AddressManagement(record)}>
+              编辑
+            </a>,
             <a key="subAddressTemplate" onClick={() => handleSubAddressManagement(record)}>
               上架
             </a>,
           ];
         } else {
           return [
+            <a key="subAddressTemplate" onClick={() => handleSub2AddressManagement(record)}>
+              编辑
+            </a>,
             <a key="edit" onClick={() => handleEnd(record)}>
               下架
             </a>,
@@ -391,8 +440,15 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
         initialValues={currentRecord}
       />
 
+      <SubEditAreaGoodsForm
+        visible={sub2ModalVisible}
+        onCreate={currentRecord ? handleSubEditDone : handleSubCreate}
+        onCancel={() => setSub2ModalVisible(false)}
+        initialValues={currentRecord}
+      />
+
       <Drawer
-        title="楼宇商品管理1"
+        title="楼宇商品管理"
         width={720}
         onClose={() => {
           setSubDrawerVisible(false); // 关闭抽屉
