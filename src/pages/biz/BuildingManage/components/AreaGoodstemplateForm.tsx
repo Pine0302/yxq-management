@@ -221,11 +221,11 @@ const AreaGoodsTemplateForm: React.FC<AreaGoodsTemplateFormProps> = ({
         transform: (value) => ({ gname: value }), // 自定义检索字段
       },
     },
-    {
-      title: '已售',
-      dataIndex: 'sellnum',
-      search: false,
-    },
+    // {
+    //   title: '已售',
+    //   dataIndex: 'sellnum',
+    //   search: false,
+    // },
     {
       title: '当前库存',
       dataIndex: 'total',
