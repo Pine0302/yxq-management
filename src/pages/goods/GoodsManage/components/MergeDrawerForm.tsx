@@ -13,6 +13,8 @@ import { message, Modal } from 'antd';
 import { addGoods, editGoods, goodsDetail } from '../service';
 import type { SideDishGoods } from '../data';
 import PackageTable from './PackageTable';
+import { Button, Table, Input, Space } from 'antd';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 type MergeFormProps = {
   modalVisible: boolean;
@@ -69,6 +71,14 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
+
+  // 在 MergeDrawerForm 组件内部添加以下代码
+  //const [customAttributes, setCustomAttributes] = useState<any[]>([]);
+
+  // 规格与属性管理状态
+  const [customAttributes, setCustomAttributes] = useState([
+    { name: '', values: [''] }, // 初始值：规格名称 + 单个空属性值
+  ]);
 
   useEffect(() => {
     if (props.modalVisible && props.value) {
@@ -141,6 +151,12 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
 
   const mergeSubmit = async (formData: any) => {
     setIsSubmitting(true); // 提交前禁用按钮
+
+    // 处理规格和属性数据
+    const formattedCustomAttributes = customAttributes.map((spec) => ({
+      name: spec.name,
+      values: spec.values.filter((value) => value.trim() !== ''), // 移除空值
+    }));
     console.log(formData);
     const {
       id,
@@ -193,6 +209,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           sideDishIds,
           pepper,
           belong,
+          goodsAttributes: formattedCustomAttributes, // 将处理后的规格数据添加到提交数据
         };
         response = await editGoods(postData);
       } else {
@@ -214,6 +231,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           pepper,
           source: 1,
           belong,
+          goodsAttributes: formattedCustomAttributes, // 将处理后的规格数据添加到提交数据
         };
         response = await addGoods(postData);
       }
@@ -238,11 +256,108 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
     return true;
   };
 
+  // 处理输入变化
+  // const handleInputChange = (value: string, key: string, index: number) => {
+  //   const newAttributes = [...customAttributes];
+  //   newAttributes[index][key] = value;
+  //   setCustomAttributes(newAttributes);
+  // };
+
+  // 处理输入变化
+  const handleInputChange = (value: string, key: string, index: number, valueIndex?: number) => {
+    const newAttributes = [...customAttributes];
+    if (key === 'name') {
+      // 更新规格名称
+      newAttributes[index].name = value;
+    } else if (key === 'values' && valueIndex !== undefined) {
+      // 更新某个规格的属性值
+      newAttributes[index].values[valueIndex] = value;
+    }
+    setCustomAttributes(newAttributes);
+  };
+
+  // 添加新规格行
+  const handleAddAttribute = () => {
+    setCustomAttributes([...customAttributes, { name: '', values: [''] }]);
+  };
+
+  // 添加属性值
+  const handleAddAttributeValue = (specIndex: number) => {
+    const newAttributes = [...customAttributes];
+    newAttributes[specIndex].values.push(''); // 添加一个空的属性值
+    setCustomAttributes(newAttributes);
+  };
+
+  // 删除规格或属性值
+  const handleRemoveAttribute = (index: number, valueIndex?: number) => {
+    const newAttributes = [...customAttributes];
+    if (valueIndex !== undefined) {
+      // 删除单个属性值
+      newAttributes[index].values.splice(valueIndex, 1);
+    } else {
+      // 删除整个规格
+      newAttributes.splice(index, 1);
+    }
+    setCustomAttributes(newAttributes);
+  };
+
+  // // 添加新行
+  // const handleAddAttribute = () => {
+  //   setCustomAttributes([...customAttributes, { name: '', value: '' }]);
+  // };
+
+  // 删除行
+  // const handleRemoveAttribute = (index: number) => {
+  //   const newAttributes = [...customAttributes];
+  //   newAttributes.splice(index, 1);
+  //   setCustomAttributes(newAttributes);
+  // };
+
+  // 自定义属性表格列定义
+  const columns = [
+    {
+      title: '规格',
+      dataIndex: 'name',
+      render: (_: any, record: any, index: number) => (
+        <Input
+          placeholder="请输入规格"
+          value={record.name}
+          onChange={(e) => handleInputChange(e.target.value, 'name', index)}
+        />
+      ),
+    },
+    {
+      title: '规格值',
+      dataIndex: 'value',
+      render: (_: any, record: any, index: number) => (
+        <Input
+          placeholder="请输入规格值"
+          value={record.value}
+          onChange={(e) => handleInputChange(e.target.value, 'value', index)}
+        />
+      ),
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      render: (_: any, record: any, index: number) => (
+        <Button
+          type="link"
+          icon={<MinusCircleOutlined />}
+          onClick={() => handleRemoveAttribute(index)}
+          danger
+        >
+          删除
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <>
       <DrawerForm
         formRef={formRef}
-        title={props?.isEdit ? '编辑商品' : '新增商品'}
+        title={props?.isEdit ? '编辑商品2' : '新增商品3'}
         visible={props.modalVisible}
         onVisibleChange={drawerVisiableChangeHandle}
         layout="horizontal"
@@ -386,6 +501,84 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
             wrapperCol={{ span: 22 }}
           />
         </ProForm.Group>
+
+        {/* 自定义属性 */}
+        <ProForm.Item label="商品规格">
+          {customAttributes.map((attribute, specIndex) => (
+            <div key={specIndex} style={{ marginBottom: '20px' }}>
+              {/* 单行Flex布局：规格名 + 规格值列表 */}
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                {/* 左侧：规格名输入框 */}
+                <div style={{ width: '20%', marginRight: '10px' }}>
+                  <Input
+                    placeholder="请输入规格名称"
+                    value={attribute.name}
+                    onChange={(e) => handleInputChange(e.target.value, 'name', specIndex)}
+                  />
+                </div>
+
+                {/* 右侧：规格值输入框列表 */}
+                <div style={{ flex: 1 }}>
+                  {attribute.values.map((value, valueIndex) => (
+                    <div
+                      key={valueIndex}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      <Input
+                        placeholder="请输入规格值"
+                        value={value}
+                        style={{ marginRight: '10px', flex: 1 }}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, 'values', specIndex, valueIndex)
+                        }
+                      />
+                      <Button
+                        type="link"
+                        icon={<MinusCircleOutlined />}
+                        onClick={() => handleRemoveAttribute(specIndex, valueIndex)}
+                        danger
+                      />
+                    </div>
+                  ))}
+
+                  {/* 添加规格值按钮 */}
+                  <Button
+                    type="dashed"
+                    icon={<PlusOutlined />}
+                    onClick={() => handleAddAttributeValue(specIndex)}
+                    style={{ marginTop: '8px' }}
+                  >
+                    添加规格值
+                  </Button>
+                </div>
+              </div>
+
+              {/* 删除整个规格的按钮 */}
+              <Button
+                type="link"
+                icon={<MinusCircleOutlined />}
+                onClick={() => handleRemoveAttribute(specIndex)}
+                danger
+                style={{ marginTop: '8px' }}
+              >
+                删除规格
+              </Button>
+            </div>
+          ))}
+
+          {/* 添加新规格按钮 */}
+          <Button
+            type="dashed"
+            onClick={handleAddAttribute}
+            style={{ width: '100%', marginTop: '20px' }}
+          >
+            <PlusOutlined /> 添加新规格
+          </Button>
+        </ProForm.Item>
       </DrawerForm>
       <Modal
         // zIndex={9999999}
