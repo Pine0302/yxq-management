@@ -13,7 +13,7 @@ import { message, Modal } from 'antd';
 import { addGoods, editGoods, goodsDetail } from '../service';
 import type { SideDishGoods } from '../data';
 import PackageTable from './PackageTable';
-import { Button, Table, Input, Space } from 'antd';
+import { Button, Table, Input, Space, Typography, Form } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 type MergeFormProps = {
@@ -73,22 +73,46 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const [showPackageStep, setShowPackageStep] = useState<boolean>(false);
 
   // 在 MergeDrawerForm 组件内部添加以下代码
-  //const [customAttributes, setCustomAttributes] = useState<any[]>([]);
+  const [customAttributes, setCustomAttributes] = useState<any[]>([]);
 
-  // 规格与属性管理状态
-  const [customAttributes, setCustomAttributes] = useState([
-    { name: '', values: [''] }, // 初始值：规格名称 + 单个空属性值
-  ]);
+  const [showCustomAttributes, setShowCustomAttributes] = useState<boolean>(false);
+
+  const [validationErrors, setValidationErrors] = useState({});
+
+  //规格与属性管理状态;
+  // const [customAttributes, setCustomAttributes] = useState([
+  //   { name: '', values: [''] }, // 初始值：规格名称 + 单个空属性值
+  // ]);
 
   useEffect(() => {
+    //编辑
     if (props.modalVisible && props.value) {
       if (props.value.limitBuy) {
         setLimitBuyState(true);
       } else {
+        console.log('props.value2:', props.value);
         setLimitBuyState(false);
       }
+      if (props.value.goodsAttributeList?.length > 0) {
+        const attributes = props.value.goodsAttributeList.map((attr: any) => ({
+          name: attr.name || '',
+          values: attr.values || [''], // 如果没有值，默认填充一个空字符串
+        }));
+        setCustomAttributes(attributes);
+        console.log('props.value3:', props.value);
+      } else {
+        // 新增时初始化为空规格
+        setCustomAttributes([{ name: '', values: [''] }]);
+      }
+      setShowCustomAttributes(props.value.belong === 2);
+    } else {
+      //新增
     }
   }, [props.modalVisible, props.value]); // 添加 visible 作为依赖项
+
+  const handleBelongChange = (value: number) => {
+    setShowCustomAttributes(value === 2);
+  };
 
   const drawerVisiableChangeHandle = async (visiable: boolean) => {
     if (visiable) {
@@ -96,6 +120,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
         const { data } = await goodsDetail({ id: props.value.id });
         formRef.current?.setFieldsValue(data);
         setShowPackageStep(data?.type === 'SPECIFICATIONS');
+        setShowCustomAttributes(data?.belong === 2);
         // 处理图片展示
         setFileList([
           {
@@ -123,6 +148,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           belong: undefined, // 确保新增时经营归属没有初始值
         });
         setShowPackageStep(false);
+        setShowCustomAttributes(false);
         setFileList([]);
       }
     } else {
@@ -150,6 +176,10 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   };
 
   const mergeSubmit = async (formData: any) => {
+    if (Object.keys(validationErrors).length > 0) {
+      message.error('请填写所有必填的规格和规格值！');
+      return false;
+    }
     setIsSubmitting(true); // 提交前禁用按钮
 
     // 处理规格和属性数据
@@ -262,23 +292,56 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   //   newAttributes[index][key] = value;
   //   setCustomAttributes(newAttributes);
   // };
+  const validateInput = (attributes) => {
+    const newErrors = {};
+    attributes.forEach((attr, index) => {
+      const errors = [];
+      if (!attr.name.trim()) {
+        errors.push('name');
+      }
+      attr.values.forEach((value, vIndex) => {
+        if (!value.trim()) {
+          errors.push(`value-${vIndex}`);
+        }
+      });
+      if (errors.length > 0) {
+        newErrors[index] = errors;
+      }
+    });
+    setValidationErrors(newErrors);
+  };
 
   // 处理输入变化
   const handleInputChange = (value: string, key: string, index: number, valueIndex?: number) => {
     const newAttributes = [...customAttributes];
+    console.log('key33:', key);
+    console.log('value33:', value);
+    console.log('index33:', index);
+    console.log('valueIndex33:', valueIndex);
     if (key === 'name') {
       // 更新规格名称
       newAttributes[index].name = value;
+      console.log('valueIndex34:', valueIndex);
     } else if (key === 'values' && valueIndex !== undefined) {
       // 更新某个规格的属性值
       newAttributes[index].values[valueIndex] = value;
+      console.log('valueIndex35:', valueIndex);
     }
     setCustomAttributes(newAttributes);
+    validateInput(newAttributes);
+    console.log('valueIndex36:', newAttributes);
+  };
+
+  const handleBlur = (value: string, key: string, index: number) => {
+    // 仅在失去焦点时更新状态
+    handleInputChange(value, key, index);
   };
 
   // 添加新规格行
   const handleAddAttribute = () => {
-    setCustomAttributes([...customAttributes, { name: '', values: [''] }]);
+    const newAttributes = [...customAttributes, { name: '', values: [''] }];
+    setCustomAttributes(newAttributes);
+    validateInput(newAttributes); // 确保新添加的规格也进行校验
   };
 
   // 添加属性值
@@ -286,6 +349,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
     const newAttributes = [...customAttributes];
     newAttributes[specIndex].values.push(''); // 添加一个空的属性值
     setCustomAttributes(newAttributes);
+    validateInput(newAttributes); // 确保新添加的规格值也进行校验
   };
 
   // 删除规格或属性值
@@ -313,51 +377,11 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   //   setCustomAttributes(newAttributes);
   // };
 
-  // 自定义属性表格列定义
-  const columns = [
-    {
-      title: '规格',
-      dataIndex: 'name',
-      render: (_: any, record: any, index: number) => (
-        <Input
-          placeholder="请输入规格"
-          value={record.name}
-          onChange={(e) => handleInputChange(e.target.value, 'name', index)}
-        />
-      ),
-    },
-    {
-      title: '规格值',
-      dataIndex: 'value',
-      render: (_: any, record: any, index: number) => (
-        <Input
-          placeholder="请输入规格值"
-          value={record.value}
-          onChange={(e) => handleInputChange(e.target.value, 'value', index)}
-        />
-      ),
-    },
-    {
-      title: '操作',
-      dataIndex: 'operation',
-      render: (_: any, record: any, index: number) => (
-        <Button
-          type="link"
-          icon={<MinusCircleOutlined />}
-          onClick={() => handleRemoveAttribute(index)}
-          danger
-        >
-          删除
-        </Button>
-      ),
-    },
-  ];
-
   return (
     <>
       <DrawerForm
         formRef={formRef}
-        title={props?.isEdit ? '编辑商品2' : '新增商品3'}
+        title={props?.isEdit ? '编辑商品' : '新增商品'}
         visible={props.modalVisible}
         onVisibleChange={drawerVisiableChangeHandle}
         layout="horizontal"
@@ -499,86 +523,95 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
             ]}
             labelCol={{ span: 9 }}
             wrapperCol={{ span: 22 }}
+            onChange={(e) => handleBelongChange(e.target.value)}
           />
         </ProForm.Group>
 
         {/* 自定义属性 */}
-        <ProForm.Item label="商品规格">
-          {customAttributes.map((attribute, specIndex) => (
-            <div key={specIndex} style={{ marginBottom: '20px' }}>
-              {/* 单行Flex布局：规格名 + 规格值列表 */}
-              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                {/* 左侧：规格名输入框 */}
-                <div style={{ width: '20%', marginRight: '10px' }}>
-                  <Input
-                    placeholder="请输入规格名称"
-                    value={attribute.name}
-                    onChange={(e) => handleInputChange(e.target.value, 'name', specIndex)}
-                  />
-                </div>
+        {/* 规格管理表格 */}
 
-                {/* 右侧：规格值输入框列表 */}
-                <div style={{ flex: 1 }}>
-                  {attribute.values.map((value, valueIndex) => (
-                    <div
-                      key={valueIndex}
+        {showCustomAttributes && (
+          <>
+            <Form.Item label="自定义规格属性：" colon={false}>
+              {/* 无需输入或选择元素，仅显示标签 */}
+            </Form.Item>
+            <Table
+              dataSource={customAttributes}
+              columns={[
+                {
+                  title: '属性名称',
+                  dataIndex: 'name',
+                  render: (_: any, record: any, index: number) => (
+                    <Input
+                      placeholder="请输入属性名称"
+                      defaultValue={record.name}
+                      //onChange={(e) => handleInputChange(e.target.value, 'name', index, 0)}
+                      onBlur={(e) => handleBlur(e.target.value, 'name', index)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: '8px',
+                        borderColor: validationErrors[index]?.includes('name') ? 'red' : undefined,
                       }}
-                    >
-                      <Input
-                        placeholder="请输入规格值"
-                        value={value}
-                        style={{ marginRight: '10px', flex: 1 }}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, 'values', specIndex, valueIndex)
-                        }
-                      />
+                    />
+                  ),
+                },
+                {
+                  title: '选项',
+                  dataIndex: 'values',
+                  render: (_: any, record: any, index: number) => (
+                    <>
+                      {record.values.map((value: string, valueIndex: number) => (
+                        <Space key={valueIndex} style={{ marginBottom: 8 }}>
+                          <Input
+                            placeholder="请输入请输入规格选项值"
+                            value={value}
+                            onChange={(e) =>
+                              handleInputChange(e.target.value, 'values', index, valueIndex)
+                            }
+                            style={{
+                              borderColor: validationErrors[index]?.includes(`value-${valueIndex}`)
+                                ? 'red'
+                                : undefined,
+                            }}
+                          />
+                          <Button
+                            type="link"
+                            icon={<MinusCircleOutlined />}
+                            onClick={() => handleRemoveAttribute(index, valueIndex)}
+                            danger
+                          />
+                        </Space>
+                      ))}
                       <Button
-                        type="link"
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => handleRemoveAttribute(specIndex, valueIndex)}
-                        danger
-                      />
-                    </div>
-                  ))}
-
-                  {/* 添加规格值按钮 */}
-                  <Button
-                    type="dashed"
-                    icon={<PlusOutlined />}
-                    onClick={() => handleAddAttributeValue(specIndex)}
-                    style={{ marginTop: '8px' }}
-                  >
-                    添加规格值
-                  </Button>
-                </div>
-              </div>
-
-              {/* 删除整个规格的按钮 */}
-              <Button
-                type="link"
-                icon={<MinusCircleOutlined />}
-                onClick={() => handleRemoveAttribute(specIndex)}
-                danger
-                style={{ marginTop: '8px' }}
-              >
-                删除规格
-              </Button>
-            </div>
-          ))}
-
-          {/* 添加新规格按钮 */}
-          <Button
-            type="dashed"
-            onClick={handleAddAttribute}
-            style={{ width: '100%', marginTop: '20px' }}
-          >
-            <PlusOutlined /> 添加新规格
-          </Button>
-        </ProForm.Item>
+                        type="dashed"
+                        icon={<PlusOutlined />}
+                        onClick={() => handleAddAttributeValue(index)}
+                      >
+                        添加规格选项值
+                      </Button>
+                    </>
+                  ),
+                },
+                {
+                  title: '操作',
+                  render: (_: any, record: any, index: number) => (
+                    <Button
+                      type="link"
+                      icon={<MinusCircleOutlined />}
+                      onClick={() => handleRemoveAttribute(index)}
+                      danger
+                    >
+                      删除
+                    </Button>
+                  ),
+                },
+              ]}
+              rowKey="name"
+              pagination={false}
+            />
+            <Button type="dashed" onClick={handleAddAttribute} block>
+              添加属性
+            </Button>
+          </>
+        )}
       </DrawerForm>
       <Modal
         // zIndex={9999999}

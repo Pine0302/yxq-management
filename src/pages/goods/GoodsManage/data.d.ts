@@ -70,6 +70,7 @@ export type GoodsTableItem = {
   type?: string;
   pepper?: number;
   belong?: number;
+  goodsAttributeList: GoodsAttribute[]; // 规格属性
 };
 
 export type GoodsDetailWrapper = {
