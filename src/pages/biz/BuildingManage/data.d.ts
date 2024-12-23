@@ -100,6 +100,7 @@ export type TemlateAreaGoodsTableItem = {
   packageFee: number;
   price: number;
   belong: number;
+  goodsAttributeList: any[];
 };
 
 export type TemlateAreaGoodsTableWrapper = {

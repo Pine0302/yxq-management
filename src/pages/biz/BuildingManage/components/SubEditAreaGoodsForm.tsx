@@ -31,6 +31,7 @@ interface BuildingFormValues {
   limitBuy: boolean;
   limitBuyNum: number;
   gid: number;
+  goodsAttributeList: any[];
 }
 
 const SubEditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
@@ -57,9 +58,13 @@ const SubEditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
     }
   }, [visible, initialValues, form]);
 
+  const formatGoodsAttributes = (attributes) => {
+    return attributes.map((attr) => `${attr.name} (${attr.values.join(', ')})`).join('; ');
+  };
+
   return (
     <Modal
-      title={initialValues ? '商品编辑11' : '商品编辑11'}
+      title={initialValues ? '商品编辑' : '商品编辑'}
       visible={visible}
       onOk={() => {
         form
@@ -117,6 +122,11 @@ const SubEditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
                 <span style={{ color: '#f40' }}>¥{initialValues?.originalPrice || '0.00'}</span>
               </div>
             </div>
+            {initialValues?.goodsAttributeList && (
+              <div style={{ fontSize: '14px', color: '#666' }}>
+                商品属性：{formatGoodsAttributes(initialValues.goodsAttributeList)}
+              </div>
+            )}
           </div>
         </div>
         {/* 分割线 */}
