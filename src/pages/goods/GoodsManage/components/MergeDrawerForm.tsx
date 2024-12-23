@@ -143,6 +143,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           packageFee: null,
           limitBuy: false,
           limitNum: 0,
+          sort: 0,
           status: false,
           sideDishGoods: [],
           belong: undefined, // 确保新增时经营归属没有初始值
@@ -175,11 +176,43 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
     });
   };
 
+  const canAddNewAttribute = () => {
+    const existingNames = customAttributes.map((attr) => attr.name.trim().toLowerCase());
+    const namesSet = new Set(existingNames); // 使用 Set 来检查重复项，Set 自动排除重复值
+
+    // 检查是否所有名称都已填写且没有重复
+    if (existingNames.length !== namesSet.size || existingNames.includes('')) {
+      message.error('属性名称不能为空或重复！');
+      return false;
+    }
+
+    return true;
+  };
+
+  const checkDuplicateValues = (index) => {
+    const attribute = customAttributes[index];
+    const valuesSet = new Set(attribute.values.map((value) => value.trim().toLowerCase()));
+    if (attribute.values.length !== valuesSet.size) {
+      message.error('同一个属性下的规格值不能重复！');
+      return false; // 存在重复
+    }
+    return true; // 无重复
+  };
+
   const mergeSubmit = async (formData: any) => {
     if (Object.keys(validationErrors).length > 0) {
       message.error('请填写所有必填的规格和规格值！');
       return false;
     }
+
+    for (let attribute of customAttributes) {
+      const valuesSet = new Set(attribute.values.map((value) => value.trim().toLowerCase()));
+      if (attribute.values.length !== valuesSet.size) {
+        message.error('同一个属性下的规格值不能重复！');
+        return false; // 存在重复，终止提交
+      }
+    }
+
     setIsSubmitting(true); // 提交前禁用按钮
 
     // 处理规格和属性数据
@@ -203,6 +236,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
       sideDishGoods,
       pepper,
       belong,
+      sort,
     } = formData;
     let { pic } = formData;
     const sideDishIds: { gid: any; relationType: any }[] = [];
@@ -239,6 +273,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           sideDishIds,
           pepper,
           belong,
+          sort,
           goodsAttributes: formattedCustomAttributes, // 将处理后的规格数据添加到提交数据
         };
         response = await editGoods(postData);
@@ -261,6 +296,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
           pepper,
           source: 1,
           belong,
+          sort,
           goodsAttributes: formattedCustomAttributes, // 将处理后的规格数据添加到提交数据
         };
         response = await addGoods(postData);
@@ -314,10 +350,6 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   // 处理输入变化
   const handleInputChange = (value: string, key: string, index: number, valueIndex?: number) => {
     const newAttributes = [...customAttributes];
-    console.log('key33:', key);
-    console.log('value33:', value);
-    console.log('index33:', index);
-    console.log('valueIndex33:', valueIndex);
     if (key === 'name') {
       // 更新规格名称
       newAttributes[index].name = value;
@@ -339,6 +371,9 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
 
   // 添加新规格行
   const handleAddAttribute = () => {
+    if (customAttributes.length > 0 && !canAddNewAttribute()) {
+      return;
+    }
     const newAttributes = [...customAttributes, { name: '', values: [''] }];
     setCustomAttributes(newAttributes);
     validateInput(newAttributes); // 确保新添加的规格也进行校验
@@ -348,6 +383,9 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
   const handleAddAttributeValue = (specIndex: number) => {
     const newAttributes = [...customAttributes];
     newAttributes[specIndex].values.push(''); // 添加一个空的属性值
+    if (!checkDuplicateValues(specIndex)) {
+      return; // 如果检查到重复，则不进行添加
+    }
     setCustomAttributes(newAttributes);
     validateInput(newAttributes); // 确保新添加的规格值也进行校验
   };
@@ -488,6 +526,7 @@ const MergeDrawerForm: React.FC<MergeFormProps> = (props) => {
             ]}
             rules={[{ required: true }]}
           />
+          <ProFormDigit label="排序号" name="sort" initialValue={0} />
         </ProForm.Group>
 
         <ProForm.Group>
