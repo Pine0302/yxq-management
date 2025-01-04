@@ -101,6 +101,12 @@ const TableList: React.FC = () => {
       ),
     },
     {
+      title: '排序',
+      dataIndex: 'sort',
+      hideInSearch: true,
+      valueType: 'digit',
+    },
+    {
       title: '打包费',
       dataIndex: 'packageFee',
       hideInSearch: true,

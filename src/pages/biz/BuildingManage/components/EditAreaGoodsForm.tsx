@@ -57,6 +57,10 @@ const EditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
     }
   }, [visible, initialValues, form]);
 
+  const formatGoodsAttributes = (attributes) => {
+    return attributes.map((attr) => `${attr.name} (${attr.values.join(', ')})`).join('; ');
+  };
+
   return (
     <Modal
       title={initialValues ? '商品上架' : '商品上架'}
@@ -117,6 +121,11 @@ const EditAreaGoodsForm: React.FC<CreateBuildingFormProps> = ({
                 <span style={{ color: '#f40' }}>¥{initialValues?.originalPrice || '0.00'}</span>
               </div>
             </div>
+            {initialValues?.goodsAttributeList && (
+              <div style={{ fontSize: '14px', color: '#666' }}>
+                商品属性：{formatGoodsAttributes(initialValues.goodsAttributeList)}
+              </div>
+            )}
           </div>
         </div>
         {/* 分割线 */}
