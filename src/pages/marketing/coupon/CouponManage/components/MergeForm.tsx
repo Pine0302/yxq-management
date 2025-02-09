@@ -15,6 +15,8 @@ import {
 import { Col, Row, Divider, message, Checkbox, Input, Space } from 'antd';
 
 import { buildingPageInfo } from '../../../../biz/BuildingManage/service';
+import { goodsPageInfo } from '../../../../goods/GoodsManage/service';
+
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { addCoupon, editCoupon } from '../service';
 
@@ -33,6 +35,15 @@ const buildingSelectRequest = async () => {
     value: v.id,
   }));
 };
+
+const goodsSelectRequest = async () => {
+  const res = await goodsPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  return (res.data?.list || []).map((v) => ({
+    label: v.gname,
+    value: v.id,
+  }));
+};
+
 const handleSubmit = async (values: any, isEdit: boolean = false) => {
   // Placeholder for submit logic
 
@@ -40,6 +51,9 @@ const handleSubmit = async (values: any, isEdit: boolean = false) => {
 
   // 打印 fixedArea 详细内容
   console.log('Fixed Area:', values.fixedArea);
+
+  // 打印 fixedGoods 详细内容
+  console.log('Fixed Goods:', values.fixedGoods);
 
   if (!values?.id) {
     console.log('add');
@@ -56,6 +70,7 @@ const requiredRule = { rules: [{ required: true }] };
 const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
   const formRef = useRef<FormInstance<any>>();
   const [buildingOptions, setBuildingOptions] = useState<{ label: string; value: string }[]>([]);
+  const [goodsOptions, setGoodsOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
     // 获取楼宇选项
@@ -64,6 +79,13 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       setBuildingOptions(options);
     };
     fetchBuildingOptions();
+
+    // 获取楼宇选项
+    const fetchGoodsOptions = async () => {
+      const options = await goodsSelectRequest();
+      setGoodsOptions(options);
+    };
+    fetchGoodsOptions();
   }, []);
 
   useEffect(() => {
@@ -74,10 +96,25 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           ? value.activityAreas.map((area: any) => area.id)
           : [];
       console.log('areaIds:', areaIds);
+
+      // formRef.current?.setFieldsValue({
+      //   ...value,
+      //   applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
+      //   fixedArea: areaIds,
+      // });
+      //console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据
+
+      const goodsIds =
+        value.activityGoods && value.activityGoods.length > 0
+          ? value.activityGoods.map((goods: any) => goods.id)
+          : [];
+      console.log('goodsIds:', goodsIds);
       formRef.current?.setFieldsValue({
         ...value,
         applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
         fixedArea: areaIds,
+        applicableGoodsType: goodsIds.length > 0 ? 'specific' : 'all',
+        fixedGoods: goodsIds,
       });
       console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据
     } else if (!visible) {
@@ -87,7 +124,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
   return (
     <ModalForm
-      title={isEdit ? '编辑优惠券' : '新增优惠券'}
+      title={isEdit ? '编辑优惠券1' : '新增优惠券1'}
       formRef={formRef}
       layout="horizontal"
       labelCol={{ span: 4 }}
@@ -105,10 +142,33 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
           } else if (values.applicableBuildingsType === 'specific') {
             // values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
-            values.fixedArea = values.fixedArea
-              .map((item: { value: number }) => item.value)
-              .join(',');
+            //在这里增加判断,如果 values.fixedArea 是一个纯数字的数组,则不做下面的过滤处理
+            if (
+              Array.isArray(values.fixedArea) &&
+              values.fixedArea.every((item: any) => typeof item === 'number')
+            ) {
+            } else {
+              values.fixedArea = values.fixedArea
+                .map((item: { value: number }) => item.value)
+                .join(',');
+            }
           }
+          console.log('values.fixedGoods1:', values.fixedGoods);
+          if (values.applicableGoodsType === 'all') {
+            // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
+          } else if (values.applicableGoodsType === 'specific') {
+            // values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
+            if (
+              Array.isArray(values.fixedGoods) &&
+              values.fixedGoods.every((item: any) => typeof item === 'number')
+            ) {
+            } else {
+              values.fixedGoods = values.fixedGoods
+                .map((item: { value: number }) => item.value)
+                .join(',');
+            }
+          }
+
           console.log('开始提交1');
           await handleSubmit(values, isEdit);
           message.success('提交成功');
@@ -326,19 +386,49 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       <Row gutter={16}>
         <Col span={24}>
           <ProFormRadio.Group
-            name="gids"
+            name="applicableGoodsType"
             label="适用商品"
             labelCol={{ span: 4 }} // 控制标签的宽度
             wrapperCol={{ span: 20 }} // 控制输入框的宽度
             options={[
-              { label: '全部', value: '-1' },
-              // { label: '部分', value: 'partial' },
+              { label: '全部', value: 'all' },
+              { label: '指定商品', value: 'specific' },
             ]}
-            initialValue="-1" // 默认选择全部
+            initialValue="all" // 默认选择全部
             rules={[{ required: true, message: '请选择适用商品' }]}
           />
         </Col>
       </Row>
+
+      <ProFormDependency name={['applicableGoodsType']}>
+        {({ applicableGoodsType }) => {
+          if (applicableGoodsType === 'specific') {
+            return (
+              <Row>
+                <Col span={24}>
+                  <ProFormSelect
+                    name="fixedGoods"
+                    label="可使用商品"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                    mode="multiple"
+                    options={goodsOptions}
+                    fieldProps={{
+                      placeholder: '请选择可使用商品',
+                      labelInValue: true,
+                      onChange: (val) => {
+                        console.log('Selected goodss:', val); // 直接打印选中的值，确保它们是对象数组
+                      },
+                    }}
+                    rules={[{ required: true, message: '请选择可使用商品' }]}
+                  />
+                </Col>
+              </Row>
+            );
+          }
+          return null;
+        }}
+      </ProFormDependency>
 
       <Row>
         <Col span={24}>

@@ -167,13 +167,21 @@ const CouponManage: React.FC = () => {
         return activityAreas.map((area) => area.areaName).join('，');
       },
     },
+
     {
       title: '适用商品',
-      dataIndex: 'gids',
+      dataIndex: 'activityGoods',
       hideInForm: true,
       hideInSearch: true,
-      render: (text) => (text === '-1' || !text ? '不限制' : text),
+      //render: (text) => (text === '-1' || !text ? '不限制' : text),
+      renderText: (activityGoods: any[]) => {
+        if (!activityGoods || activityGoods.length === 0) {
+          return '不限制';
+        }
+        return activityGoods.map((goods) => goods.gname).join('，');
+      },
     },
+
     {
       title: '免包装费',
       dataIndex: 'packageFree',
