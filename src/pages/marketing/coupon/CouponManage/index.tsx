@@ -155,6 +155,20 @@ const CouponManage: React.FC = () => {
         return rd;
       },
     },
+
+    {
+      title: '适用类目',
+      dataIndex: 'activityMenu',
+      hideInForm: true,
+      hideInSearch: true,
+      renderText: (activityMenu: any[]) => {
+        if (!activityMenu || activityMenu.length === 0) {
+          return '不限制';
+        }
+        return activityMenu.map((menu) => menu.name).join('，');
+      },
+    },
+
     {
       title: '适用楼宇',
       dataIndex: 'activityAreas',

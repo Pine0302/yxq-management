@@ -16,6 +16,7 @@ import { Col, Row, Divider, message, Checkbox, Input, Space } from 'antd';
 
 import { buildingPageInfo } from '../../../../biz/BuildingManage/service';
 import { goodsPageInfo } from '../../../../goods/GoodsManage/service';
+import { userMenuPageInfo } from '../../../../system/UserMenu/service';
 
 import type { RequestOptionsType } from '@ant-design/pro-utils';
 import { addCoupon, editCoupon } from '../service';
@@ -37,9 +38,17 @@ const buildingSelectRequest = async () => {
 };
 
 const goodsSelectRequest = async () => {
-  const res = await goodsPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  const res = await goodsPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
   return (res.data?.list || []).map((v) => ({
     label: v.gname,
+    value: v.id,
+  }));
+};
+
+const menuSelectRequest = async () => {
+  const res = await userMenuPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  return (res.data?.list || []).map((v) => ({
+    label: v.name,
     value: v.id,
   }));
 };
@@ -71,6 +80,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   const formRef = useRef<FormInstance<any>>();
   const [buildingOptions, setBuildingOptions] = useState<{ label: string; value: string }[]>([]);
   const [goodsOptions, setGoodsOptions] = useState<{ label: string; value: string }[]>([]);
+  const [menuOptions, setMenuOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
     // 获取楼宇选项
@@ -80,12 +90,19 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     };
     fetchBuildingOptions();
 
-    // 获取楼宇选项
+    // 获取商品选项
     const fetchGoodsOptions = async () => {
       const options = await goodsSelectRequest();
       setGoodsOptions(options);
     };
     fetchGoodsOptions();
+
+    //获取类目选项
+    const fetchMenuOptions = async () => {
+      const options = await menuSelectRequest();
+      setMenuOptions(options);
+    };
+    fetchMenuOptions();
   }, []);
 
   useEffect(() => {
@@ -109,13 +126,23 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           ? value.activityGoods.map((goods: any) => goods.id)
           : [];
       console.log('goodsIds:', goodsIds);
+
+      const menuIds =
+        value.activityMenu && value.activityMenu.length > 0
+          ? value.activityMenu.map((menu: any) => menu.id)
+          : [];
+      console.log('menuIds:', menuIds);
+
       formRef.current?.setFieldsValue({
         ...value,
         applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
         fixedArea: areaIds,
         applicableGoodsType: goodsIds.length > 0 ? 'specific' : 'all',
         fixedGoods: goodsIds,
+        applicableMenuType: menuIds.length > 0 ? 'specific' : 'all',
+        fixedMenu: menuIds,
       });
+
       console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据
     } else if (!visible) {
       formRef.current?.resetFields();
@@ -124,7 +151,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
   return (
     <ModalForm
-      title={isEdit ? '编辑优惠券1' : '新增优惠券1'}
+      title={isEdit ? '编辑优惠券' : '新增优惠券'}
       formRef={formRef}
       layout="horizontal"
       labelCol={{ span: 4 }}
@@ -164,6 +191,22 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             ) {
             } else {
               values.fixedGoods = values.fixedGoods
+                .map((item: { value: number }) => item.value)
+                .join(',');
+            }
+          }
+
+          console.log('values.fixedMenu1:', values.fixedMenu);
+          if (values.applicableMenuType === 'all') {
+            // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
+          } else if (values.applicableMenuType === 'specific') {
+            // values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
+            if (
+              Array.isArray(values.fixedMenu) &&
+              values.fixedMenu.every((item: any) => typeof item === 'number')
+            ) {
+            } else {
+              values.fixedMenu = values.fixedMenu
                 .map((item: { value: number }) => item.value)
                 .join(',');
             }
@@ -382,6 +425,53 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
+
+      <Row gutter={16}>
+        <Col span={24}>
+          <ProFormRadio.Group
+            name="applicableMenuType"
+            label="适用类目"
+            labelCol={{ span: 4 }} // 控制标签的宽度
+            wrapperCol={{ span: 20 }} // 控制输入框的宽度
+            options={[
+              { label: '全部', value: 'all' },
+              { label: '指定类目', value: 'specific' },
+            ]}
+            initialValue="all" // 默认选择全部
+            rules={[{ required: true, message: '请选择适用类目' }]}
+          />
+        </Col>
+      </Row>
+
+      <ProFormDependency name={['applicableMenuType']}>
+        {({ applicableMenuType }) => {
+          if (applicableMenuType === 'specific') {
+            return (
+              <Row>
+                <Col span={24}>
+                  <ProFormSelect
+                    name="fixedMenu"
+                    label="可使用类目"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                    mode="multiple"
+                    options={menuOptions}
+                    fieldProps={{
+                      placeholder: '请选择可使用类目',
+                      labelInValue: true,
+                      onChange: (val) => {
+                        console.log('Selected menus:', val); // 直接打印选中的值，确保它们是对象数组
+                      },
+                    }}
+                    rules={[{ required: true, message: '请选择可使用类目' }]}
+                  />
+                </Col>
+              </Row>
+            );
+          }
+          return null;
+        }}
+      </ProFormDependency>
 
       <Row gutter={16}>
         <Col span={24}>
