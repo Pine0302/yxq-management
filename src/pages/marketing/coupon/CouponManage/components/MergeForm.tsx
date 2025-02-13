@@ -108,6 +108,8 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   useEffect(() => {
     console.log('activityAreas:', value?.activityAreas);
     if (visible && value) {
+      const initialTotalAmountType = value.totalAmount === 100000 ? 'unlimited' : 'limited';
+
       const areaIds =
         value.activityAreas && value.activityAreas.length > 0
           ? value.activityAreas.map((area: any) => area.id)
@@ -135,6 +137,8 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
       formRef.current?.setFieldsValue({
         ...value,
+        applicableTotalAmountType: initialTotalAmountType,
+        totalAmount: initialTotalAmountType === 'unlimited' ? 100000 : value.totalAmount,
         applicableBuildingsType: areaIds.length > 0 ? 'specific' : 'all',
         fixedArea: areaIds,
         applicableGoodsType: goodsIds.length > 0 ? 'specific' : 'all',
@@ -237,7 +241,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           <ProFormSelect
             {...requiredRule}
             request={async () => [
-              // { value: 'DISCOUNT', label: '折扣券' },
+              { value: 'DISCOUNT', label: '折扣券' },
               { value: 'FULL_REDUCE', label: '满减券' },
             ]}
             name="type"
@@ -266,15 +270,51 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
       <Row>
         <Col span={16}>
-          <ProFormDigit
+          <ProFormRadio.Group
+            name="applicableTotalAmountType"
             label="总投放数"
-            name="totalAmount"
-            width="sm"
-            min={1}
-            rules={[{ required: true, message: '请输入总投放数' }]}
+            initialValue="unlimited"
+            options={[
+              { label: '不限制', value: 'unlimited' },
+              { label: '限制数量', value: 'limited' },
+            ]}
+            rules={[{ required: true, message: '请选择投放数量类型' }]}
           />
+
+          <ProFormDependency name={['applicableTotalAmountType']}>
+            {({ applicableTotalAmountType }) => {
+              if (applicableTotalAmountType === 'limited') {
+                return (
+                  <ProFormDigit
+                    label=" "
+                    name="totalAmount"
+                    width="sm"
+                    min={1}
+                    placeholder="请输入总投放数"
+                    rules={[{ required: true, message: '请输入总投放数' }]}
+                    hidden={false} // 显示输入框
+                  />
+                );
+              }
+              return (
+                <ProFormDigit
+                  label=" "
+                  name="totalAmount"
+                  width="sm"
+                  disabled
+                  hidden={true} // 隐藏输入框
+                  initialValue={100000}
+                  fieldProps={{
+                    value: 100000,
+                    style: { color: 'rgba(0, 0, 0, 0.25)' },
+                  }}
+                />
+              );
+            }}
+          </ProFormDependency>
         </Col>
       </Row>
+
       <Row>
         <Col span={16}>
           <ProFormDigit
