@@ -145,6 +145,11 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         fixedGoods: goodsIds,
         applicableMenuType: menuIds.length > 0 ? 'specific' : 'all',
         fixedMenu: menuIds,
+        // 如果是礼品券，重置类目相关字段
+        ...(value.type === 'PRESENT' && {
+          applicableMenuType: 'all',
+          fixedMenu: [],
+        }),
       });
 
       console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据
@@ -165,9 +170,29 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         onCancel: onCancel,
         bodyStyle: { maxHeight: '80vh', maxWidth: '80vh', overflow: 'auto' },
       }}
+      // ...其他属性保持不变
+      onValuesChange={(changedValues, allValues) => {
+        if ('type' in changedValues) {
+          if (changedValues.type === 'PRESENT') {
+            formRef.current?.setFieldsValue({ reduce: 0 });
+          }
+        }
+      }}
       visible={visible}
       onFinish={async (values) => {
         try {
+          // 新增礼品券校验
+          if (values.type === 'PRESENT') {
+            if (
+              values.applicableGoodsType !== 'specific' ||
+              !values.fixedGoods
+              //values.fixedGoods.length !== 1
+            ) {
+              message.error('礼品券只能选择一个商品');
+              throw new Error('礼品券必须指定且只能选择一个商品');
+            }
+          }
+
           console.log('values.fixedArea1:', values.fixedArea);
           if (values.applicableBuildingsType === 'all') {
             // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
@@ -189,14 +214,27 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             // values.fixedArea = '-1'; // 如果选择了通用，将 fixedArea 设置为 -1
           } else if (values.applicableGoodsType === 'specific') {
             // values.fixedArea = values.fixedArea.join(','); // 如果是指定楼宇，确保 fixedArea 是一个字符串
+            if (values.type === 'PRESENT') {
+              if (
+                Array.isArray(values.fixedGoods) &&
+                values.fixedGoods.every((item: any) => typeof item === 'number')
+              ) {
+                message.error('提交失败，请重新选择商品');
+                return;
+              }
+            }
             if (
               Array.isArray(values.fixedGoods) &&
               values.fixedGoods.every((item: any) => typeof item === 'number')
             ) {
             } else {
-              values.fixedGoods = values.fixedGoods
-                .map((item: { value: number }) => item.value)
-                .join(',');
+              if (values.type === 'PRESENT') {
+                values.fixedGoods = values.fixedGoods.value;
+              } else {
+                values.fixedGoods = values.fixedGoods
+                  .map((item: { value: number }) => item.value)
+                  .join(',');
+              }
             }
           }
 
@@ -332,30 +370,61 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           </ProForm.Group>
         </Col>
       </Row>
+
+      <ProFormDependency name={['type']}>
+        {({ type }) => {
+          const isPresent = type === 'PRESENT';
+          return isPresent ? (
+            <Row>
+              <Col span={16}>
+                <ProFormRadio.Group
+                  name="presentType"
+                  label="馈赠礼品"
+                  initialValue="PRESENT"
+                  options={[
+                    {
+                      label: '买一赠一',
+                      value: 'PRESENT',
+                      disabled: true,
+                    },
+                  ]}
+                  rules={[{ required: true, message: '请选择馈赠类型' }]}
+                  fieldProps={{
+                    optionType: 'button',
+                    buttonStyle: 'solid',
+                  }}
+                />
+              </Col>
+            </Row>
+          ) : null;
+        }}
+      </ProFormDependency>
+
       <Row>
         <Col span={16}>
           <ProFormDependency name={['type']}>
             {({ type }) => {
-              const isDiscount = type === 'DISCOUNT';
-              return (
+              const isPresent = type === 'PRESENT';
+
+              return !isPresent ? (
                 <ProFormDigit
                   label="面值"
                   name="reduce"
                   width="sm"
                   min={0}
-                  max={isDiscount ? 100 : undefined}
+                  max={type === 'DISCOUNT' ? 100 : undefined}
                   fieldProps={{
-                    step: isDiscount ? 1 : 0.01,
-                    precision: isDiscount ? 0 : 2,
+                    step: type === 'DISCOUNT' ? 1 : 0.01,
+                    precision: type === 'DISCOUNT' ? 0 : 2,
                   }}
                   rules={[
                     { required: true, message: '请输入面值' },
                     {
                       type: 'number',
                       min: 0,
-                      message: isDiscount ? '面值不能小于0' : '面值不能为负数',
+                      message: type === 'DISCOUNT' ? '面值不能小于0' : '面值不能为负数',
                     },
-                    isDiscount
+                    type === 'DISCOUNT'
                       ? {
                           validator: (_, value) =>
                             Number.isInteger(value)
@@ -365,7 +434,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
                       : {},
                   ]}
                 />
-              );
+              ) : null;
             }}
           </ProFormDependency>
         </Col>
@@ -496,96 +565,130 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-      <Row gutter={16}>
-        <Col span={24}>
-          <ProFormRadio.Group
-            name="applicableMenuType"
-            label="适用类目"
-            labelCol={{ span: 4 }} // 控制标签的宽度
-            wrapperCol={{ span: 20 }} // 控制输入框的宽度
-            options={[
-              { label: '全部', value: 'all' },
-              { label: '指定类目', value: 'specific' },
-            ]}
-            initialValue="all" // 默认选择全部
-            rules={[{ required: true, message: '请选择适用类目' }]}
-          />
-        </Col>
-      </Row>
-      <ProFormDependency name={['applicableMenuType']}>
-        {({ applicableMenuType }) => {
-          if (applicableMenuType === 'specific') {
-            return (
-              <Row>
+
+      {/* 原代码中的适用类目部分修改如下 */}
+      <ProFormDependency name={['applicableMenuType', 'type']}>
+        {({ applicableMenuType, type }) => {
+          // 当选择礼品券时隐藏整个类目模块
+          if (type === 'PRESENT') return null;
+
+          return (
+            <>
+              <Row gutter={16}>
                 <Col span={24}>
-                  <ProFormSelect
-                    name="fixedMenu"
-                    label="可使用类目"
+                  <ProFormRadio.Group
+                    name="applicableMenuType"
+                    label="适用类目"
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 20 }}
-                    mode="multiple"
-                    options={menuOptions}
-                    fieldProps={{
-                      placeholder: '请选择可使用类目',
-                      labelInValue: true,
-                      onChange: (val) => {
-                        console.log('Selected menus:', val); // 直接打印选中的值，确保它们是对象数组
-                      },
-                    }}
-                    rules={[{ required: true, message: '请选择可使用类目' }]}
+                    options={[
+                      { label: '全部', value: 'all' },
+                      { label: '指定类目', value: 'specific' },
+                    ]}
+                    initialValue="all"
+                    rules={[{ required: true, message: '请选择适用类目' }]}
                   />
                 </Col>
               </Row>
-            );
-          }
-          return null;
+
+              {applicableMenuType === 'specific' && (
+                <Row>
+                  <Col span={24}>
+                    <ProFormSelect
+                      name="fixedMenu"
+                      label="可使用类目"
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                      mode="multiple"
+                      options={menuOptions}
+                      fieldProps={{
+                        placeholder: '请选择可使用类目',
+                        labelInValue: true,
+                      }}
+                      rules={[{ required: true, message: '请选择可使用类目' }]}
+                    />
+                  </Col>
+                </Row>
+              )}
+            </>
+          );
         }}
       </ProFormDependency>
-      <Row gutter={16}>
-        <Col span={24}>
-          <ProFormRadio.Group
-            name="applicableGoodsType"
-            label="适用商品"
-            labelCol={{ span: 4 }} // 控制标签的宽度
-            wrapperCol={{ span: 20 }} // 控制输入框的宽度
-            options={[
-              { label: '全部', value: 'all' },
-              { label: '指定商品', value: 'specific' },
-            ]}
-            initialValue="all" // 默认选择全部
-            rules={[{ required: true, message: '请选择适用商品' }]}
-          />
-        </Col>
-      </Row>
-      <ProFormDependency name={['applicableGoodsType']}>
-        {({ applicableGoodsType }) => {
-          if (applicableGoodsType === 'specific') {
-            return (
-              <Row>
+
+      {/* 修改适用商品部分 */}
+      <ProFormDependency name={['type', 'applicableGoodsType']}>
+        {({ type, applicableGoodsType }) => {
+          const isPresent = type === 'PRESENT';
+
+          return (
+            <>
+              <Row gutter={16}>
                 <Col span={24}>
-                  <ProFormSelect
-                    name="fixedGoods"
-                    label="可使用商品"
+                  <ProFormRadio.Group
+                    name="applicableGoodsType"
+                    label="适用商品"
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 20 }}
-                    mode="multiple"
-                    options={goodsOptions}
-                    fieldProps={{
-                      placeholder: '请选择可使用商品',
-                      labelInValue: true,
-                      onChange: (val) => {
-                        console.log('Selected goodss:', val); // 直接打印选中的值，确保它们是对象数组
+                    options={[
+                      { label: '全部', value: 'all', disabled: isPresent }, // 礼品券禁用全部选项
+                      { label: '指定商品', value: 'specific' },
+                    ]}
+                    initialValue={isPresent ? 'specific' : 'all'} // 礼品券默认指定商品
+                    rules={[
+                      {
+                        required: true,
+                        message: '请选择适用商品',
+                        validator: (_, value) => {
+                          if (isPresent && value !== 'specific') {
+                            return Promise.reject('礼品券必须指定商品');
+                          }
+                          return Promise.resolve();
+                        },
                       },
-                    }}
-                    rules={[{ required: true, message: '请选择可使用商品' }]}
+                    ]}
                   />
                 </Col>
               </Row>
-            );
-          }
-          return null;
+
+              {applicableGoodsType === 'specific' && (
+                <Row>
+                  <Col span={24}>
+                    <ProFormSelect
+                      name="fixedGoods"
+                      label="可使用商品"
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                      mode={isPresent ? undefined : 'multiple'} // 礼品券切换为单选模式
+                      options={goodsOptions}
+                      fieldProps={{
+                        placeholder: '请选择可使用商品1',
+                        labelInValue: true,
+                        maxTagCount: isPresent ? 1 : undefined, // 礼品券限制选择1个
+                        onChange: (selectedValue) => {
+                          if (isPresent) {
+                            if (selectedValue && selectedValue.length > 1) {
+                              message.error('礼品券只能选择一个商品');
+                              // 手动限制选择数量，确保 selectedValue 是数组
+                              formRef.current?.setFieldsValue({ fixedGoods: [selectedValue[0]] });
+                            } else if (selectedValue && selectedValue.length === 1) {
+                              // 确保 selectedValue 是数组
+                              formRef.current?.setFieldsValue({ fixedGoods: selectedValue });
+                            }
+                          } else {
+                            // 非礼品券模式，直接设置值，确保 selectedValue 是数组
+                            formRef.current?.setFieldsValue({ fixedGoods: selectedValue });
+                          }
+                        },
+                      }}
+                    />
+                  </Col>
+                </Row>
+              )}
+            </>
+          );
         }}
       </ProFormDependency>
+
       <Row>
         <Col span={24}>
           <ProFormRadio.Group

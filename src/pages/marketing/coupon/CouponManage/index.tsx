@@ -107,6 +107,10 @@ const CouponManage: React.FC = () => {
           text: '满减券',
           status: 'Waraning',
         },
+        PRESENT: {
+          text: '礼品馈赠券',
+          status: 'Waraning',
+        },
       },
     },
     {
