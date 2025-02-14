@@ -163,7 +163,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       modalProps={{
         destroyOnClose: true, // 确保关闭时销毁表单
         onCancel: onCancel,
-        bodyStyle: { maxHeight: '80vh', overflow: 'auto' },
+        bodyStyle: { maxHeight: '80vh', maxWidth: '80vh', overflow: 'auto' },
       }}
       visible={visible}
       onFinish={async (values) => {
@@ -269,49 +269,68 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       </Row>
 
       <Row>
-        <Col span={16}>
-          <ProFormRadio.Group
-            name="applicableTotalAmountType"
-            label="总投放数"
-            initialValue="unlimited"
-            options={[
-              { label: '不限制', value: 'unlimited' },
-              { label: '限制数量', value: 'limited' },
-            ]}
-            rules={[{ required: true, message: '请选择投放数量类型' }]}
-          />
-
-          <ProFormDependency name={['applicableTotalAmountType']}>
-            {({ applicableTotalAmountType }) => {
-              if (applicableTotalAmountType === 'limited') {
-                return (
-                  <ProFormDigit
-                    label=" "
-                    name="totalAmount"
-                    width="sm"
-                    min={1}
-                    placeholder="请输入总投放数"
-                    rules={[{ required: true, message: '请输入总投放数' }]}
-                    hidden={false} // 显示输入框
-                  />
-                );
-              }
-              return (
-                <ProFormDigit
-                  label=" "
-                  name="totalAmount"
-                  width="sm"
-                  disabled
-                  hidden={true} // 隐藏输入框
-                  initialValue={100000}
+        <Col span={40}>
+          <ProForm.Group>
+            <Row gutter={22} align="middle">
+              {/* 左侧标签+单选框组 */}
+              <Col span={16} style={{ display: 'flex', alignItems: 'left' }}>
+                <ProFormRadio.Group
+                  name="applicableTotalAmountType"
+                  label="总投放数"
+                  initialValue="unlimited"
+                  labelCol={{ span: 12 }} // 增加标签占比
+                  wrapperCol={{ span: 18 }}
+                  options={[
+                    { label: '不限制', value: 'unlimited' },
+                    { label: '限制数量', value: 'limited' },
+                  ]}
+                  rules={[{ required: true, message: '请选择投放数量类型' }]}
                   fieldProps={{
-                    value: 100000,
-                    style: { color: 'rgba(0, 0, 0, 0.25)' },
+                    style: {
+                      display: 'flex',
+                      gap: '16px',
+                      alignItems: 'center',
+                      whiteSpace: 'nowrap',
+                    },
                   }}
                 />
-              );
-            }}
-          </ProFormDependency>
+              </Col>
+
+              {/* 右侧数字输入框 */}
+              <Col span={6}>
+                <ProFormDependency name={['applicableTotalAmountType']}>
+                  {({ applicableTotalAmountType }) => {
+                    if (applicableTotalAmountType === 'limited') {
+                      return (
+                        <ProFormDigit
+                          name="totalAmount"
+                          label=" "
+                          min={1}
+                          placeholder="请输入总投放数"
+                          rules={[{ required: true, message: '请输入总投放数' }]}
+                          fieldProps={{
+                            style: {
+                              width: '100%',
+                              maxWidth: '200px',
+                            },
+                          }}
+                        />
+                      );
+                    }
+                    return (
+                      <ProFormDigit
+                        name="totalAmount"
+                        label=" "
+                        disabled
+                        hidden={true}
+                        initialValue={100000}
+                      />
+                    );
+                  }}
+                </ProFormDependency>
+              </Col>
+            </Row>
+          </ProForm.Group>
         </Col>
       </Row>
 
