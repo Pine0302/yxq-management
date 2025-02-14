@@ -108,7 +108,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   useEffect(() => {
     console.log('activityAreas:', value?.activityAreas);
     if (visible && value) {
-      const initialTotalAmountType = value.totalAmount === 100000 ? 'unlimited' : 'limited';
+      const initialTotalAmountType = value.sendLimit === 0 ? 'unlimited' : 'limited';
 
       const areaIds =
         value.activityAreas && value.activityAreas.length > 0
@@ -243,13 +243,13 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             request={async () => [
               { value: 'DISCOUNT', label: '折扣券' },
               { value: 'FULL_REDUCE', label: '满减券' },
+              { value: 'PRESENT', label: '礼品馈赠券' },
             ]}
             name="type"
             label="卡券类型"
           />
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
           <ProFormText
@@ -267,7 +267,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Row>
         <Col span={40}>
           <ProForm.Group>
@@ -333,26 +332,44 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           </ProForm.Group>
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
-          <ProFormDigit
-            label="面值"
-            name="reduce"
-            width="sm"
-            min={0}
-            fieldProps={{
-              step: 0.01,
-              precision: 2,
+          <ProFormDependency name={['type']}>
+            {({ type }) => {
+              const isDiscount = type === 'DISCOUNT';
+              return (
+                <ProFormDigit
+                  label="面值"
+                  name="reduce"
+                  width="sm"
+                  min={0}
+                  max={isDiscount ? 100 : undefined}
+                  fieldProps={{
+                    step: isDiscount ? 1 : 0.01,
+                    precision: isDiscount ? 0 : 2,
+                  }}
+                  rules={[
+                    { required: true, message: '请输入面值' },
+                    {
+                      type: 'number',
+                      min: 0,
+                      message: isDiscount ? '面值不能小于0' : '面值不能为负数',
+                    },
+                    isDiscount
+                      ? {
+                          validator: (_, value) =>
+                            Number.isInteger(value)
+                              ? Promise.resolve()
+                              : Promise.reject('折扣券面值必须为整数'),
+                        }
+                      : {},
+                  ]}
+                />
+              );
             }}
-            rules={[
-              { required: true, message: '请输入面值' },
-              { type: 'number', min: 0, message: '面值不能为负数' },
-            ]}
-          />
+          </ProFormDependency>
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
           <ProFormDigit
@@ -370,7 +387,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
           <ProFormText
@@ -381,7 +397,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Divider orientation="left">领取和使用规则</Divider>
       <ProFormRadio.Group
         name="receiveTimeLimit"
@@ -420,7 +435,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           return null;
         }}
       </ProFormDependency>
-
       <ProFormDigit
         name="limitPerUser"
         label="每人限领次数："
@@ -435,7 +449,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         }}
         rules={[{ required: true, message: '请输入每人限领次数' }]}
       />
-
       <Row>
         <Col span={24}>
           <ProFormDigit
@@ -452,7 +465,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Divider orientation="left">使用范围</Divider>
       <Row gutter={16}>
         <Col span={12}>
@@ -484,7 +496,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col span={24}>
           <ProFormRadio.Group
@@ -501,7 +512,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <ProFormDependency name={['applicableMenuType']}>
         {({ applicableMenuType }) => {
           if (applicableMenuType === 'specific') {
@@ -531,7 +541,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           return null;
         }}
       </ProFormDependency>
-
       <Row gutter={16}>
         <Col span={24}>
           <ProFormRadio.Group
@@ -548,7 +557,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <ProFormDependency name={['applicableGoodsType']}>
         {({ applicableGoodsType }) => {
           if (applicableGoodsType === 'specific') {
@@ -578,7 +586,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           return null;
         }}
       </ProFormDependency>
-
       <Row>
         <Col span={24}>
           <ProFormRadio.Group
@@ -595,7 +602,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <ProFormDependency name={['applicableBuildingsType']}>
         {({ applicableBuildingsType }) => {
           if (applicableBuildingsType === 'specific') {
@@ -625,7 +631,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           return null;
         }}
       </ProFormDependency>
-
       <Divider orientation="left">叠加使用</Divider>
       <Row gutter={16}>
         <Col span={24}>
@@ -643,7 +648,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Divider orientation="left">短信提醒</Divider>
       <Row gutter={16}>
         <Col span={24}>
