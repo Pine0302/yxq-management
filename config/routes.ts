@@ -98,6 +98,12 @@ export default [
         component: './user/UserManage',
       },
       {
+        name: 'member-card',
+        icon: 'smile',
+        path: '/user/member-card',
+        component: './user/MemberCardManage',
+      },
+      {
         component: './404',
       },
     ],
