@@ -1,12 +1,11 @@
-import { CheckOutlined, CloseOutlined, MessageOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Popover, Modal, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Modal, message } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { memberCardPageInfo, deleteCoupon, endCoupon } from './service';
 import type { TableListItem, TableListPagination } from './data';
-import MergeForm from './components/MergeForm';
 import MergeCForm from './components/MergeCForm';
 import LaunchForm from './components/LaunchForm';
 import CouponDetailForm from './components/CouponDetailForm';
@@ -222,16 +221,6 @@ const MemberCard: React.FC = () => {
         }}
       />
 
-      <MergeForm
-        visible={mergeFormVisible}
-        isEdit={isEdit}
-        value={currentRow}
-        onCancel={() => setMergeFormVisible(false)}
-        onSuccess={() => {
-          actionRef.current?.reload(); // 刷新表格数据
-          setMergeFormVisible(false); // 将 MergeForm 设为不可见
-        }}
-      />
       <LaunchForm
         visible={launchFormVisible}
         isEdit={isEdit}

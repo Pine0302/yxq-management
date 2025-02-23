@@ -45,6 +45,10 @@ const goodsSelectRequest = async () => {
   }));
 };
 
+// 定义一个异步函数 menuSelectRequest，用于获取菜单选择请求的数据
+// 定义一个异步函数 menuSelectRequest，用于获取菜单选择请求的数据
+// 调用 userMenuPageInfo 函数，传入参数 { current: 1, pageNum: 1, pageSize: 100 }
+// 该函数可能是从某个 API 获取用户菜单页面的信息
 const menuSelectRequest = async () => {
   const res = await userMenuPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
   return (res.data?.list || []).map((v) => ({

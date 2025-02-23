@@ -64,3 +64,14 @@ export type CouponType = {
   status: boolean;
   sendStatus: number;
 };
+
+export interface MemberCardInterestType {
+  id?: number;
+  type: number;
+  number: number;
+  fixedMenu: string;
+  gids: string;
+  useTimes: number;
+  end: number;
+  isTemp?: boolean;
+}

@@ -12,6 +12,8 @@ import { Col, Row, Divider, message, Table, Button, Modal, Space, Tag, InputNumb
 import type { ColumnsType } from 'antd/es/table';
 import { addMemberCard, editMemberCard } from '../service';
 import { couponPageInfo } from '../../../marketing/coupon/CouponManage/service';
+import InterestForm from './InterestForm';
+import type { MemberCardInterestType } from '../data';
 
 // 在文件顶部定义常量
 const COUPON_TYPE_MAP = {
@@ -46,17 +48,6 @@ export type CouponType = {
   sendStatus: number;
 };
 
-//绑定的权益类型
-export type memberCardInterestType = {
-  id: number;
-  type: number; //权益类型 1.折扣券
-  number: number; //折扣力度
-  fixedMenu: string; //限制的商品类目
-  gids: string; //限制的商品
-  useTimes: number; //使用限制
-  end: number; //可使用终端
-};
-
 type MergeFormProps = {
   visible?: boolean;
   onCancel?: () => void;
@@ -76,13 +67,16 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   const formRef = useRef<FormInstance<any>>();
 
   const [showCouponModal, setShowCouponModal] = useState(false);
+  // 状态管理部分新增
+  const [interestModalVisible, setInterestModalVisible] = useState(false);
+  const [editingInterest, setEditingInterest] = useState<MemberCardInterestType | null>(null);
   const [coupons, setCoupons] = useState<CouponType[]>([]);
   const [selectedCoupons, setSelectedCoupons] = useState<SelectedCoupon[]>([]);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
 
   const [showInterestModal, setShowInterestModal] = useState(false);
-  const [editingInterest, setEditingInterest] = useState<memberCardInterestType | null>(null);
-  const [selectedInterests, setSelectedInterests] = useState<memberCardInterestType[]>([]);
+
+  const [selectedInterests, setSelectedInterests] = useState<MemberCardInterestType[]>([]);
 
   // 获取优惠券列表
   const fetchCoupons = async (params: any = {}) => {
@@ -168,6 +162,27 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       fetchCoupons({ current: 1, pageSize: 10 }); // 首次加载时获取第一页数据
     }
   }, [showCouponModal]); // 监听弹窗显示状态变化
+
+  // 修改处理函数
+  const handleInterestSubmit = (values: MemberCardInterestType) => {
+    if (editingInterest?.id) {
+      // 编辑模式 - 保留原始ID
+      setSelectedInterests((prev) =>
+        prev.map((item) => (item.id === editingInterest.id ? { ...item, ...values } : item)),
+      );
+    } else {
+      // 新增模式 - 使用负数作为临时ID
+      setSelectedInterests((prev) => [
+        ...prev,
+        {
+          ...values,
+          id: -Date.now(), // 使用负数作为临时ID（保持number类型）
+          isTemp: true, // 标记为临时数据
+        },
+      ]);
+    }
+    setInterestModalVisible(false);
+  };
 
   // 列定义
   const columns: ColumnsType<CouponType> = [
@@ -264,7 +279,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
             type="link"
             onClick={() => {
               setEditingInterest(record);
-              setShowInterestModal(true);
+              setInterestModalVisible(true);
             }}
           >
             编辑
@@ -346,7 +361,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       }}
     >
       {/* 添加优惠券弹窗表单 */}
-      <ModalForm<memberCardInterestType>
+      <ModalForm<MemberCardInterestType>
         title={editingInterest ? '编辑权益' : '新增权益'}
         visible={showInterestModal}
         autoFocusFirstInput
@@ -505,7 +520,9 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           </ProFormDependency>
         </Col>
       </Row>
-      <Divider orientation="left">会员权益设置</Divider>
+      <Divider orientation="center">会员权益设置</Divider>
+
+      <Divider orientation="left">赠送券</Divider>
       {/* 赠送券模块 */}
       <Row style={{ marginBottom: 16 }}>
         <Col span={24}>
@@ -596,6 +613,16 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           scroll={{ y: 400 }}
         />
       </Modal>
+
+      <InterestForm
+        visible={interestModalVisible}
+        onCancel={() => {
+          setInterestModalVisible(false);
+          setEditingInterest(undefined);
+        }}
+        onSubmit={handleInterestSubmit}
+        initialValues={editingInterest}
+      />
     </ModalForm>
   );
 };
