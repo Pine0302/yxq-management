@@ -46,6 +46,17 @@ export type CouponType = {
   sendStatus: number;
 };
 
+//绑定的权益类型
+export type memberCardInterestType = {
+  id: number;
+  type: number; //权益类型 1.折扣券
+  number: number; //折扣力度
+  fixedMenu: string; //限制的商品类目
+  gids: string; //限制的商品
+  useTimes: number; //使用限制
+  end: number; //可使用终端
+};
+
 type MergeFormProps = {
   visible?: boolean;
   onCancel?: () => void;
@@ -115,7 +126,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
       // 仅在编辑模式且有值时初始化
       if (value?.memberCardCouponDTOList) {
-        console.log('初始化已选优惠券:', value.memberCardCouponDTOList);
         setSelectedCoupons(value.memberCardCouponDTOList);
       }
     } else {
