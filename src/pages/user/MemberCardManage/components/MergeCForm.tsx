@@ -14,7 +14,9 @@ import { addMemberCard, editMemberCard } from '../service';
 import { couponPageInfo } from '../../../marketing/coupon/CouponManage/service';
 import InterestForm from './InterestForm';
 import type { MemberCardInterestType } from '../data';
-
+import { buildingPageInfo } from '../../../biz/BuildingManage/service';
+import { goodsPageInfo } from '../../../goods/GoodsManage/service';
+import { userMenuPageInfo } from '../../../system/UserMenu/service';
 // 在文件顶部定义常量
 const COUPON_TYPE_MAP = {
   PRESENT: '礼品赠送券',
@@ -61,6 +63,31 @@ const INTEREST_TYPE_MAP = {
   1: '折扣券',
 } as const;
 
+// 在 MergeForm.tsx 中添加这些请求方法
+const buildingSelectRequest = async () => {
+  const res = await buildingPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  return (res.data?.list || []).map((v) => ({
+    label: v.areaName,
+    value: v.id,
+  }));
+};
+
+const goodsSelectRequest = async () => {
+  const res = await goodsPageInfo({ current: 1, pageNum: 1, pageSize: 1000 });
+  return (res.data?.list || []).map((v) => ({
+    label: v.gname,
+    value: v.id,
+  }));
+};
+
+const menuSelectRequest = async () => {
+  const res = await userMenuPageInfo({ current: 1, pageNum: 1, pageSize: 100 });
+  return (res.data?.list || []).map((v) => ({
+    label: v.name,
+    value: v.id,
+  }));
+};
+
 const requiredRule = { rules: [{ required: true }] };
 
 const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
@@ -68,7 +95,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
 
   const [showCouponModal, setShowCouponModal] = useState(false);
   // 状态管理部分新增
-  const [interestModalVisible, setInterestModalVisible] = useState(false);
+
   const [editingInterest, setEditingInterest] = useState<MemberCardInterestType | null>(null);
   const [coupons, setCoupons] = useState<CouponType[]>([]);
   const [selectedCoupons, setSelectedCoupons] = useState<SelectedCoupon[]>([]);
@@ -77,6 +104,35 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   const [showInterestModal, setShowInterestModal] = useState(false);
 
   const [selectedInterests, setSelectedInterests] = useState<MemberCardInterestType[]>([]);
+
+  const [menuOptions, setMenuOptions] = useState<{ label: string; value: string }[]>([]);
+  const [goodsOptions, setGoodsOptions] = useState<{ label: string; value: string }[]>([]);
+  const [buildingOptions, setBuildingOptions] = useState<{ label: string; value: string }[]>([]);
+  const [hasLoadedOptions, setHasLoadedOptions] = useState(false);
+
+  useEffect(() => {
+    console.log('hasLoadedOptions:', hasLoadedOptions);
+    if (visible && !hasLoadedOptions) {
+      const loadOptions = async () => {
+        try {
+          const [buildings, goods, menus] = await Promise.all([
+            buildingSelectRequest(),
+            goodsSelectRequest(),
+            menuSelectRequest(),
+          ]);
+          // 更新选项状态
+          setBuildingOptions(buildings);
+          setGoodsOptions(goods);
+          setMenuOptions(menus);
+          setHasLoadedOptions(true); // 标记为已加载
+        } catch (error) {
+          message.error('加载失败...');
+        }
+      };
+
+      loadOptions();
+    }
+  }, [visible, hasLoadedOptions]); // 依赖 visible 和 hasLoadedOptions
 
   // 获取优惠券列表
   const fetchCoupons = async (params: any = {}) => {
@@ -124,6 +180,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       // 新建模式强制清空
       if (!isEdit) {
         setSelectedCoupons([]);
+        setSelectedInterests([]);
         return;
       }
 
@@ -133,6 +190,17 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       }
     } else {
       setSelectedCoupons([]);
+    }
+    if (value?.memberCardInterestDTOList) {
+      // 确保所有数组字段存在且为数组
+      setSelectedInterests(
+        value.memberCardInterestDTOList.map((item) => ({
+          ...item,
+          fixedMenu: Array.isArray(item.fixedMenu) ? item.fixedMenu : [],
+          fixedGoods: Array.isArray(item.fixedGoods) ? item.fixedGoods : [],
+          fixedArea: Array.isArray(item.fixedArea) ? item.fixedArea : [],
+        })),
+      );
     }
   }, [visible, value, isEdit]); // 增加isEdit依赖
 
@@ -163,25 +231,38 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     }
   }, [showCouponModal]); // 监听弹窗显示状态变化
 
-  // 修改处理函数
+  // MergeForm.tsx
   const handleInterestSubmit = (values: MemberCardInterestType) => {
+    // 确保处理后的数据格式正确
+    const processedValues = {
+      ...values,
+      fixedMenu: Array.isArray(values.fixedMenu) ? values.fixedMenu : [],
+      fixedGoods: Array.isArray(values.fixedGoods) ? values.fixedGoods : [],
+      fixedArea: Array.isArray(values.fixedArea) ? values.fixedArea : [],
+    };
+
     if (editingInterest?.id) {
-      // 编辑模式 - 保留原始ID
       setSelectedInterests((prev) =>
-        prev.map((item) => (item.id === editingInterest.id ? { ...item, ...values } : item)),
+        prev.map((item) =>
+          item.id === editingInterest.id
+            ? {
+                ...processedValues,
+                id: editingInterest.id, // 保留原始ID
+              }
+            : item,
+        ),
       );
     } else {
-      // 新增模式 - 使用负数作为临时ID
       setSelectedInterests((prev) => [
         ...prev,
         {
-          ...values,
-          id: -Date.now(), // 使用负数作为临时ID（保持number类型）
-          isTemp: true, // 标记为临时数据
+          ...processedValues,
+          id: -Date.now(), // 临时ID
+          isTemp: true,
         },
       ]);
     }
-    setInterestModalVisible(false);
+    setShowInterestModal(false);
   };
 
   // 列定义
@@ -264,11 +345,42 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   ];
 
   // 已选权益列定义
-  const interestColumns: ColumnsType<memberCardInterestType> = [
+  const interestColumns: ColumnsType<MemberCardInterestType> = [
     { title: '权益类型', dataIndex: 'type', render: (t) => INTEREST_TYPE_MAP[t] },
     { title: '折扣力度', dataIndex: 'number', render: (v) => `${v}%` },
-    { title: '限制类目', dataIndex: 'fixedMenu' },
-    { title: '限制商品', dataIndex: 'gids' },
+    {
+      title: '限制类目',
+      dataIndex: 'fixedMenu',
+      render: (value, record) => {
+        const ids = Array.isArray(value) ? value : [];
+        const names = ids.map(
+          (id) => menuOptions.find((opt) => opt.value === id)?.label || `未知类目${id}`,
+        );
+        return names.join(', ') || '无';
+      },
+    },
+    {
+      title: '限制商品',
+      dataIndex: 'fixedGoods',
+      render: (value, record) => {
+        const ids = Array.isArray(value) ? value : [];
+        const names = ids.map(
+          (id) => goodsOptions.find((opt) => opt.value === id)?.label || `未知商品${id}`,
+        );
+        return names.join(', ') || '无';
+      },
+    },
+    {
+      title: '限制楼宇',
+      dataIndex: 'fixedArea',
+      render: (value, record) => {
+        const ids = Array.isArray(value) ? value : [];
+        const names = ids.map(
+          (id) => buildingOptions.find((opt) => opt.value === id)?.label || `未知楼宇${id}`,
+        );
+        return names.join(', ') || '无';
+      },
+    },
     { title: '使用限制', dataIndex: 'useTimes', render: (v) => (v ? `${v}次` : '不限') },
     { title: '使用终端', dataIndex: 'end' },
     {
@@ -278,8 +390,9 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           <Button
             type="link"
             onClick={() => {
+              console.log('当前编辑的权益:', record);
               setEditingInterest(record);
-              setInterestModalVisible(true);
+              setShowInterestModal(true);
             }}
           >
             编辑
@@ -360,73 +473,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         }
       }}
     >
-      {/* 添加优惠券弹窗表单 */}
-      <ModalForm<MemberCardInterestType>
-        title={editingInterest ? '编辑权益' : '新增权益'}
-        visible={showInterestModal}
-        autoFocusFirstInput
-        modalProps={{
-          destroyOnClose: true,
-          onCancel: () => {
-            setShowInterestModal(false);
-            setEditingInterest(null);
-          },
-        }}
-        onFinish={async (values) => {
-          if (editingInterest) {
-            setSelectedInterests((prev) =>
-              prev.map((item) =>
-                item.id === editingInterest.id ? { ...values, id: item.id } : item,
-              ),
-            );
-          } else {
-            setSelectedInterests((prev) => [
-              ...prev,
-              {
-                ...values,
-                id: Date.now(), // 临时ID
-              },
-            ]);
-          }
-          setShowInterestModal(false);
-          return true;
-        }}
-        initialValues={editingInterest}
-      >
-        <ProFormSelect
-          name="type"
-          label="权益类型"
-          valueEnum={{
-            1: '折扣券',
-          }}
-          rules={[{ required: true }]}
-        />
-
-        <ProFormDigit
-          name="number"
-          label="折扣力度"
-          min={1}
-          max={100}
-          addonAfter="%"
-          rules={[{ required: true }]}
-        />
-
-        <ProFormText name="fixedMenu" label="限制商品类目" />
-        <ProFormText name="gids" label="限制商品ID" />
-
-        <ProFormDigit name="useTimes" label="使用限制" tooltip="0表示不限次数" min={0} />
-
-        <ProFormSelect
-          name="end"
-          label="可使用终端"
-          valueEnum={{
-            1: '小程序',
-            2: 'APP',
-            3: 'PC',
-          }}
-          mode="multiple"
-        />
-      </ModalForm>
       <Divider orientation="left">基本信息</Divider>
       <ProFormText
         name="id"
@@ -615,13 +661,13 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       </Modal>
 
       <InterestForm
-        visible={interestModalVisible}
+        visible={showInterestModal}
         onCancel={() => {
-          setInterestModalVisible(false);
-          setEditingInterest(undefined);
+          setShowInterestModal(false);
+          setEditingInterest(null); // 保持类型一致性
         }}
         onSubmit={handleInterestSubmit}
-        initialValues={editingInterest}
+        initialValues={editingInterest || undefined} // 处理 null 的情况
       />
     </ModalForm>
   );

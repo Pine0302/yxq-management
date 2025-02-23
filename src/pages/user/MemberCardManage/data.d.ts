@@ -1,3 +1,5 @@
+import { List } from 'lodash';
+
 export type TableListItem = {
   id: number;
   name: string;
@@ -69,9 +71,14 @@ export interface MemberCardInterestType {
   id?: number;
   type: number;
   number: number;
-  fixedMenu: string;
   gids: string;
   useTimes: number;
   end: number;
   isTemp?: boolean;
+  activityAreas: List;
+  activityGoods: List;
+  activityMenu: List;
+  fixedMenu: string[]; // 存储ID数组
+  fixedGoods: string[]; // 存储ID数组
+  fixedArea: string[]; // 存储ID数组
 }
