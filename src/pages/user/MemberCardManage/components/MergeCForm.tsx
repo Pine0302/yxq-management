@@ -65,6 +65,11 @@ type MergeFormProps = {
   onSuccess?: () => void;
 };
 
+// 在文件顶部增加权益类型常量
+const INTEREST_TYPE_MAP = {
+  1: '折扣券',
+} as const;
+
 const requiredRule = { rules: [{ required: true }] };
 
 const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value, onSuccess }) => {
@@ -74,6 +79,10 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   const [coupons, setCoupons] = useState<CouponType[]>([]);
   const [selectedCoupons, setSelectedCoupons] = useState<SelectedCoupon[]>([]);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [editingInterest, setEditingInterest] = useState<memberCardInterestType | null>(null);
+  const [selectedInterests, setSelectedInterests] = useState<memberCardInterestType[]>([]);
 
   // 获取优惠券列表
   const fetchCoupons = async (params: any = {}) => {
@@ -132,6 +141,22 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       setSelectedCoupons([]);
     }
   }, [visible, value, isEdit]); // 增加isEdit依赖
+
+  // 初始化权益列表的useEffect
+  useEffect(() => {
+    if (visible) {
+      if (!isEdit) {
+        setSelectedInterests([]);
+        return;
+      }
+
+      if (value?.memberCardInterestDTOList) {
+        setSelectedInterests(value.memberCardInterestDTOList);
+      }
+    } else {
+      setSelectedInterests([]);
+    }
+  }, [visible, value, isEdit]);
 
   // 新增一个 useEffect 监听 selectedCoupons 的变化
   useEffect(() => {
@@ -223,6 +248,41 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     },
   ];
 
+  // 已选权益列定义
+  const interestColumns: ColumnsType<memberCardInterestType> = [
+    { title: '权益类型', dataIndex: 'type', render: (t) => INTEREST_TYPE_MAP[t] },
+    { title: '折扣力度', dataIndex: 'number', render: (v) => `${v}%` },
+    { title: '限制类目', dataIndex: 'fixedMenu' },
+    { title: '限制商品', dataIndex: 'gids' },
+    { title: '使用限制', dataIndex: 'useTimes', render: (v) => (v ? `${v}次` : '不限') },
+    { title: '使用终端', dataIndex: 'end' },
+    {
+      title: '操作',
+      render: (_, record, index) => (
+        <Space>
+          <Button
+            type="link"
+            onClick={() => {
+              setEditingInterest(record);
+              setShowInterestModal(true);
+            }}
+          >
+            编辑
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => {
+              setSelectedInterests((prev) => prev.filter((_, i) => i !== index));
+            }}
+          >
+            删除
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
   const handleSubmit = async (values: any, isEdit: boolean = false) => {
     // Placeholder for submit logic
 
@@ -237,6 +297,11 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     const submitData = {
       ...values,
       memberCardCouponDTOList,
+      memberCardInterestDTOList: selectedInterests.map((item) => ({
+        ...item,
+        // 移除临时ID
+        id: item.id?.toString().includes('temp') ? undefined : item.id,
+      })),
     };
 
     console.log('Submit-data:', submitData);
@@ -280,6 +345,73 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
         }
       }}
     >
+      {/* 添加优惠券弹窗表单 */}
+      <ModalForm<memberCardInterestType>
+        title={editingInterest ? '编辑权益' : '新增权益'}
+        visible={showInterestModal}
+        autoFocusFirstInput
+        modalProps={{
+          destroyOnClose: true,
+          onCancel: () => {
+            setShowInterestModal(false);
+            setEditingInterest(null);
+          },
+        }}
+        onFinish={async (values) => {
+          if (editingInterest) {
+            setSelectedInterests((prev) =>
+              prev.map((item) =>
+                item.id === editingInterest.id ? { ...values, id: item.id } : item,
+              ),
+            );
+          } else {
+            setSelectedInterests((prev) => [
+              ...prev,
+              {
+                ...values,
+                id: Date.now(), // 临时ID
+              },
+            ]);
+          }
+          setShowInterestModal(false);
+          return true;
+        }}
+        initialValues={editingInterest}
+      >
+        <ProFormSelect
+          name="type"
+          label="权益类型"
+          valueEnum={{
+            1: '折扣券',
+          }}
+          rules={[{ required: true }]}
+        />
+
+        <ProFormDigit
+          name="number"
+          label="折扣力度"
+          min={1}
+          max={100}
+          addonAfter="%"
+          rules={[{ required: true }]}
+        />
+
+        <ProFormText name="fixedMenu" label="限制商品类目" />
+        <ProFormText name="gids" label="限制商品ID" />
+
+        <ProFormDigit name="useTimes" label="使用限制" tooltip="0表示不限次数" min={0} />
+
+        <ProFormSelect
+          name="end"
+          label="可使用终端"
+          valueEnum={{
+            1: '小程序',
+            2: 'APP',
+            3: 'PC',
+          }}
+          mode="multiple"
+        />
+      </ModalForm>
       <Divider orientation="left">基本信息</Divider>
       <ProFormText
         name="id"
@@ -316,7 +448,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
           <ProFormText
@@ -335,7 +466,6 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           />
         </Col>
       </Row>
-
       <Row>
         <Col span={16}>
           <ProFormDigit
@@ -375,9 +505,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           </ProFormDependency>
         </Col>
       </Row>
-
       <Divider orientation="left">会员权益设置</Divider>
-
       {/* 赠送券模块 */}
       <Row style={{ marginBottom: 16 }}>
         <Col span={24}>
@@ -416,7 +544,39 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           )}
         </Col>
       </Row>
-
+      {/* 在ModalForm中添加权益模块的JSX */}
+      <Divider orientation="left">折扣权益</Divider>
+      <Row style={{ marginBottom: 16 }}>
+        <Col span={24}>
+          {selectedInterests.length > 0 ? (
+            <>
+              <Table
+                columns={interestColumns}
+                dataSource={selectedInterests}
+                rowKey="id"
+                pagination={false}
+                bordered
+              />
+              <Button
+                type="dashed"
+                onClick={() => setShowInterestModal(true)}
+                style={{ width: '100%', marginTop: 16 }}
+              >
+                添加折扣权益
+              </Button>
+            </>
+          ) : (
+            <Button
+              type="dashed"
+              onClick={() => setShowInterestModal(true)}
+              style={{ width: '100%' }}
+              block
+            >
+              添加折扣权益
+            </Button>
+          )}
+        </Col>
+      </Row>
       {/* 优惠券选择弹窗 */}
       <Modal
         title="选择优惠券"
