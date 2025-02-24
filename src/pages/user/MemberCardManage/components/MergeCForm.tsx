@@ -234,6 +234,8 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
   // MergeForm.tsx
   const handleInterestSubmit = (values: MemberCardInterestType) => {
     // 确保处理后的数据格式正确
+    console.log('收到的表单数据:', values);
+
     const processedValues = {
       ...values,
       fixedMenu: Array.isArray(values.fixedMenu) ? values.fixedMenu : [],

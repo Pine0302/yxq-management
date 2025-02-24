@@ -85,6 +85,11 @@ const InterestForm: React.FC<InterestFormProps> = ({
     fetchMenuOptions();
   }, []); // 添加空依赖数组，只在挂载时执行一次
 
+  // 在MergeForm.tsx中添加调试效果
+  // useEffect(() => {
+  //   console.log('当前选中的权益列表:', selectedInterests);
+  // }, [selectedInterests]);
+
   // useEffect(() => {
   //   if (visible && initialValues) {
   //     console.log('activityAreas:', initialValues?.activityAreas);
@@ -406,7 +411,7 @@ const InterestForm: React.FC<InterestFormProps> = ({
         valueEnum={{
           1: '小程序',
           2: 'APP',
-          3: 'PC',
+          //    3: 'PC',
         }}
         mode="multiple"
         rules={[{ required: true, message: '请选择至少一个使用终端' }]}
