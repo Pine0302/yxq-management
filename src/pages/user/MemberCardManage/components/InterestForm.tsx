@@ -194,11 +194,33 @@ const InterestForm: React.FC<InterestFormProps> = ({
       }}
       onFinish={async (values) => {
         console.log('Form values:', values); // 提交表单时打印表单数据
+        if (
+          Array.isArray(values.fixedMenu) &&
+          values.fixedMenu.every((item: any) => typeof item === 'number')
+        ) {
+        } else {
+          values.fixedMenu = values.fixedMenu?.map((item: any) => item.value) || [];
+        }
+        if (
+          Array.isArray(values.fixedGoods) &&
+          values.fixedGoods.every((item: any) => typeof item === 'number')
+        ) {
+        } else {
+          values.fixedGoods = values.fixedGoods?.map((item: any) => item.value) || [];
+        }
+        if (
+          Array.isArray(values.fixedArea) &&
+          values.fixedArea.every((item: any) => typeof item === 'number')
+        ) {
+        } else {
+          values.fixedArea = values.fixedArea?.map((item: any) => item.value) || [];
+        }
+
         const transformValues = {
           ...values,
-          fixedMenu: values.fixedMenu?.map((item: any) => item.value) || [],
-          fixedGoods: values.fixedGoods?.map((item: any) => item.value) || [],
-          fixedArea: values.fixedArea?.map((item: any) => item.value) || [],
+          // fixedMenu: values.fixedMenu?.map((item: any) => item.value) || [],
+          // fixedGoods: values.fixedGoods?.map((item: any) => item.value) || [],
+          // fixedArea: values.fixedArea?.map((item: any) => item.value) || [],
         };
 
         console.log('处理后的表单值:', transformValues);

@@ -354,11 +354,28 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       title: '限制类目',
       dataIndex: 'fixedMenu',
       render: (value, record) => {
-        const ids = Array.isArray(value) ? value : [];
-        const names = ids.map(
-          (id) => menuOptions.find((opt) => opt.value === id)?.label || `未知类目${id}`,
-        );
-        return names.join(', ') || '无';
+        console.log('fixedMenu:', value);
+        if (typeof value === 'string' || value instanceof String) {
+          console.log('fixedMenu1:', value);
+          if (value === '') {
+            return '不限制';
+          } else {
+            const ids = value.split(',').map((id) => parseInt(id));
+            console.log('ids:', ids);
+            console.log('menuOptions:', menuOptions);
+            console.log('record:', record);
+            const names = ids.map(
+              (id) => menuOptions.find((opt) => opt.value === id)?.label || `未知类目${id}`,
+            );
+            return names.join(', ') || '无';
+          }
+        } else {
+          const ids = Array.isArray(value) ? value : [];
+          const names = ids.map(
+            (id) => menuOptions.find((opt) => opt.value === id)?.label || `未知类目${id}`,
+          );
+          return names.join(', ') || '无1';
+        }
       },
     },
     {
