@@ -145,24 +145,25 @@ const InterestForm: React.FC<InterestFormProps> = ({
       // 每次打开弹窗时重置表单
       formRef.current?.resetFields();
       formRef.current?.setFieldsValue(initialValues);
+      console.log('initialValues:', initialValues); // 检查表单设值后的数据0
       if (initialValues) {
         console.log('activityAreas:', initialValues?.activityAreas);
         const areaIds =
           initialValues.activityAreas && initialValues.activityAreas.length > 0
             ? initialValues.activityAreas.map((area: any) => area.id)
-            : [];
+            : initialValues.fixedArea;
         console.log('areaIds:', areaIds);
 
         const goodsIds =
           initialValues.activityGoods && initialValues.activityGoods.length > 0
             ? initialValues.activityGoods.map((goods: any) => goods.id)
-            : [];
+            : initialValues.fixedGoods;
         console.log('goodsIds:', goodsIds);
 
         const menuIds =
           initialValues.activityMenu && initialValues.activityMenu.length > 0
             ? initialValues.activityMenu.map((menu: any) => menu.id)
-            : [];
+            : initialValues.fixedMenu;
         console.log('menuIds:', menuIds);
 
         formRef.current?.setFieldsValue({
@@ -208,6 +209,7 @@ const InterestForm: React.FC<InterestFormProps> = ({
         } else {
           values.fixedGoods = values.fixedGoods?.map((item: any) => item.value) || [];
         }
+
         if (
           Array.isArray(values.fixedArea) &&
           values.fixedArea.every((item: any) => typeof item === 'number')

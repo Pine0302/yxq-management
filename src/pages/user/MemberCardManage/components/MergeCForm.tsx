@@ -382,22 +382,56 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       title: '限制商品',
       dataIndex: 'fixedGoods',
       render: (value, record) => {
-        const ids = Array.isArray(value) ? value : [];
-        const names = ids.map(
-          (id) => goodsOptions.find((opt) => opt.value === id)?.label || `未知商品${id}`,
-        );
-        return names.join(', ') || '无';
+        console.log('fixedGoods:', value);
+        if (typeof value === 'string' || value instanceof String) {
+          console.log('fixedGoods:', value);
+          if (value === '') {
+            return '不限制';
+          } else {
+            const ids = value.split(',').map((id) => parseInt(id));
+            console.log('ids:', ids);
+            console.log('goodsOptions:', goodsOptions);
+            console.log('record:', record);
+            const names = ids.map(
+              (id) => goodsOptions.find((opt) => opt.value === id)?.label || `未知商品${id}`,
+            );
+            return names.join(', ') || '无';
+          }
+        } else {
+          const ids = Array.isArray(value) ? value : [];
+          const names = ids.map(
+            (id) => goodsOptions.find((opt) => opt.value === id)?.label || `未知商品${id}`,
+          );
+          return names.join(', ') || '无1';
+        }
       },
     },
     {
       title: '限制楼宇',
       dataIndex: 'fixedArea',
       render: (value, record) => {
-        const ids = Array.isArray(value) ? value : [];
-        const names = ids.map(
-          (id) => buildingOptions.find((opt) => opt.value === id)?.label || `未知楼宇${id}`,
-        );
-        return names.join(', ') || '无';
+        console.log('fixedArea:', value);
+        if (typeof value === 'string' || value instanceof String) {
+          console.log('fixedArea:', value);
+          if (value === '') {
+            return '不限制';
+          } else {
+            const ids = value.split(',').map((id) => parseInt(id));
+            console.log('ids:', ids);
+            console.log('buildingOptions:', buildingOptions);
+            console.log('record:', record);
+            const names = ids.map(
+              (id) => buildingOptions.find((opt) => opt.value === id)?.label || `未知楼宇${id}`,
+            );
+            return names.join(', ') || '无';
+          }
+        } else {
+          const ids = Array.isArray(value) ? value : [];
+          const names = ids.map(
+            (id) => buildingOptions.find((opt) => opt.value === id)?.label || `未知楼宇${id}`,
+          );
+          return names.join(', ') || '无1';
+        }
       },
     },
     { title: '使用限制', dataIndex: 'useTimes', render: (v) => (v ? `${v}次` : '不限') },
