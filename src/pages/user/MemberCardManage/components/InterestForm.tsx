@@ -148,22 +148,32 @@ const InterestForm: React.FC<InterestFormProps> = ({
       console.log('initialValues:', initialValues); // 检查表单设值后的数据0
       if (initialValues) {
         console.log('activityAreas:', initialValues?.activityAreas);
-        const areaIds =
+        let areaIds =
           initialValues.activityAreas && initialValues.activityAreas.length > 0
             ? initialValues.activityAreas.map((area: any) => area.id)
-            : initialValues.fixedArea;
+            : [];
+        if (areaIds.length === 0 && initialValues.fixedArea != null) {
+          areaIds = initialValues.fixedArea;
+        }
         console.log('areaIds:', areaIds);
 
-        const goodsIds =
+        let goodsIds =
           initialValues.activityGoods && initialValues.activityGoods.length > 0
             ? initialValues.activityGoods.map((goods: any) => goods.id)
-            : initialValues.fixedGoods;
+            : [];
+
+        if (goodsIds.length === 0 && initialValues.fixedGoods != null) {
+          goodsIds = initialValues.fixedArea;
+        }
         console.log('goodsIds:', goodsIds);
 
-        const menuIds =
+        let menuIds =
           initialValues.activityMenu && initialValues.activityMenu.length > 0
             ? initialValues.activityMenu.map((menu: any) => menu.id)
-            : initialValues.fixedMenu;
+            : [];
+        if (menuIds.length === 0 && initialValues.fixedMenu != null) {
+          menuIds = initialValues.fixedMenu;
+        }
         console.log('menuIds:', menuIds);
 
         formRef.current?.setFieldsValue({
