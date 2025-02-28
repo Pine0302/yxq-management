@@ -63,6 +63,7 @@ const InterestForm: React.FC<InterestFormProps> = ({
 
   useEffect(() => {
     console.log('qqq:', 123);
+    console.log(':', 123);
 
     const fetchBuildingOptions = async () => {
       const options = await buildingSelectRequest();
@@ -146,6 +147,8 @@ const InterestForm: React.FC<InterestFormProps> = ({
       formRef.current?.resetFields();
       formRef.current?.setFieldsValue(initialValues);
       console.log('initialValues:', initialValues); // 检查表单设值后的数据0
+      console.log('可以使用的终端:', initialValues?.end); // 检查表单设值后的数据0  可以使用的终端: 1,2
+
       if (initialValues) {
         console.log('activityAreas:', initialValues?.activityAreas);
         let areaIds =
@@ -184,7 +187,14 @@ const InterestForm: React.FC<InterestFormProps> = ({
           fixedGoods: goodsIds,
           applicableMenuType: menuIds.length > 0 ? 'specific' : 'all',
           fixedMenu: menuIds,
+          end: initialValues?.end
+            ? Array.isArray(initialValues.end)
+              ? initialValues.end.map(String) // 确保数组元素为字符串
+              : initialValues.end.split(',').map((item) => item.trim())
+            : [],
         });
+        console.log('处理后的end值:', initialValues?.end);
+        console.log('表单当前end值:', formRef.current?.getFieldValue('end'));
       }
       console.log('Form values set:', formRef.current?.getFieldsValue()); // 检查表单设值后的数据0
     } else if (!visible) {
@@ -243,7 +253,14 @@ const InterestForm: React.FC<InterestFormProps> = ({
         // });
         return true;
       }}
-      initialValues={initialValues}
+      // initialValues={{
+      //   ...initialValues,
+      //   end: initialValues?.end
+      //     ? Array.isArray(initialValues.end)
+      //       ? initialValues.end.map(String) // 确保数组元素为字符串
+      //       : initialValues.end.split(',').map((item) => item.trim())
+      //     : [],
+      // }}
     >
       <ProFormSelect
         name="type"
@@ -442,12 +459,15 @@ const InterestForm: React.FC<InterestFormProps> = ({
       <ProFormSelect
         name="end"
         label="可使用终端"
-        valueEnum={{
-          1: '小程序',
-          2: 'APP',
-          //    3: 'PC',
-        }}
         mode="multiple"
+        options={[
+          { label: '小程序', value: '1' },
+          { label: 'APP', value: '2' },
+        ]}
+        fieldProps={{
+          optionLabelProp: 'label', // 确保显示标签
+          labelInValue: false, // 关闭值包装
+        }}
         rules={[{ required: true, message: '请选择至少一个使用终端' }]}
       />
     </ModalForm>

@@ -73,7 +73,7 @@ export interface MemberCardInterestType {
   number: number;
   gids: string;
   useTimes: number;
-  end: number;
+  end: string;
   isTemp?: boolean;
   activityAreas: List;
   activityGoods: List;

@@ -435,7 +435,30 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
       },
     },
     { title: '使用限制', dataIndex: 'useTimes', render: (v) => (v ? `${v}次` : '不限') },
-    { title: '使用终端', dataIndex: 'end' },
+    {
+      title: '使用终端',
+      dataIndex: 'end',
+      render: (terminalValues: number[] | string) => {
+        // 统一处理为数组格式
+        const values = Array.isArray(terminalValues)
+          ? terminalValues
+          : typeof terminalValues === 'string'
+          ? terminalValues.split(',').map(Number)
+          : [];
+
+        // 剩余代码保持不变...
+        const terminalMap = {
+          1: '小程序',
+          2: 'APP',
+        };
+
+        return values.length > 0
+          ? values
+              .map((v) => terminalMap[v as keyof typeof terminalMap] || `未知终端${v}`)
+              .join('，')
+          : '无';
+      },
+    },
     {
       title: '操作',
       render: (_, record, index) => (
