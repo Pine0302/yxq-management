@@ -1,18 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ProForm from '@ant-design/pro-form'; // 显式导入 ProForm
 import {
   ProFormSelect,
   ProFormDigit,
-  ProFormText,
-  FormInstance,
   ModalForm,
   ProFormRadio,
   ProFormDependency,
+  type FormInstance, // 内联类型导入
 } from '@ant-design/pro-form';
 import type { MemberCardInterestType } from '../data';
 import { Col, Row, message } from 'antd';
 import { buildingPageInfo } from '../../../biz/BuildingManage/service';
 import { goodsPageInfo } from '../../../goods/GoodsManage/service';
 import { userMenuPageInfo } from '../../../system/UserMenu/service';
+
+import { DatePicker } from 'antd';
+import type { RangePickerProps } from 'antd/es/date-picker';
+
+import moment from 'moment';
 
 export type InterestFormProps = {
   visible?: boolean;
@@ -36,6 +41,18 @@ const goodsSelectRequest = async () => {
     value: v.id,
   }));
 };
+
+// 定义表单项目的样式
+const antFormItemStyle: React.CSSProperties = {
+  marginBottom: 16, // 数字类型默认单位是px
+};
+
+// 定义循环类型选择器容器样式
+const cycleTypeSelectorStyle = {
+  display: 'flex',
+  gap: 16, // 等效 gap: '16px'
+  alignItems: 'flex-end',
+} as const; // 使用 as const 锁定类型
 
 // 定义一个异步函数 menuSelectRequest，用于获取菜单选择请求的数据
 // 定义一个异步函数 menuSelectRequest，用于获取菜单选择请求的数据
@@ -140,12 +157,21 @@ const InterestForm: React.FC<InterestFormProps> = ({
   //     formRef.current?.setFieldsValue(formattedValues);
   //   }
   // }, [visible, initialValues, menuOptions, goodsOptions, buildingOptions]);
+  // 实现判断函数
+  function determineTimeLimitType(data: any) {
+    if (data?.fixedDate) return 'fixed';
+    if (data?.cycleType) return 'cycle';
+    if (data?.limitDays) return 'duration';
+    return 'fixed'; // 默认值
+  }
 
   useEffect(() => {
     if (visible) {
+      // 在useEffect的回显逻辑中添加
+      const timeLimitType = determineTimeLimitType(initialValues); // 需要实现判断逻辑
       // 每次打开弹窗时重置表单
       formRef.current?.resetFields();
-      formRef.current?.setFieldsValue(initialValues);
+      //formRef.current?.setFieldsValue(initialValues);
       console.log('initialValues:', initialValues); // 检查表单设值后的数据0
       console.log('可以使用的终端:', initialValues?.end); // 检查表单设值后的数据0  可以使用的终端: 1,2
 
@@ -192,7 +218,21 @@ const InterestForm: React.FC<InterestFormProps> = ({
               ? initialValues.end.map(String) // 确保数组元素为字符串
               : initialValues.end.split(',').map((item) => item.trim())
             : [],
+          timeLimitType:
+            initialValues?.useTimes === 1
+              ? determineTimeLimitType({
+                  ...initialValues,
+                  cycleType: undefined,
+                })
+              : timeLimitType,
+          cycleType: initialValues?.cycleType,
+          cycleDay: initialValues?.cycleDay,
+          limitDays: initialValues?.limitDays,
+          fixedDate: initialValues?.fixedDate
+            ? moment(initialValues.fixedDate, 'YYYY-MM-DD')
+            : null,
         });
+
         console.log('处理后的end值:', initialValues?.end);
         console.log('表单当前end值:', formRef.current?.getFieldValue('end'));
       }
@@ -213,8 +253,25 @@ const InterestForm: React.FC<InterestFormProps> = ({
         destroyOnClose: true,
         onCancel: () => onCancel?.(),
       }}
+      onValuesChange={(changedValues, allValues) => {
+        // 自动修正逻辑
+        if (allValues.useTimes === 1 && allValues.timeLimitType === 'cycle') {
+          formRef.current?.setFieldsValue({
+            timeLimitType: 'fixed',
+            cycleType: undefined,
+            cycleDay: undefined,
+          });
+          message.warning('单次使用已自动切换为固定日期');
+        }
+      }}
       onFinish={async (values) => {
         console.log('Form values:', values); // 提交表单时打印表单数据
+
+        if (values.useTimes === 1 && values.timeLimitType === 'cycle') {
+          message.error('数据异常，请重新选择时间限制类型');
+          return false;
+        }
+
         if (
           Array.isArray(values.fixedMenu) &&
           values.fixedMenu.every((item: any) => typeof item === 'number')
@@ -237,9 +294,26 @@ const InterestForm: React.FC<InterestFormProps> = ({
         } else {
           values.fixedArea = values.fixedArea?.map((item: any) => item.value) || [];
         }
-
+        console.log('处理后的表单值1:', values.fixedDate);
         const transformValues = {
           ...values,
+          fixedDate: (() => {
+            const date = values.fixedDate;
+            // 如果是有效moment对象
+            if (moment.isMoment(date) && date.isValid()) {
+              return date.format('YYYY-MM-DD');
+            }
+            // 如果是合法日期字符串
+            if (typeof date === 'string' && moment(date).isValid()) {
+              return moment(date).format('YYYY-MM-DD');
+            }
+            return null;
+          })(),
+          // 如果是仅一次使用时自动清除循环日期相关参数
+          ...(values.useTimes === 1 && {
+            cycleType: undefined,
+            cycleDay: undefined,
+          }),
           // fixedMenu: values.fixedMenu?.map((item: any) => item.value) || [],
           // fixedGoods: values.fixedGoods?.map((item: any) => item.value) || [],
           // fixedArea: values.fixedArea?.map((item: any) => item.value) || [],
@@ -448,13 +522,137 @@ const InterestForm: React.FC<InterestFormProps> = ({
         }}
       </ProFormDependency>
 
-      <ProFormDigit
+      {/* 使用限制类型 */}
+      <ProFormRadio.Group
         name="useTimes"
         label="使用限制"
-        tooltip="0表示不限次数"
-        min={0}
-        rules={[{ required: true, message: '请输入使用限制次数' }]}
+        options={[
+          { label: '不限制', value: 0 },
+          { label: '仅可使用一次', value: 1 },
+        ]}
+        rules={[{ required: true, message: '请选择使用限制类型' }]}
       />
+
+      {/* 时间限制模块 */}
+      <ProFormDependency name={['useTimes']}>
+        {({ useTimes }) => (
+          <ProFormRadio.Group
+            name="timeLimitType"
+            label="使用时限"
+            options={[
+              { label: '固定日期', value: 'fixed' },
+              {
+                label: '循环日期',
+                value: 'cycle',
+                disabled: useTimes === 1, // 关键修改：当使用次数为1时禁用该选项
+              },
+              { label: '有效期限', value: 'duration' },
+            ]}
+            rules={[
+              {
+                required: true,
+                message: '请选择时限类型',
+                validator: (_, value) => {
+                  if (useTimes === 1 && value === 'cycle') {
+                    return Promise.reject('单次使用时不能选择循环日期');
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          />
+        )}
+      </ProFormDependency>
+
+      <ProFormDependency name={['timeLimitType', 'useTimes']}>
+        {({ timeLimitType, useTimes }) => {
+          // 当选择"仅可使用一次"时隐藏循环日期选项
+          if (useTimes === 1 && timeLimitType === 'cycle') {
+            return (
+              <div style={{ color: 'red', marginBottom: 16 }}>注意：单次使用时无法设置循环日期</div>
+            );
+          }
+
+          return (
+            // 添加Fragment包裹
+            <>
+              {timeLimitType === 'fixed' && (
+                // 修改DatePicker.RangePicker部分为：
+                <ProForm.Item
+                  name="fixedDate"
+                  label="使用日期"
+                  rules={[{ required: true, message: '请选择日期' }]}
+                >
+                  <DatePicker<moment.Moment>
+                    style={{ width: '100%' }}
+                    format="YYYY-MM-DD"
+                    placeholder="请选择日期"
+                    disabledDate={(current) => (current ? current < moment().endOf('day') : false)}
+                    // 添加类型断言解决 placeholder 的类型问题
+                    {...({
+                      placeholder: '请选择日期',
+                    } as React.ComponentProps<typeof DatePicker>)}
+                  />
+                </ProForm.Item>
+              )}
+
+              {timeLimitType === 'cycle' && useTimes !== 1 && (
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <ProFormRadio.Group
+                      name="cycleType"
+                      label="循环类型"
+                      options={[
+                        { label: '每周', value: 'week' },
+                        { label: '每月', value: 'month' },
+                      ]}
+                      rules={[{ required: true, message: '请选择循环类型' }]}
+                    />
+                  </Col>
+                  <Col span={16}>
+                    <ProFormDependency name={['cycleType']}>
+                      {({ cycleType }) => (
+                        <ProFormSelect
+                          name="cycleDay"
+                          label="选择日期"
+                          options={
+                            cycleType === 'week'
+                              ? [
+                                  { label: '周一', value: 1 },
+                                  { label: '周二', value: 2 },
+                                  { label: '周三', value: 3 },
+                                  { label: '周四', value: 4 },
+                                  { label: '周五', value: 5 },
+                                  { label: '周六', value: 6 },
+                                  { label: '周日', value: 7 },
+                                  // ...其他周几选项
+                                ]
+                              : Array.from({ length: 30 }, (_, i) => ({
+                                  label: `${i + 1}号`,
+                                  value: i + 1,
+                                }))
+                          }
+                          rules={[{ required: true, message: '请选择具体日期' }]}
+                        />
+                      )}
+                    </ProFormDependency>
+                  </Col>
+                </Row>
+              )}
+
+              {timeLimitType === 'duration' && (
+                <ProFormDigit
+                  name="limitDays"
+                  label="有效天数"
+                  min={1}
+                  tooltip="从领取当日开始计算的有效天数"
+                  rules={[{ required: true, message: '请输入有效天数' }]}
+                />
+              )}
+            </>
+          );
+        }}
+      </ProFormDependency>
 
       <ProFormSelect
         name="end"

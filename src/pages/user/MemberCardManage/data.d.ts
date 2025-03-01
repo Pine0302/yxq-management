@@ -81,4 +81,10 @@ export interface MemberCardInterestType {
   fixedMenu: string[]; // 存储ID数组
   fixedGoods: string[]; // 存储ID数组
   fixedArea: string[]; // 存储ID数组
+  // ...其他原有字段
+  timeLimitType?: 'fixed' | 'cycle' | 'duration';
+  fixedDate?: string; // 从 [string, string] 改为 string
+  cycleType?: 'week' | 'month';
+  cycleDay?: number;
+  limitDays?: number;
 }
