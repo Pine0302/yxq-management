@@ -88,3 +88,21 @@ export interface MemberCardInterestType {
   cycleDay?: number;
   limitDays?: number;
 }
+
+export type TemlateAddressTableWrapper = {
+  data: {
+    total: number;
+    list: TemlateAddressTableItem[];
+  };
+};
+
+export type TemlateAreaGoodsTableItem = {
+  id: number;
+  username: string;
+  phone: string;
+  startTime: string;
+  endTime: string;
+  startTimeText: string;
+  endTimeText: string;
+  status: number;
+};

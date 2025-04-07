@@ -1,14 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal, message, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { memberCardPageInfo, deleteCoupon, endCoupon } from './service';
+import { memberCardPageInfo, deleteMemberCard, endCoupon, checkCardOrder } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import MergeCForm from './components/MergeCForm';
 import LaunchForm from './components/LaunchForm';
 import CouponDetailForm from './components/CouponDetailForm';
+import CardMemberTemplateForm from './components/CardMemberTemplateForm';
 
 const tableRequest = async (params?: { pageSize: number; current: number }) => {
   const res = await memberCardPageInfo({
@@ -26,6 +27,9 @@ const MemberCard: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<any>();
   const [launchFormVisible, setLaunchFormVisible] = useState<boolean>(false);
   const [couponDetailFormVisible, setCouponDetailFormVisible] = useState<boolean>(false);
+  const [cardMemberDrawerVisible, setCardMemberDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false); // 控制Drawer的显示
+
   const actionRef = useRef<ActionType>();
 
   const handleEdit = (record: any) => {
@@ -42,22 +46,37 @@ const MemberCard: React.FC = () => {
 
   // 使用POST方法删除数据的函数
   const handleDelete = (record: any) => {
-    Modal.confirm({
-      title: '确定删除这条记录吗？',
-      content: '删除后无法恢复，请确认！',
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: async () => {
-        try {
-          const res = await deleteCoupon(record);
-          message.success('删除成功');
-          actionRef.current?.reload(); // 刷新表格数据
-        } catch (error) {
-          message.error('删除操作失败: ' + error.message);
-        }
-      },
+    //检测是否可以删除
+
+    checkCardOrder({ cardId: record.id }).then((res) => {
+      const data = res.data; // 获取返回的 data 字段
+      console.log('data:', data); // 输出：true
+      if (data) {
+        message.error('该优惠券正在使用中，无法删除');
+        return;
+      } else {
+        Modal.confirm({
+          title: '确定删除这条记录吗？',
+          content: '删除后无法恢复，请确认！',
+          okText: '确认',
+          okType: 'danger',
+          cancelText: '取消',
+          onOk: async () => {
+            try {
+              const res = await deleteMemberCard({ cardId: record.id });
+              message.success('删除成功');
+              actionRef.current?.reload(); // 刷新表格数据
+            } catch (error) {
+              message.error('删除操作失败: ' + error.message);
+            }
+          },
+        });
+      }
     });
+    /*if (checkCardOrderResult== false) {
+      message.error('该优惠券正在使用中，无法删除');
+      return;
+    }*/
   };
 
   // 使用POST方法删除数据的函数
@@ -178,10 +197,16 @@ const MemberCard: React.FC = () => {
           <a key="details" onClick={() => handleCEdit(record)}>
             编辑
           </a>,
-          <a key="modify" onClick={() => handleCEdit(record)}>
+          <a key="modify" onClick={() => handleDelete(record)}>
             删除
           </a>,
-          <a key="end" onClick={() => handleEnd(record)}>
+          <a
+            key="end"
+            onClick={() => {
+              setCurrentRow(record);
+              setCardMemberDrawerVisible(true); // 打开Drawer
+            }}
+          >
             人员列表
           </a>,
         ];
@@ -246,6 +271,22 @@ const MemberCard: React.FC = () => {
           setMergeCFormVisible(false); // 将 MergeForm 设为不可见
         }}
       />
+
+      {cardMemberDrawerVisible && (
+        <Drawer
+          title="开通人员列表"
+          width={1080}
+          onClose={() => setCardMemberDrawerVisible(false)}
+          visible={cardMemberDrawerVisible}
+          bodyStyle={{ paddingBottom: 80 }}
+        >
+          <CardMemberTemplateForm
+            visible={drawerVisible}
+            onCancel={() => setCardMemberDrawerVisible(false)}
+            cardId={currentRow?.id}
+          />
+        </Drawer>
+      )}
     </PageContainer>
   );
 };

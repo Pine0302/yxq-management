@@ -374,7 +374,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           const names = ids.map(
             (id) => menuOptions.find((opt) => opt.value === id)?.label || `未知类目${id}`,
           );
-          return names.join(', ') || '无1';
+          return names.join(', ') || '无';
         }
       },
     },
@@ -402,7 +402,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           const names = ids.map(
             (id) => goodsOptions.find((opt) => opt.value === id)?.label || `未知商品${id}`,
           );
-          return names.join(', ') || '无1';
+          return names.join(', ') || '无';
         }
       },
     },
@@ -430,7 +430,7 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           const names = ids.map(
             (id) => buildingOptions.find((opt) => opt.value === id)?.label || `未知楼宇${id}`,
           );
-          return names.join(', ') || '无1';
+          return names.join(', ') || '无';
         }
       },
     },
