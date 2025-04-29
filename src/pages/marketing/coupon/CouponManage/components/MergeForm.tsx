@@ -411,25 +411,34 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
                   label="面值"
                   name="reduce"
                   width="sm"
-                  min={0}
+                  min={type === 'FULL_REDUCE' ? 1 : 0}
                   max={type === 'DISCOUNT' ? 100 : undefined}
                   fieldProps={{
-                    step: type === 'DISCOUNT' ? 1 : 0.01,
-                    precision: type === 'DISCOUNT' ? 0 : 2,
+                    step: type === 'DISCOUNT' || type === 'FULL_REDUCE' ? 1 : 0.01,
+                    precision: type === 'DISCOUNT' || type === 'FULL_REDUCE' ? 0 : 2,
                   }}
                   rules={[
                     { required: true, message: '请输入面值' },
                     {
                       type: 'number',
-                      min: 0,
-                      message: type === 'DISCOUNT' ? '面值不能小于0' : '面值不能为负数',
+                      min: type === 'FULL_REDUCE' ? 1 : 0,
+                      message:
+                        type === 'DISCOUNT'
+                          ? '面值不能小于0'
+                          : type === 'FULL_REDUCE'
+                          ? '面值必须大于0'
+                          : '面值不能为负数',
                     },
-                    type === 'DISCOUNT'
+                    type === 'DISCOUNT' || type === 'FULL_REDUCE'
                       ? {
-                          validator: (_, value) =>
-                            Number.isInteger(value)
+                          validator: (_, val) =>
+                            Number.isInteger(val)
                               ? Promise.resolve()
-                              : Promise.reject('折扣券面值必须为整数'),
+                              : Promise.reject(
+                                  type === 'DISCOUNT'
+                                    ? '折扣券面值必须为整数'
+                                    : '满减券面值必须为整数',
+                                ),
                         }
                       : {},
                   ]}
