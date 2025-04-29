@@ -501,11 +501,67 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
     const submitData = {
       ...values,
       memberCardCouponDTOList,
-      memberCardInterestDTOList: selectedInterests.map((item) => ({
-        ...item,
-        // 移除临时ID
-        id: item.id?.toString().includes('temp') ? undefined : item.id,
-      })),
+      memberCardInterestDTOList: selectedInterests.map((item) => {
+        // 处理fixedMenu字段
+        let fixedMenu: number[] = [];
+        if (item.fixedMenu) {
+          if (typeof item.fixedMenu === 'string') {
+            if (item.fixedMenu !== '') {
+              fixedMenu = (item.fixedMenu as string)
+                .split(',')
+                .map((id: string) => parseInt(id, 10));
+            }
+          } else if (Array.isArray(item.fixedMenu)) {
+            // 将数组中的每个元素转换为数字
+            fixedMenu = item.fixedMenu.map((value: any) =>
+              typeof value === 'number' ? value : parseInt(String(value), 10),
+            );
+          }
+        }
+
+        // 处理fixedGoods字段;
+        let fixedGoods: number[] = [];
+        if (item.fixedGoods) {
+          if (typeof item.fixedGoods === 'string') {
+            if (item.fixedGoods !== '') {
+              fixedGoods = (item.fixedGoods as string)
+                .split(',')
+                .map((id: string) => parseInt(id, 10));
+            }
+          } else if (Array.isArray(item.fixedGoods)) {
+            // 将数组中的每个元素转换为数字
+            fixedGoods = item.fixedGoods.map((value: any) =>
+              typeof value === 'number' ? value : parseInt(String(value), 10),
+            );
+          }
+        }
+
+        // 处理fixedArea字段
+        let fixedArea: number[] = [];
+        if (item.fixedArea) {
+          if (typeof item.fixedArea === 'string') {
+            if (item.fixedArea !== '') {
+              fixedArea = (item.fixedArea as string)
+                .split(',')
+                .map((id: string) => parseInt(id, 10));
+            }
+          } else if (Array.isArray(item.fixedArea)) {
+            // 将数组中的每个元素转换为数字
+            fixedArea = item.fixedArea.map((value: any) =>
+              typeof value === 'number' ? value : parseInt(String(value), 10),
+            );
+          }
+        }
+
+        return {
+          ...item,
+          // 移除临时ID
+          id: item.id?.toString().includes('temp') ? undefined : item.id,
+          fixedMenu,
+          fixedGoods,
+          fixedArea,
+        };
+      }),
     };
 
     console.log('Submit-data:', submitData);
