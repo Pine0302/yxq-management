@@ -553,6 +553,20 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           }
         }
 
+        // 处理fixedArea字段
+        let end: string[] = [];
+
+        if (Array.isArray(item.end)) {
+          // 如果已经是数组，直接赋值
+          end = item.end;
+        } else if (typeof item.end === 'string' && item.end !== '') {
+          // 如果是非空字符串，按逗号分隔并转换为数字数组
+          end = item.end.split(',');
+        }
+
+        const updateTime = null;
+        const createTime = null;
+
         return {
           ...item,
           // 移除临时ID
@@ -560,6 +574,9 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
           fixedMenu,
           fixedGoods,
           fixedArea,
+          end,
+          createTime,
+          updateTime,
         };
       }),
     };
