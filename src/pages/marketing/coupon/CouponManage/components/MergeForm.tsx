@@ -673,14 +673,22 @@ const MergeForm: React.FC<MergeFormProps> = ({ visible, onCancel, isEdit, value,
                         placeholder: '请选择可使用商品1',
                         labelInValue: true,
                         maxTagCount: isPresent ? 1 : undefined, // 礼品券限制选择1个
+                        showSearch: true, // 启用搜索功能
+                        filterOption: (input, option) =>
+                          (option?.label?.toString() ?? '')
+                            .toLowerCase()
+                            .includes(input.toLowerCase()), // 文字匹配过滤
                         onChange: (selectedValue) => {
                           if (isPresent) {
-                            if (selectedValue && selectedValue.length > 1) {
+                            if (Array.isArray(selectedValue) && selectedValue.length > 1) {
                               message.error('礼品券只能选择一个商品');
                               // 手动限制选择数量，确保 selectedValue 是数组
                               formRef.current?.setFieldsValue({ fixedGoods: [selectedValue[0]] });
-                            } else if (selectedValue && selectedValue.length === 1) {
+                            } else if (Array.isArray(selectedValue) && selectedValue.length === 1) {
                               // 确保 selectedValue 是数组
+                              formRef.current?.setFieldsValue({ fixedGoods: selectedValue });
+                            } else if (!Array.isArray(selectedValue)) {
+                              // 处理单选模式下的选择
                               formRef.current?.setFieldsValue({ fixedGoods: selectedValue });
                             }
                           } else {
